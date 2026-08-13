@@ -4,8 +4,8 @@ import christianCoupleImg from '../assets/images/christian_couple_arch_178646762
 import muslimCoupleImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
 import intercasteCoupleImg from '../assets/images/intercaste_couple_arch_new_1786468081966.jpg';
 import templeImg from '../assets/images/kanchipuram_temple_1786470394211.jpg';
-import churchImg from '../assets/images/chruch.png';
-import masjidImg from '../assets/images/masjid.png';
+import churchImg from '../assets/images/christian_couple_arch_1786467622108.jpg';
+import masjidImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
 import {
   View,
   Text,
