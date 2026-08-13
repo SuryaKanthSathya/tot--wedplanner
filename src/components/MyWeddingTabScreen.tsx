@@ -15,6 +15,7 @@ import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
 import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
+import { CarsListingPage } from './CarsListingPage';
 import {
   Menu,
   Bell,
@@ -449,6 +450,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showVenueListing, setShowVenueListing] = useState(false);
   const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState(false);
+  const [showCarsListing, setShowCarsListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
 
   if (showPhotographyListing) {
@@ -512,6 +514,17 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
         onBack={() => setShowInvitationListing(false)}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={onToggleSavedInvite}
+        onOpenSavedTab={onOpenSavedTab}
+      />
+    );
+  }
+
+  if (showCarsListing) {
+    return (
+      <CarsListingPage
+        onBack={() => setShowCarsListing(false)}
+        savedCarIds={savedCarIds}
+        onToggleSavedCar={onToggleSavedCar}
         onOpenSavedTab={onOpenSavedTab}
       />
     );
@@ -627,6 +640,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                   }
                   if (sid === 'invitation' || sname.includes('invit')) {
                     setShowInvitationListing(true);
+                    return;
+                  }
+                  if (sid === 'cars' || sname.includes('car')) {
+                    setShowCarsListing(true);
                     return;
                   }
 
@@ -901,6 +918,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                             setShowInvitationListing(true);
                             return;
                           }
+                          if (t.includes('car') || t.includes('bus') || t.includes('transport')) {
+                            setShowCarsListing(true);
+                            return;
+                          }
                           toggleChecklist(item.id);
                         }}
                         style={{ flex: 1, marginLeft: 10 }}
@@ -1005,6 +1026,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                           if (sname.includes('invit') || sname.includes('card')) {
                             setShowServicesModal(false);
                             setShowInvitationListing(true);
+                            return;
+                          }
+                          if (sname.includes('car') || sname.includes('bus') || sname.includes('transport')) {
+                            setShowServicesModal(false);
+                            setShowCarsListing(true);
                             return;
                           }
 
