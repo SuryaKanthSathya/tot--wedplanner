@@ -51,7 +51,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   isBookmarked,
   onToggleBookmark,
 }) => {
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'brands' | 'reviews'>('portfolio');
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'designs' | 'reviews'>('portfolio');
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -60,34 +60,34 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
     ? artist.portfolio
     : [
         artist.image,
-        'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
+        '/images/mehendi/mehendi_arabic_style_1786617685166.jpg',
+        '/images/mehendi/mehendi_intricate_palms_1786617718285.jpg',
+        '/images/mehendi/mehendi_jewelry_bangles_1786617751591.jpg',
+        '/images/mehendi/mehendi_modern_minimalist_1786617671026.jpg',
+        '/images/mehendi/mehendi_traditional_feet_1786617653822.jpg',
       ];
 
   const packagesList = [
     {
-      title: 'South Indian Muhurtham Package',
+      title: 'Bridal Mehendi Package',
       price: artist.startingPrice,
       popular: true,
       features: [
-        'HD / Airbrush Long-lasting Base',
-        'Traditional Poola-Jada Hair Braiding with Fresh Flowers',
-        'Precision Saree Iron-Pleating & Draping',
-        'Lash Application & Custom Lip Blend',
-        'Complimentary Touch-up Kit for Mandap',
+        'Organic Homemade Henna Paste',
+        'Intricate Bridal Hand & Foot Designs',
+        'Custom Figures (Bride & Groom Portraits)',
+        'Long-lasting Deep Dark Stain Guarantee',
+        'Pre-wedding Mehndi Care Guide Included',
       ],
     },
     {
-      title: 'Grand Reception Glamour',
+      title: 'Guest & Family Mehendi Package',
       price: `₹${(artist.priceValue + 12000).toLocaleString('en-IN')} onwards`,
       popular: false,
       features: [
-        'Sweatproof Airbrush Contour & Body Glow',
-        'High-fashion Hair Styling & Extensions',
-        'Luxury Eye Art & Swarovski Rhinestone Accents',
+        'Mehendi for up to 10 Bridesmaids/Family',
+        'Arabic or Indian Minimalist Designs',
+        'Fast Application by Assistant Artists',
         'International Cosmetics (Dior, NARS, Charlotte Tilbury)',
         'On-location Touchup Assistance throughout event',
       ],
@@ -116,16 +116,16 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
     },
   ];
 
-  const cosmeticBrands = artist.brandsUsed || [
-    'MAC Cosmetics',
-    'Charlotte Tilbury',
-    'NARS',
-    'Huda Beauty',
-    'Dior Beauty',
-    'Bobbi Brown',
-    'TEMPTU Airbrush',
-    'Estée Lauder',
-    'Kryolan',
+  const cosmeticBrands = artist.designsUsed || [
+    'Traditional Indian',
+    'Intricate Arabic',
+    'Floral Motifs',
+    'Mandala Art',
+    'Bridal Figures',
+    'Peacock Motifs',
+    'Indo-Arabic',
+    'Minimalist / Khafif',
+    'White / Glitter Henna',
   ];
 
   const reviewsList = [
@@ -141,7 +141,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
       id: 'rev-2',
       name: 'Dr. Sneha Rajan',
       date: 'December 2025',
-      event: 'Grand Reception Glamour',
+      event: 'Guest & Family Mehendi Package',
       rating: 5,
       comment: `Extremely professional team. They arrived right on time at 3:00 AM at our venue. Used genuine MAC and Charlotte Tilbury products. My hair extensions and flower veni setting received so many compliments!`,
     },
@@ -280,19 +280,19 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
         <View style={styles.highlightsContainer}>
           <View style={styles.highlightPill}>
             <CheckCircle2 className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>Trial Session Available</Text>
+            <Text style={styles.highlightText}>Organic Homemade Henna</Text>
           </View>
           <View style={styles.highlightPill}>
             <ShieldCheck className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>100% Sanitized Tools</Text>
+            <Text style={styles.highlightText}>Deep Dark Stain Guarantee</Text>
           </View>
           <View style={styles.highlightPill}>
             <Sparkles className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>On-Venue Travel (Pan-TN)</Text>
+            <Text style={styles.highlightText}>Custom Bridal Motifs (Figures, Peacocks)</Text>
           </View>
           <View style={styles.highlightPill}>
-            <Scissors className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>Hair Extensions & Saree Draping</Text>
+            <Palette className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+            <Text style={styles.highlightText}>Guest Mehendi Included in Packages</Text>
           </View>
         </View>
 
@@ -301,18 +301,63 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           <Text style={styles.sectionTitle}>About {artist.name}</Text>
           <Text style={styles.descriptionText}>
             {artist.description ||
-              `${artist.name} is one of ${artist.location}'s most sought-after bridal mehendi artists. Renowned for flawless HD airbrush finishes, sweatproof long-wearing cosmetics, and artistic traditional South Indian bridal transformations.`}
+              `${artist.name} is one of ${artist.location}'s most sought-after bridal mehendi artists. Specializes in intricate, highly detailed bridal mehendi with flawless symmetry, traditional motifs, and modern aesthetic designs using 100% organic, chemical-free henna.`}
           </Text>
         </View>
 
+        
+        {/* TRUST BADGES SECTION */}
+        <View style={styles.trustBadgesGrid}>
+          <View style={styles.trustBadgeCard}>
+            <View style={styles.badgeIconBg}>
+              <Star className="w-4 h-4 text-[#C28E38] fill-[#C28E38]" />
+            </View>
+            <View style={styles.badgeTextCol}>
+              <Text style={styles.badgeTitle} numberOfLines={1} ellipsizeMode="tail">Google Reviews</Text>
+              <Text style={styles.badgeValue} numberOfLines={1} ellipsizeMode="tail">4.9/5 Average</Text>
+            </View>
+          </View>
+          
+          <View style={styles.trustBadgeCard}>
+            <View style={styles.badgeIconBg}>
+              <Heart className="w-4 h-4 text-[#8B1E2F] fill-[#8B1E2F]" />
+            </View>
+            <View style={styles.badgeTextCol}>
+              <Text style={styles.badgeTitle} numberOfLines={1} ellipsizeMode="tail">Instagram</Text>
+              <Text style={styles.badgeValue} numberOfLines={1} ellipsizeMode="tail">10k+ Followers</Text>
+            </View>
+          </View>
+
+          <View style={styles.trustBadgeCard}>
+            <View style={styles.badgeIconBg}>
+              <Award className="w-4 h-4 text-[#4A6B53] fill-[#4A6B53]" />
+            </View>
+            <View style={styles.badgeTextCol}>
+              <Text style={styles.badgeTitle} numberOfLines={1} ellipsizeMode="tail">Awards</Text>
+              <Text style={styles.badgeValue} numberOfLines={1} ellipsizeMode="tail">Best Bridal Mehendi</Text>
+            </View>
+          </View>
+
+          <View style={styles.trustBadgeCard}>
+            <View style={styles.badgeIconBg}>
+              <CheckCircle2 className="w-4 h-4 text-[#137333] fill-[#137333]" />
+            </View>
+            <View style={styles.badgeTextCol}>
+              <Text style={styles.badgeTitle} numberOfLines={1} ellipsizeMode="tail">TOT Certified</Text>
+              <Text style={styles.badgeValue} numberOfLines={1} ellipsizeMode="tail">Verified Artist</Text>
+            </View>
+          </View>
+        </View>
+
+
         {/* INTERACTIVE TABS */}
-        <View style={styles.tabBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }} style={[styles.tabBar, { paddingHorizontal: 0, marginHorizontal: -16 }]}>
           <TouchableOpacity
             style={[styles.tabItem, activeTab === 'portfolio' && styles.tabItemActive]}
             onPress={() => setActiveTab('portfolio')}
           >
             <Text style={[styles.tabItemText, activeTab === 'portfolio' && styles.tabItemTextActive]}>
-              Bridal Look Portfolio
+              Mehendi Portfolio
             </Text>
           </TouchableOpacity>
 
@@ -326,11 +371,11 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'brands' && styles.tabItemActive]}
-            onPress={() => setActiveTab('brands')}
+            style={[styles.tabItem, activeTab === 'designs' && styles.tabItemActive]}
+            onPress={() => setActiveTab('designs')}
           >
-            <Text style={[styles.tabItemText, activeTab === 'brands' && styles.tabItemTextActive]}>
-              Cosmetic Brands
+            <Text style={[styles.tabItemText, activeTab === 'designs' && styles.tabItemTextActive]}>
+              Design Styles
             </Text>
           </TouchableOpacity>
 
@@ -342,7 +387,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
               Reviews ({artist.reviewsCount})
             </Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
 
         {/* TAB 1: PORTFOLIO */}
         {activeTab === 'portfolio' && (
@@ -403,10 +448,10 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           </View>
         )}
 
-        {/* TAB 3: COSMETIC BRANDS */}
-        {activeTab === 'brands' && (
+        {/* TAB 3: DESIGN STYLES & MOTIFS */}
+        {activeTab === 'designs' && (
           <View style={styles.tabContent}>
-            <Text style={styles.tabSubtitle}>100% Authentic Luxury & High-Definition Cosmetics Used</Text>
+            <Text style={styles.tabSubtitle}>100% Organic Henna with Natural Essential Oils for Dark, Long-Lasting Stains</Text>
             <View style={styles.brandsGrid}>
               {cosmeticBrands.map((brand, bIdx) => (
                 <View key={bIdx} style={styles.brandCard}>
@@ -419,7 +464,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
             <View style={styles.brandGuaranteeBox}>
               <ShieldCheck className="w-5 h-5 text-[#581420] mr-2" />
               <View style={{ flex: 1 }}>
-                <Text style={styles.guaranteeTitle}>Hygienic & Skin-Safe Assurance</Text>
+                <Text style={styles.guaranteeTitle}>100% Organic & Chemical-Free Henna</Text>
                 <Text style={styles.guaranteeSub}>
                   All beauty sponges are single-use disposable, brushes are UV-sanitized between clients, and top hypoallergenic formulas protect sensitive skin.
                 </Text>
@@ -733,7 +778,56 @@ const styles = StyleSheet.create({
     lineHeight: 19,
     color: '#5A4C4E',
   },
-  tabBar: {
+  trustBadgesGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      marginHorizontal: 20,
+      marginBottom: 24,
+    },
+    trustBadgeCard: {
+      width: '48%',
+      backgroundColor: '#FAFAFA',
+      borderRadius: 12,
+      padding: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: '#F0F0F0',
+      marginBottom: 12,
+    },
+    badgeIconBg: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: '#FFFFFF',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 10,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    badgeTextCol: {
+      flex: 1,
+      flexShrink: 1,
+    },
+    badgeTitle: {
+      fontFamily: 'Inter-Medium',
+      fontSize: 11,
+      color: '#8C7A7C',
+      marginBottom: 2,
+      flexShrink: 1,
+    },
+    badgeValue: {
+      fontFamily: 'Inter-SemiBold',
+      fontSize: 12,
+      color: '#2A2425',
+      flexShrink: 1,
+    },
+    tabBar: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#E8DFD5',

@@ -10,12 +10,14 @@ import {
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { PhotographyListingPage } from './PhotographyListingPage';
+import { MehendiListingPage } from './MehendiListingPage';
+import { CateringListingPage } from './CateringListingPage';
+import { CarsListingPage } from './CarsListingPage';
 import { MakeupListingPage } from './MakeupListingPage';
 import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
 import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
-import { CarsListingPage } from './CarsListingPage';
 import {
   Menu,
   Bell,
@@ -147,7 +149,7 @@ function calculateDaysLeft(dateString?: string): number {
   if (!dateString) return 126;
   try {
     let targetDate: Date | null = null;
-    
+
     // Try native Date parsing first
     const nativeParsed = new Date(dateString);
     if (!isNaN(nativeParsed.getTime())) {
@@ -445,13 +447,41 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showServicesModal, setShowServicesModal] = useState(false);
   const [showServicesView, setShowServicesView] = useState(false);
   const [showPhotographyListing, setShowPhotographyListing] = useState(false);
+  const [showMehendiListing, setShowMehendiListing] = useState(false);
+  const [showCateringListing, setShowCateringListing] = useState(false);
+  const [showCarsListing, setShowCarsListing] = useState(false);
   const [showMakeupListing, setShowMakeupListing] = useState(false);
   const [showDecorListing, setShowDecorListing] = useState(false);
   const [showVenueListing, setShowVenueListing] = useState(false);
   const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState(false);
-  const [showCarsListing, setShowCarsListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
+
+
+  if (showMehendiListing) {
+    return (
+      <MehendiListingPage
+        onBack={() => setShowMehendiListing(false)}
+        savedArtistIds={[]} // Add default empty array to avoid undefined errors if props change
+      />
+    );
+  }
+
+  if (showCateringListing) {
+    return (
+      <CateringListingPage
+        onBack={() => setShowCateringListing(false)}
+      />
+    );
+  }
+
+  if (showCarsListing) {
+    return (
+      <CarsListingPage
+        onBack={() => setShowCarsListing(false)}
+      />
+    );
+  }
 
   if (showPhotographyListing) {
     return (
@@ -642,6 +672,14 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                     setShowInvitationListing(true);
                     return;
                   }
+                  if (sid === 'mehendi' || sname.includes('mehendi')) {
+                    setShowMehendiListing(true);
+                    return;
+                  }
+                  if (sid === 'catering' || sname.includes('cater')) {
+                    setShowCateringListing(true);
+                    return;
+                  }
                   if (sid === 'cars' || sname.includes('car')) {
                     setShowCarsListing(true);
                     return;
@@ -765,7 +803,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
           <View style={styles.countdownCard}>
             <View style={styles.countdownLeft}>
               <Text style={styles.countdownCardTitle}>Wedding Countdown</Text>
-              
+
               <View style={styles.numberWrapper}>
                 <Text style={styles.countdownNumber}>{daysLeft}</Text>
                 <Text style={styles.daysLabel}>DAYS</Text>
