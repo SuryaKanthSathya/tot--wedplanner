@@ -8,6 +8,8 @@ import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
 import { DestinationWeddingFlow } from './DestinationWeddingFlow';
 import { SavedTabScreen } from './SavedTabScreen';
+import { CateringListingPage } from './CateringListingPage';
+import { MehendiListingPage } from './MehendiListingPage';
 import {
   View,
   Text,
@@ -89,6 +91,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showEntertainmentListing, setShowEntertainmentListing] = useState<boolean>(false);
   const [showInvitationListing, setShowInvitationListing] = useState<boolean>(false);
   const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
+  const [showCateringListing, setShowCateringListing] = useState<boolean>(false);
+  const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
 
   // Persisted Saved Studios State
@@ -231,6 +235,50 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     });
   };
 
+  // Persisted Saved Mehendi State
+  const [savedMehendiIds, setSavedMehendiIds] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('saved_mehendi');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleSavedMehendi = (id: string) => {
+    setSavedMehendiIds((prev) => {
+      const updated = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem('saved_mehendi', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
+  // Persisted Saved Catering State
+  const [savedCateringIds, setSavedCateringIds] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('saved_catering');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleSavedCatering = (id: string) => {
+    setSavedCateringIds((prev) => {
+      const updated = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem('saved_catering', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
   useEffect(() => {
     if (initialTab === 'my-wedding' && !isPlannerCreated) {
       setActiveTab('home');
@@ -266,6 +314,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
     if (featureName === 'Destination Wedding') {
       setShowDestinationWeddingFlow(true);
+      return;
+    }
+    if (featureName === 'Mehendi') {
+      setShowMehendiListing(true);
+      return;
+    }
+    if (featureName === 'Catering') {
+      setShowCateringListing(true);
       return;
     }
     if (featureName === 'Plan My Entire Wedding') {
@@ -382,6 +438,34 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
+        }}
+      />
+    );
+  }
+
+  if (showMehendiListing) {
+    return (
+      <MehendiListingPage
+        onBack={() => setShowMehendiListing(false)}
+        savedMehendiIds={savedMehendiIds}
+        onToggleSavedMehendi={toggleSavedMehendi}
+        onOpenSavedTab={() => {
+          setShowMehendiListing(false);
+          setActiveTab('saved');
+        }}
+      />
+    );
+  }
+
+  if (showCateringListing) {
+    return (
+      <CateringListingPage
+        onBack={() => setShowCateringListing(false)}
+        savedCateringIds={savedCateringIds}
+        onToggleSavedCatering={toggleSavedCatering}
+        onOpenSavedTab={() => {
+          setShowCateringListing(false);
+          setActiveTab('saved');
         }}
       />
     );
