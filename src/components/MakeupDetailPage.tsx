@@ -11,28 +11,21 @@ import {
 } from 'react-native-web';
 import {
   ChevronLeft,
-  Heart,
   Share2,
+  Heart,
   Star,
   MapPin,
   Calendar,
   Sparkles,
-  CheckCircle2,
+  Users,
   Award,
   ShieldCheck,
   Instagram,
   Phone,
-  Send,
   MessageCircle,
   X,
-  Check,
-  Building2,
-  Clock,
-  ChevronDown,
-  User,
-  Scissors,
-  Smile,
-  Palette,
+  Briefcase,
+  Globe,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MakeupStudio } from './MakeupListingPage';
@@ -51,109 +44,18 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   isBookmarked,
   onToggleBookmark,
 }) => {
-  const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'brands' | 'reviews'>('portfolio');
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const portfolioImages = studio.portfolio && studio.portfolio.length > 0
-    ? studio.portfolio
+  const portfolioImages = studio.portfolio && studio.portfolio.length >= 4
+    ? studio.portfolio.slice(0, 4)
     : [
         studio.image,
         'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
         'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80',
         'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=600&q=80',
       ];
-
-  const packagesList = [
-    {
-      title: 'South Indian Muhurtham Package',
-      price: studio.startingPrice,
-      popular: true,
-      features: [
-        'HD / Airbrush Long-lasting Base',
-        'Traditional Poola-Jada Hair Braiding with Fresh Flowers',
-        'Precision Saree Iron-Pleating & Draping',
-        'Lash Application & Custom Lip Blend',
-        'Complimentary Touch-up Kit for Mandap',
-      ],
-    },
-    {
-      title: 'Grand Reception Glamour',
-      price: `₹${(studio.priceValue + 12000).toLocaleString('en-IN')} onwards`,
-      popular: false,
-      features: [
-        'Sweatproof Airbrush Contour & Body Glow',
-        'High-fashion Hair Styling & Extensions',
-        'Luxury Eye Art & Swarovski Rhinestone Accents',
-        'International Cosmetics (Dior, NARS, Charlotte Tilbury)',
-        'On-location Touchup Assistance throughout event',
-      ],
-    },
-    {
-      title: 'Engagement & Pre-Wedding Trial',
-      price: `₹${(Math.round(studio.priceValue * 0.6)).toLocaleString('en-IN')} onwards`,
-      popular: false,
-      features: [
-        'Soft Radiant HD Makeup',
-        'Blow-dry Curls or Modern Updo',
-        'Lehenga / Saree Draping',
-        'Pre-wedding Skin Prep Consultation',
-      ],
-    },
-    {
-      title: 'Groom Makeover & Beard Styling',
-      price: '₹12,000 onwards',
-      popular: false,
-      features: [
-        'Subtle Camera-Ready Mattifying Base',
-        'Beard Sculpting & Hair Setting',
-        'Under-eye Concealing & Lip Conditioning',
-        'Sherwani / Veshti Styling Assistance',
-      ],
-    },
-  ];
-
-  const cosmeticBrands = studio.brandsUsed || [
-    'MAC Cosmetics',
-    'Charlotte Tilbury',
-    'NARS',
-    'Huda Beauty',
-    'Dior Beauty',
-    'Bobbi Brown',
-    'TEMPTU Airbrush',
-    'Estée Lauder',
-    'Kryolan',
-  ];
-
-  const reviewsList = [
-    {
-      id: 'rev-1',
-      name: 'Priyanka & Karthi',
-      date: 'January 2026',
-      event: 'Bridal Muhurtham in ' + studio.location,
-      rating: 5,
-      comment: `Absolute magic! ${studio.name} made me look like an absolute queen on my wedding day. The saree draping was so neat and the HD makeup lasted from 5 AM until afternoon without cracking or fading!`,
-    },
-    {
-      id: 'rev-2',
-      name: 'Dr. Sneha Rajan',
-      date: 'December 2025',
-      event: 'Grand Reception Glamour',
-      rating: 5,
-      comment: `Extremely professional team. They arrived right on time at 3:00 AM at our venue. Used genuine MAC and Charlotte Tilbury products. My hair extensions and flower veni setting received so many compliments!`,
-    },
-    {
-      id: 'rev-3',
-      name: 'Ananya V.',
-      date: 'November 2025',
-      event: 'Engagement & Sangeet',
-      rating: 5,
-      comment: `The glow was so natural and skin-like! I was worried about looking cakey, but ${studio.name} understood my skin tone perfectly. Highly recommended for all South Indian brides!`,
-    },
-  ];
 
   const handleShare = () => {
     if (navigator.share) {
@@ -177,7 +79,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   };
 
   const handleWhatsApp = () => {
-    const text = encodeURIComponent(`Hi ${studio.name}, I found your bridal makeup profile on WeddingApp and would like to check availability for my wedding date.`);
+    const text = encodeURIComponent(`Hi ${studio.name}, I found your profile and would like to check availability.`);
     Linking.openURL(`https://wa.me/919876543210?text=${text}`).catch(() => {
       setToastMessage('Opening WhatsApp...');
       setTimeout(() => setToastMessage(null), 2000);
@@ -186,7 +88,6 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* TOAST MESSAGE */}
       <AnimatePresence>
         {toastMessage && (
           <motion.div
@@ -201,13 +102,11 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
         )}
       </AnimatePresence>
 
-      {/* HEADER NAV BAR */}
+      {/* HEADER NAV BAR (Transparent overlapping top) */}
       <View style={styles.navHeader}>
         <TouchableOpacity style={styles.navBtn} onPress={onBack} activeOpacity={0.7}>
           <ChevronLeft className="w-5 h-5 text-[#2A2425]" />
         </TouchableOpacity>
-
-        <Text style={styles.navTitle} numberOfLines={1}>{studio.name}</Text>
 
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity style={styles.navBtn} onPress={handleShare} activeOpacity={0.7}>
@@ -224,265 +123,208 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* HERO IMAGE & TIER BADGE */}
+        {/* HERO IMAGE */}
         <View style={styles.heroContainer}>
           <Image source={{ uri: studio.image }} style={styles.heroImage} />
           <View style={styles.heroOverlay} />
-          
-          <View style={styles.tierBadgeContainer}>
-            <View style={styles.tierBadge}>
-              <Award className="w-3.5 h-3.5 text-[#C28E38] mr-1" />
-              <Text style={styles.tierBadgeText}>{studio.tier} Makeup Artist</Text>
-            </View>
-          </View>
+        </View>
 
-          <View style={styles.heroContent}>
-            <Text style={styles.studioName}>{studio.name}</Text>
-            
-            <View style={styles.ratingRow}>
-              <View style={styles.starPill}>
-                <Star className="w-3.5 h-3.5 text-white fill-white mr-1" />
-                <Text style={styles.starText}>{studio.rating.toFixed(1)}</Text>
+        {/* OVERLAPPING MAIN CARD */}
+        <View style={styles.mainCard}>
+          {/* Header Row */}
+          <View style={styles.titleRow}>
+            <Image source={{ uri: studio.image }} style={styles.logoThumbnail} />
+            <View style={styles.titleInfo}>
+              <Text style={styles.studioName} numberOfLines={1}>{studio.name}</Text>
+              
+              <View style={styles.totBadge}>
+                <ShieldCheck size={10} color="#C28E38" />
+                <Text style={styles.totBadgeText}>TOT CERTIFIED</Text>
               </View>
-              <Text style={styles.reviewsText}>({studio.reviewsCount} verified reviews)</Text>
-              <View style={styles.dotSeparator} />
-              <MapPin className="w-3.5 h-3.5 text-white/80 mr-1" />
-              <Text style={styles.locationText}>{studio.location}</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* QUICK INFO CARDS ROW */}
-        <View style={styles.quickInfoRow}>
-          <View style={[styles.quickInfoCard, { flex: 1 }]}>
-            <Text style={styles.quickInfoLabel}>Starting Price</Text>
-            <Text style={styles.quickInfoValue}>{studio.startingPrice}</Text>
-          </View>
-
-          <View style={styles.quickInfoDivider} />
-
-          <View style={[styles.quickInfoCard, { flex: 1.3 }]}>
-            <Text style={styles.quickInfoLabel}>Specialization</Text>
-            <Text style={styles.quickInfoValueSpecial} numberOfLines={2}>
-              {studio.category}
-            </Text>
-          </View>
-
-          <View style={styles.quickInfoDivider} />
-
-          <View style={[styles.quickInfoCard, { flex: 1 }]}>
-            <Text style={styles.quickInfoLabel}>Experience</Text>
-            <Text style={styles.quickInfoValue}>{studio.experience || '8+ Years'}</Text>
-          </View>
-        </View>
-
-        {/* HIGHLIGHTS BADGES */}
-        <View style={styles.highlightsContainer}>
-          <View style={styles.highlightPill}>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>Trial Session Available</Text>
-          </View>
-          <View style={styles.highlightPill}>
-            <ShieldCheck className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>100% Sanitized Tools</Text>
-          </View>
-          <View style={styles.highlightPill}>
-            <Sparkles className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>On-Venue Travel (Pan-TN)</Text>
-          </View>
-          <View style={styles.highlightPill}>
-            <Scissors className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightText}>Hair Extensions & Saree Draping</Text>
-          </View>
-        </View>
-
-        {/* DESCRIPTION */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>About {studio.name}</Text>
-          <Text style={styles.descriptionText}>
-            {studio.description ||
-              `${studio.name} is one of ${studio.location}'s most sought-after bridal makeup studios. Renowned for flawless HD airbrush finishes, sweatproof long-wearing cosmetics, and artistic traditional South Indian bridal transformations.`}
-          </Text>
-        </View>
-
-        {/* INTERACTIVE TABS */}
-        <View style={styles.tabBar}>
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'portfolio' && styles.tabItemActive]}
-            onPress={() => setActiveTab('portfolio')}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'portfolio' && styles.tabItemTextActive]}>
-              Bridal Look Portfolio
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'packages' && styles.tabItemActive]}
-            onPress={() => setActiveTab('packages')}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'packages' && styles.tabItemTextActive]}>
-              Packages & Rates
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'brands' && styles.tabItemActive]}
-            onPress={() => setActiveTab('brands')}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'brands' && styles.tabItemTextActive]}>
-              Cosmetic Brands
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'reviews' && styles.tabItemActive]}
-            onPress={() => setActiveTab('reviews')}
-          >
-            <Text style={[styles.tabItemText, activeTab === 'reviews' && styles.tabItemTextActive]}>
-              Reviews ({studio.reviewsCount})
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* TAB 1: PORTFOLIO */}
-        {activeTab === 'portfolio' && (
-          <View style={styles.tabContent}>
-            <Text style={styles.tabSubtitle}>Tap image to view high-definition bridal details</Text>
-            <View style={styles.portfolioGrid}>
-              {portfolioImages.map((imgUrl, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.portfolioImageWrapper}
-                  onPress={() => setActivePhotoModal(imgUrl)}
-                  activeOpacity={0.85}
-                >
-                  <Image source={{ uri: imgUrl }} style={styles.portfolioGridImg} />
-                  <View style={styles.portfolioOverlay}>
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
-
-        {/* TAB 2: PACKAGES & RATES */}
-        {activeTab === 'packages' && (
-          <View style={styles.tabContent}>
-            {packagesList.map((pkg, idx) => (
-              <View key={idx} style={[styles.packageCard, pkg.popular && styles.packageCardPopular]}>
-                {pkg.popular && (
-                  <View style={styles.popularRibbon}>
-                    <Sparkles className="w-3 h-3 text-white mr-1" />
-                    <Text style={styles.popularRibbonText}>Most Booked Bridal Package</Text>
-                  </View>
-                )}
-                <View style={styles.packageHeader}>
-                  <Text style={styles.packageTitle}>{pkg.title}</Text>
-                  <Text style={styles.packagePrice}>{pkg.price}</Text>
-                </View>
-
-                <View style={styles.packageFeaturesList}>
-                  {pkg.features.map((feat, fIdx) => (
-                    <View key={fIdx} style={styles.featureItem}>
-                      <Check className="w-3.5 h-3.5 text-[#581420] mr-2" />
-                      <Text style={styles.featureText}>{feat}</Text>
-                    </View>
-                  ))}
-                </View>
-
-                <TouchableOpacity
-                  style={styles.packageBookBtn}
-                  onPress={() => setShowQuoteModal(true)}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.packageBookBtnText}>Request Custom Quote for Package</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* TAB 3: COSMETIC BRANDS */}
-        {activeTab === 'brands' && (
-          <View style={styles.tabContent}>
-            <Text style={styles.tabSubtitle}>100% Authentic Luxury & High-Definition Cosmetics Used</Text>
-            <View style={styles.brandsGrid}>
-              {cosmeticBrands.map((brand, bIdx) => (
-                <View key={bIdx} style={styles.brandCard}>
-                  <Palette className="w-4 h-4 text-[#581420] mr-2" />
-                  <Text style={styles.brandName}>{brand}</Text>
-                </View>
-              ))}
-            </View>
-
-            <View style={styles.brandGuaranteeBox}>
-              <ShieldCheck className="w-5 h-5 text-[#581420] mr-2" />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.guaranteeTitle}>Hygienic & Skin-Safe Assurance</Text>
-                <Text style={styles.guaranteeSub}>
-                  All beauty sponges are single-use disposable, brushes are UV-sanitized between clients, and top hypoallergenic formulas protect sensitive skin.
+              <Text style={styles.subtitleText}>Makeup Studio</Text>
+              <Text style={styles.subtitleText}>{studio.tier} • {studio.location}</Text>
+              
+              <View style={styles.ratingRow}>
+                <Star size={12} color="#FBBF24" fill="#FBBF24" />
+                <Text style={styles.ratingText}>
+                  {studio.rating.toFixed(1)} <Text style={styles.reviewsCount}>({studio.reviewsCount} Reviews)</Text>
                 </Text>
               </View>
             </View>
           </View>
-        )}
 
-        {/* TAB 4: REVIEWS */}
-        {activeTab === 'reviews' && (
-          <View style={styles.tabContent}>
-            {reviewsList.map((rev) => (
-              <View key={rev.id} style={styles.reviewCard}>
-                <View style={styles.reviewHeader}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={styles.avatarBox}>
-                      <User className="w-4 h-4 text-[#581420]" />
-                    </View>
-                    <View>
-                      <Text style={styles.reviewerName}>{rev.name}</Text>
-                      <Text style={styles.reviewerEvent}>{rev.event}</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.reviewRatingBadge}>
-                    <Star className="w-3 h-3 text-amber-500 fill-amber-500 mr-1" />
-                    <Text style={styles.reviewRatingText}>{rev.rating}.0</Text>
-                  </View>
-                </View>
-
-                <Text style={styles.reviewComment}>{rev.comment}</Text>
-                <Text style={styles.reviewDate}>{rev.date}</Text>
-              </View>
-            ))}
+          {/* QUICK INFO (4 columns) */}
+          <View style={styles.quickInfoBox}>
+            <View style={styles.quickInfoItem}>
+              <Briefcase size={16} color="#4B5563" />
+              <Text style={styles.quickInfoVal}>{studio.experience || '8+ Years'}</Text>
+              <Text style={styles.quickInfoLbl}>Experience</Text>
+            </View>
+            
+            <View style={styles.quickInfoDivider} />
+            
+            <View style={styles.quickInfoItem}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#4B5563', marginBottom: 2 }}>₹₹₹₹</Text>
+              <Text style={styles.quickInfoVal}>Price Range</Text>
+              <Text style={styles.quickInfoLbl}>{studio.startingPrice}</Text>
+            </View>
+            
+            <View style={styles.quickInfoDivider} />
+            
+            <View style={styles.quickInfoItem}>
+              <Globe size={16} color="#4B5563" />
+              <Text style={styles.quickInfoVal}>Languages</Text>
+              <Text style={styles.quickInfoLbl}>English, Tamil, Hindi</Text>
+            </View>
+            
+            <View style={styles.quickInfoDivider} />
+            
+            <View style={styles.quickInfoItem}>
+              <Calendar size={16} color="#10B981" />
+              <Text style={styles.quickInfoVal}>Availability</Text>
+              <Text style={[styles.quickInfoLbl, { color: '#10B981', textDecorationLine: 'underline' }]}>Live Calendar</Text>
+            </View>
           </View>
-        )}
+
+          {/* ABOUT */}
+          <Text style={styles.sectionTitle}>About {studio.name}</Text>
+          <Text style={styles.descriptionText}>
+            {studio.description || `${studio.name} is a premier South Indian makeup studio with years of experience catering for grandeur luxury weddings across Tamil Nadu. Specialists in HD airbrush finishes and traditional bridal transformations.`}
+          </Text>
+
+          {/* MEDIA TABS */}
+          <View style={styles.mediaTabs}>
+            <View style={styles.mediaTabActiveContainer}>
+              <Text style={styles.mediaTabActive}>Photos (26)</Text>
+              <View style={styles.mediaTabActiveIndicator} />
+            </View>
+            <Text style={styles.mediaTabInactive}>Videos</Text>
+          </View>
+          <View style={styles.mediaTabsLine} />
+
+          {/* PHOTO GRID */}
+          <View style={styles.photoGrid}>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[0])}>
+              <Image source={{ uri: portfolioImages[0] }} style={styles.photoImg} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[1])}>
+              <Image source={{ uri: portfolioImages[1] }} style={styles.photoImg} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[2])}>
+              <Image source={{ uri: portfolioImages[2] }} style={styles.photoImg} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[3])}>
+              <Image source={{ uri: portfolioImages[3] }} style={styles.photoImg} />
+              <View style={styles.morePhotosOverlay}>
+                <Text style={styles.morePhotosText}>+23</Text>
+                <Text style={styles.morePhotosSubtext}>More Photos</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* TAGS */}
+          <View style={styles.tagsRow}>
+            <View style={styles.tagItem}>
+              <MapPin size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>{studio.location}, Tamil Nadu</Text>
+            </View>
+            <View style={styles.tagItem}>
+              <Users size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>1 - 100+ Guests</Text>
+            </View>
+            <View style={styles.tagItem}>
+              <Sparkles size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>Bridal & Airbrush</Text>
+            </View>
+          </View>
+
+          {/* BADGES */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.badgesScroll}>
+            <View style={styles.badgeCard}>
+              <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/2991/2991148.png'}} style={{width: 16, height: 16, marginBottom: 4}} />
+              <Text style={styles.badgeTitle}>Google Reviews</Text>
+              <Text style={styles.badgeVal}>4.8 <Star size={10} color="#FBBF24" fill="#FBBF24" /></Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <Instagram size={16} color="#E1306C" style={{marginBottom: 4}} />
+              <Text style={styles.badgeTitle}>Instagram</Text>
+              <Text style={styles.badgeVal}>@studio_glam</Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <Award size={16} color="#D97706" style={{marginBottom: 4}} />
+              <Text style={styles.badgeTitle}>Awards</Text>
+              <Text style={styles.badgeVal}>6 Awards</Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <ShieldCheck size={16} color="#10B981" style={{marginBottom: 4}} />
+              <Text style={styles.badgeTitle}>TOT Certified</Text>
+              <Text style={styles.badgeVal}>Verified Vendor</Text>
+            </View>
+          </ScrollView>
+
+          {/* POPULAR PACKAGES */}
+          <Text style={styles.sectionTitle}>Our Popular Packages</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.packagesScroll}>
+            <View style={styles.packagePill}><Text style={styles.packagePillText}>Classic Bridal HD</Text></View>
+            <View style={styles.packagePill}><Text style={styles.packagePillText}>Royal Reception Glam</Text></View>
+            <View style={styles.packagePill}><Text style={styles.packagePillText}>Engagement Styling</Text></View>
+          </ScrollView>
+
+          {/* GOOGLE REVIEWS */}
+          <View style={styles.reviewsHeader}>
+            <Text style={styles.sectionTitle}>Google Reviews</Text>
+            <TouchableOpacity>
+              <Text style={styles.viewAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.googleReviewCard}>
+            <View style={styles.gReviewHeader}>
+              <View style={styles.gReviewAvatar}>
+                <Text style={styles.gReviewAvatarText}>R</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.gReviewName}>Ritika Sharma</Text>
+                <Text style={styles.gReviewTime}>2 weeks ago</Text>
+              </View>
+              <View style={styles.gReviewRating}>
+                <Text style={styles.gReviewRatingText}>5.0</Text>
+                <View style={{flexDirection: 'row', gap: 2}}>
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                </View>
+              </View>
+            </View>
+            <Text style={styles.gReviewComment}>
+              "The makeup was absolutely amazing! Great products, precision & long lasting. Our guests are still talking about it!"
+            </Text>
+            <View style={{ alignItems: 'flex-end', marginTop: 8 }}>
+              <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/2991/2991148.png'}} style={{width: 14, height: 14}} />
+            </View>
+          </View>
+
+        </View>
       </ScrollView>
 
-      {/* STICKY BOTTOM ACTION BAR */}
-      <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting From</Text>
-          <Text style={styles.bottomPriceValue}>{studio.startingPrice}</Text>
-        </View>
-
-        <View style={styles.bottomActionBtns}>
-          <TouchableOpacity style={styles.callIconBtn} onPress={handleCallPhone} activeOpacity={0.8}>
-            <Phone className="w-4 h-4 text-[#2A2425]" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.whatsappIconBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-            <MessageCircle className="w-4 h-4 text-emerald-700" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.quoteBtnMain}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.quoteBtnMainText}>Request Quote</Text>
-          </TouchableOpacity>
-        </View>
+      {/* NEW STICKY BOTTOM ACTION BAR */}
+      <View style={styles.bottomBarNew}>
+        <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
+          <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
+          <Text style={styles.btnWhatsappText}>WhatsApp</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.btnCall} onPress={handleCallPhone} activeOpacity={0.8}>
+          <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
+          <Text style={styles.btnCallText}>Call Now</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
+          <Text style={styles.btnQuoteText}>Send Quotes</Text>
+        </TouchableOpacity>
       </View>
 
       {/* PHOTO ZOOM MODAL */}
@@ -521,41 +363,36 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#FAF7F2',
     overflow: 'hidden',
-    display: 'flex' as any,
-    flexDirection: 'column',
   },
   navHeader: {
-    height: 54,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    backgroundColor: '#FAF7F2',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EFE7DE',
-    zIndex: 10,
+    zIndex: 20,
   },
   navBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  navTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#2A2425',
-    fontFamily: 'Playfair Display, serif',
-    maxWidth: '55%',
+    borderColor: 'rgba(232, 223, 213, 0.5)',
   },
   heroContainer: {
-    position: 'relative',
-    height: 250,
-    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 320,
+    zIndex: 0,
   },
   heroImage: {
     width: '100%',
@@ -563,474 +400,375 @@ const styles = StyleSheet.create({
   },
   heroOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.42)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
   },
-  tierBadgeContainer: {
-    position: 'absolute',
-    top: 14,
-    left: 14,
+  mainCard: {
+    marginTop: 220,
+    backgroundColor: '#FAF7F2',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    minHeight: 800,
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    zIndex: 10,
   },
-  tierBadge: {
+  titleRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(42, 36, 37, 0.85)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  logoThumbnail: {
+    width: 64,
+    height: 64,
     borderRadius: 12,
+    marginRight: 16,
+    backgroundColor: '#FFF',
     borderWidth: 1,
-    borderColor: 'rgba(194, 142, 56, 0.4)',
+    borderColor: '#E8DFD5',
   },
-  tierBadgeText: {
-    color: '#F3E5AB',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  heroContent: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
+  titleInfo: {
+    flex: 1,
   },
   studioName: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: '#2A2425',
     fontFamily: 'Playfair Display, serif',
-    marginBottom: 6,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    marginBottom: 4,
+  },
+  totBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FDF6E3',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: '#F3E5AB',
+  },
+  totBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#92400E',
+    marginLeft: 4,
+  },
+  subtitleText: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginBottom: 2,
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
   },
-  starPill: {
+  ratingText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#2A2425',
+    marginLeft: 4,
+  },
+  reviewsCount: {
+    fontWeight: '400',
+    color: '#6B7280',
+  },
+  quickInfoBox: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#581420',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginRight: 6,
-  },
-  starText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  reviewsText: {
-    color: '#EFE7DE',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  dotSeparator: {
-    width: 3,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: 'rgba(255,255,255,0.6)',
-    marginHorizontal: 8,
-  },
-  locationText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  quickInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginTop: 12,
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 4,
-    zIndex: 10,
-  },
-  quickInfoCard: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 2,
-  },
-  quickInfoLabel: {
-    fontSize: 9.5,
-    color: '#8C7A7C',
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    minHeight: 14,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-  quickInfoValue: {
-    fontSize: 12.5,
-    fontWeight: '800',
-    color: '#2A2425',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  quickInfoSubValue: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#7D6E70',
-  },
-  quickInfoValueSpecial: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: '#2A2425',
-    textAlign: 'center',
-    lineHeight: 15,
-  },
-  quickInfoDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: '#E8DFD5',
-    alignSelf: 'center',
-    marginHorizontal: 2,
-  },
-  highlightsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-    paddingHorizontal: 16,
-    marginTop: 16,
-  },
-  highlightPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3ECE3',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E8DFD5',
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    marginBottom: 24,
   },
-  highlightText: {
+  quickInfoItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  quickInfoVal: {
     fontSize: 11,
-    fontWeight: '600',
-    color: '#581420',
+    fontWeight: '700',
+    color: '#1F2937',
+    marginTop: 6,
+    marginBottom: 2,
+    textAlign: 'center',
   },
-  sectionContainer: {
-    paddingHorizontal: 16,
-    marginTop: 18,
+  quickInfoLbl: {
+    fontSize: 9,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  quickInfoDivider: {
+    width: 1,
+    height: '80%',
+    backgroundColor: '#E5E7EB',
+    alignSelf: 'center',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '800',
     color: '#2A2425',
     fontFamily: 'Playfair Display, serif',
-    marginBottom: 6,
+    marginBottom: 10,
   },
   descriptionText: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#5A4C4E',
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: '#4B5563',
+    marginBottom: 24,
   },
-  tabBar: {
+  mediaTabs: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
-    marginTop: 20,
-    paddingHorizontal: 16,
-  },
-  tabItem: {
-    paddingVertical: 10,
-    marginRight: 16,
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  tabItemActive: {
-    borderBottomColor: '#581420',
-  },
-  tabItemText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#7D6E70',
-  },
-  tabItemTextActive: {
-    color: '#581420',
-    fontWeight: '800',
-  },
-  tabContent: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-  },
-  tabSubtitle: {
-    fontSize: 11,
-    color: '#7D6E70',
-    marginBottom: 10,
-    fontWeight: '500',
-  },
-  portfolioGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  portfolioImageWrapper: {
-    width: '31.5%',
-    aspectRatio: 1,
-    borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  portfolioGridImg: {
-    width: '100%',
-    height: '100%',
-  },
-  portfolioOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  packageCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  packageCardPopular: {
-    borderColor: '#581420',
-    borderWidth: 1.5,
-  },
-  popularRibbon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#581420',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    marginBottom: 10,
-    alignSelf: 'flex-start',
-    borderRadius: 8,
-  },
-  popularRibbonText: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  packageHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  packageTitle: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: '#2A2425',
-    fontFamily: 'Playfair Display, serif',
-    flex: 1,
-    marginRight: 8,
-  },
-  packagePrice: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#581420',
-  },
-  packageFeaturesList: {
-    gap: 6,
-    marginBottom: 12,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  featureText: {
-    fontSize: 12,
-    color: '#4A3D3F',
-  },
-  packageBookBtn: {
-    backgroundColor: '#F3ECE3',
-    height: 34,
-    borderRadius: 17,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  packageBookBtnText: {
-    color: '#581420',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  brandsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 14,
-  },
-  brandCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  brandName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#2A2425',
-  },
-  brandGuaranteeBox: {
-    flexDirection: 'row',
-    backgroundColor: '#F3ECE3',
-    padding: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    alignItems: 'flex-start',
-  },
-  guaranteeTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#581420',
-    marginBottom: 2,
-  },
-  guaranteeSub: {
-    fontSize: 11,
-    color: '#6A5B5D',
-    lineHeight: 15,
-  },
-  reviewCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderRadius: 14,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  reviewHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
   },
-  avatarBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F3ECE3',
-    justifyContent: 'center',
+  mediaTabActiveContainer: {
+    marginRight: 24,
     alignItems: 'center',
-    marginRight: 8,
   },
-  reviewerName: {
-    fontSize: 12,
+  mediaTabActive: {
+    fontSize: 13,
     fontWeight: '700',
     color: '#2A2425',
+    marginBottom: 6,
   },
-  reviewerEvent: {
-    fontSize: 10,
-    color: '#7D6E70',
+  mediaTabActiveIndicator: {
+    width: 24,
+    height: 3,
+    backgroundColor: '#581420',
+    borderRadius: 2,
   },
-  reviewRatingBadge: {
+  mediaTabInactive: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    marginBottom: 6 + 3, // to align with active which has indicator
+  },
+  mediaTabsLine: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 16,
+    marginTop: -8, // pull up under tabs
+  },
+  photoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 16,
+  },
+  photoGridItem: {
+    width: '48.5%',
+    aspectRatio: 1.4,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  photoImg: {
+    width: '100%',
+    height: '100%',
+  },
+  morePhotosOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  morePhotosText: {
+    color: '#FFF',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  morePhotosSubtext: {
+    color: '#FBBF24',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 24,
+  },
+  tagItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
   },
-  reviewRatingText: {
+  tagText: {
     fontSize: 11,
-    fontWeight: '800',
-    color: '#92400E',
+    color: '#4B5563',
+    marginLeft: 4,
   },
-  reviewComment: {
+  badgesScroll: {
+    gap: 12,
+    paddingRight: 16,
+    marginBottom: 24,
+  },
+  badgeCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    minWidth: 100,
+  },
+  badgeTitle: {
+    fontSize: 10,
+    color: '#4B5563',
+    marginBottom: 2,
+  },
+  badgeVal: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  packagesScroll: {
+    gap: 10,
+    paddingRight: 16,
+    marginBottom: 28,
+  },
+  packagePill: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFF',
+  },
+  packagePillText: {
+    fontSize: 11.5,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  reviewsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  viewAllText: {
     fontSize: 12,
-    color: '#4A3D3F',
-    lineHeight: 17,
-    marginBottom: 4,
+    fontWeight: '700',
+    color: '#581420',
   },
-  reviewDate: {
+  googleReviewCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
+  },
+  gReviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  gReviewAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#581420',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  gReviewAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  gReviewName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  gReviewTime: {
     fontSize: 10,
     color: '#9CA3AF',
   },
-  bottomBar: {
+  gReviewRating: {
+    alignItems: 'flex-end',
+  },
+  gReviewRatingText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  gReviewComment: {
+    fontSize: 12,
+    color: '#4B5563',
+    lineHeight: 18,
+  },
+  bottomBarNew: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 64,
-    backgroundColor: '#FFFFFF',
+    height: 68,
+    backgroundColor: '#FAF7F2',
     borderTopWidth: 1,
-    borderTopColor: '#E8DFD5',
+    borderTopColor: '#E5E7EB',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
     zIndex: 20,
+    gap: 8,
   },
-  bottomPriceCol: {
-    flexShrink: 1,
-    marginRight: 4,
-    justifyContent: 'center',
-  },
-  bottomPriceLabel: {
-    fontSize: 9.5,
-    color: '#7D6E70',
-    fontWeight: '500',
-    lineHeight: 12,
-  },
-  bottomPriceValue: {
-    fontSize: 13.5,
-    fontWeight: '800',
-    color: '#2A2425',
-    lineHeight: 18,
-  },
-  bottomActionBtns: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flexShrink: 0,
-  },
-  callIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3ECE3',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  whatsappIconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#DCFCE7',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#BBF7D0',
-  },
-  quoteBtnMain: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 12,
-    height: 38,
-    borderRadius: 19,
+  btnWhatsapp: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
   },
-  quoteBtnMainText: {
-    color: '#FFFFFF',
+  btnWhatsappText: {
     fontSize: 12,
     fontWeight: '700',
+    color: '#065F46',
+  },
+  btnCall: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  btnCallText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  btnQuote: {
+    flex: 1.3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#380B13', // very dark brown/red
+  },
+  btnQuoteText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#F3E5AB', // gold text
   },
   photoModalContainer: {
     flex: 1,

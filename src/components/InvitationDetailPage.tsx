@@ -2,35 +2,32 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   TouchableOpacity,
   ScrollView,
-  Image,
   StyleSheet,
-  Linking,
   Modal,
-  TextInput,
+  Linking,
 } from 'react-native-web';
 import {
-  ArrowLeft,
+  ChevronLeft,
+  Share2,
+  Heart,
   Star,
   MapPin,
-  Heart,
-  Phone,
-  MessageCircle,
-  Mail,
-  Users,
-  CheckCircle2,
-  Calendar,
-  Send,
-  X,
   Sparkles,
   Award,
+  ShieldCheck,
+  Instagram,
+  Phone,
+  MessageCircle,
+  X,
   Package,
   Clock,
   Printer,
-  FileText,
 } from 'lucide-react';
-import { motion } from 'motion/react';
+import { RequestQuoteModal } from './RequestQuoteModal';
+import { motion, AnimatePresence } from 'motion/react';
 
 export interface InvitationItem {
   id: string;
@@ -74,371 +71,425 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
   isBookmarked,
   onToggleBookmark,
 }) => {
-  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
-  const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
-  const [quoteSuccess, setQuoteSuccess] = useState<boolean>(false);
+  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Quote Form State
-  const [guestName, setGuestName] = useState<string>('');
-  const [guestPhone, setGuestPhone] = useState<string>('');
-  const [cardQuantity, setCardQuantity] = useState<string>('250 Cards');
-  const [customizationNeeds, setCustomizationNeeds] = useState<string>('Gold Foil + Custom Monogram');
-  const [sampleKitRequested, setSampleKitRequested] = useState<string>('Yes, send sample kit');
-  const [additionalNotes, setAdditionalNotes] = useState<string>('');
+  const portfolioImages =
+    invite.portfolio && invite.portfolio.length >= 4
+      ? invite.portfolio.slice(0, 4)
+      : [
+          invite.image,
+          invite.image,
+          invite.image,
+          invite.image,
+        ];
 
   const phoneNum = invite.phone || '+91 98765 43210';
   const whatsappNum = invite.whatsapp || '919876543210';
 
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: invite.name,
+          text: `Check out ${invite.name} for wedding invitations!`,
+          url: window.location.href,
+        })
+        .catch(() => {});
+    } else {
+      setToastMessage('Link copied to clipboard!');
+      setTimeout(() => setToastMessage(null), 2500);
+    }
+  };
+
   const handleCall = () => {
-    Linking.openURL(`tel:${phoneNum}`);
+    Linking.openURL(`tel:${phoneNum}`).catch(() => {
+      setToastMessage(`Call ${phoneNum}`);
+      setTimeout(() => setToastMessage(null), 3000);
+    });
   };
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hi ${invite.name}, I loved your invitation designs on Tale of Two App. Please share your catalog and sample kit details.`
+      `Hi ${invite.name}, I saw your invitation designs on Tale of Two App. Please share your catalog and sample kit details.`
     );
-    Linking.openURL(`https://wa.me/${whatsappNum}?text=${text}`);
+    Linking.openURL(`https://wa.me/${whatsappNum}?text=${text}`).catch(() => {
+      setToastMessage('Opening WhatsApp...');
+      setTimeout(() => setToastMessage(null), 2000);
+    });
   };
 
-  const handleSubmitQuote = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!guestName.trim() || !guestPhone.trim()) {
-      alert('Please fill in your name and phone number.');
-      return;
-    }
-    setQuoteSuccess(true);
-    setTimeout(() => {
-      setQuoteSuccess(false);
-      setShowQuoteModal(false);
-    }, 2200);
-  };
+
 
   return (
     <View style={styles.container}>
-      {/* TOP HEADER */}
-      <View style={styles.topHeader}>
-        <TouchableOpacity
-          style={styles.iconCircleBtn}
-          onPress={onBack}
-          activeOpacity={0.8}
-        >
-          <ArrowLeft className="w-5 h-5 text-stone-800" />
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-[#C28E38]" />
+            {toastMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* HEADER NAV BAR (transparent, overlapping hero) */}
+      <View style={styles.navHeader}>
+        <TouchableOpacity style={styles.navBtn} onPress={onBack} activeOpacity={0.7}>
+          <ChevronLeft className="w-5 h-5 text-[#2A2425]" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitleText} numberOfLines={1}>
-          {invite.name}
-        </Text>
-
-        <TouchableOpacity
-          style={styles.iconCircleBtn}
-          onPress={() => onToggleBookmark(invite.id)}
-          activeOpacity={0.8}
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              isBookmarked ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
-            }`}
-          />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <TouchableOpacity style={styles.navBtn} onPress={handleShare} activeOpacity={0.7}>
+            <Share2 className="w-4 h-4 text-[#2A2425]" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navBtn}
+            onPress={() => onToggleBookmark(invite.id)}
+            activeOpacity={0.7}
+          >
+            <Heart
+              className={`w-4 h-4 ${
+                isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#2A2425]'
+              }`}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* MAIN BODY */}
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* HERO IMAGE */}
-        <View style={styles.heroWrapper}>
-          <Image
-            source={{ uri: invite.portfolio[activeImageIndex] || invite.image }}
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
-
-          <View style={styles.tierBadge}>
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 mr-1" />
-            <Text style={styles.tierBadgeText}>{invite.tier} Cards</Text>
-          </View>
-
-          <View style={styles.ratingOverlay}>
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400 mr-1" />
-            <Text style={styles.ratingValueText}>{invite.rating}</Text>
-            <Text style={styles.ratingCountText}>({invite.reviewsCount} reviews)</Text>
-          </View>
-
-          {/* Thumbnails */}
-          <View style={styles.thumbRow}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {invite.portfolio.map((imgUrl, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => setActiveImageIndex(idx)}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.thumbBox,
-                    activeImageIndex === idx && styles.thumbBoxActive,
-                  ]}
-                >
-                  <Image
-                    source={{ uri: imgUrl }}
-                    style={styles.thumbImage}
-                    resizeMode="cover"
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
+        <View style={styles.heroContainer}>
+          <Image source={{ uri: invite.image }} style={styles.heroImage} resizeMode="cover" />
+          <View style={styles.heroOverlay} />
         </View>
 
-        {/* DETAILS HEADER */}
-        <View style={styles.detailsCard}>
-          <Text style={styles.inviteTitle}>{invite.name}</Text>
+        {/* OVERLAPPING MAIN CARD */}
+        <View style={styles.mainCard}>
+          {/* Header Row: logo + name + badge + rating */}
+          <View style={styles.titleRow}>
+            <Image source={{ uri: invite.image }} style={styles.logoThumbnail} resizeMode="cover" />
+            <View style={styles.titleInfo}>
+              <Text style={styles.studioName} numberOfLines={2}>
+                {invite.name}
+              </Text>
 
-          <View style={styles.locationRow}>
-            <MapPin className="w-4 h-4 text-[#581420] mr-1" />
-            <Text style={styles.locationText}>
-              {invite.location}, {invite.city}
-            </Text>
-          </View>
-
-          <Text style={styles.categoryBadge}>{invite.category}</Text>
-
-          <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Package className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Min Order</Text>
-              <Text style={styles.statValue}>{invite.minOrderQuantity}</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Clock className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Delivery Time</Text>
-              <Text style={styles.statValue}>{invite.turnaroundTime}</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Printer className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Customization</Text>
-              <Text style={styles.statValue}>{invite.customizationOptions}</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Award className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Experience</Text>
-              <Text style={styles.statValue}>{invite.experience}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* ABOUT */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeaderTitle}>About the Designer</Text>
-          <Text style={styles.descriptionText}>{invite.description}</Text>
-        </View>
-
-        {/* SPECIALTIES */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeaderTitle}>Invitation Features & Finishes</Text>
-          <View style={styles.amenitiesGrid}>
-            {invite.specialties.map((item, idx) => (
-              <View key={idx} style={styles.amenityChip}>
-                <CheckCircle2 className="w-4 h-4 text-[#581420] mr-2" />
-                <Text style={styles.amenityText}>{item}</Text>
+              <View style={styles.totBadge}>
+                <ShieldCheck size={10} color="#C28E38" />
+                <Text style={styles.totBadgeText}>TOT CERTIFIED</Text>
               </View>
-            ))}
-          </View>
-        </View>
 
-        {/* PACKAGES */}
-        {invite.packages && invite.packages.length > 0 && (
-          <View style={styles.sectionCard}>
-            <Text style={styles.sectionHeaderTitle}>Card Pricing & Options</Text>
-            {invite.packages.map((pkg, idx) => (
-              <View key={idx} style={styles.packageCard}>
-                <View style={styles.packageHeader}>
-                  <Text style={styles.packageTitle}>{pkg.title}</Text>
-                  <Text style={styles.packagePrice}>{pkg.price}</Text>
+              <Text style={styles.subtitleText}>{invite.category}</Text>
+              <Text style={styles.subtitleText}>
+                {invite.tier} • {invite.location}
+              </Text>
+
+              <View style={styles.ratingRow}>
+                <Star size={12} color="#FBBF24" fill="#FBBF24" />
+                <Text style={styles.ratingText}>
+                  {invite.rating.toFixed(1)}{' '}
+                  <Text style={styles.reviewsCount}>({invite.reviewsCount} Reviews)</Text>
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          {/* QUICK INFO (4 columns) */}
+          <View style={styles.quickInfoBox}>
+            <View style={styles.quickInfoItem}>
+              <Award size={16} color="#4B5563" />
+              <Text style={styles.quickInfoVal}>{invite.experience}</Text>
+              <Text style={styles.quickInfoLbl}>Years Exp.</Text>
+            </View>
+
+            <View style={styles.quickInfoDivider} />
+
+            <View style={styles.quickInfoItem}>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: '#4B5563', marginBottom: 2 }}>
+                ₹₹₹
+              </Text>
+              <Text style={styles.quickInfoVal}>Price Range</Text>
+              <Text style={styles.quickInfoLbl}>{invite.startingPrice}</Text>
+            </View>
+
+            <View style={styles.quickInfoDivider} />
+
+            <View style={styles.quickInfoItem}>
+              <Printer size={16} color="#4B5563" />
+              <Text style={styles.quickInfoVal}>Languages</Text>
+              <Text style={styles.quickInfoLbl}>Tamil, English</Text>
+            </View>
+
+            <View style={styles.quickInfoDivider} />
+
+            <View style={styles.quickInfoItem}>
+              <Clock size={16} color="#10B981" />
+              <Text style={styles.quickInfoVal}>Delivery</Text>
+              <Text style={[styles.quickInfoLbl, { color: '#10B981' }]}>
+                {invite.turnaroundTime}
+              </Text>
+            </View>
+          </View>
+
+          {/* ABOUT */}
+          <Text style={styles.sectionTitle}>About {invite.name.split(' ').slice(0, 3).join(' ')}</Text>
+          <Text style={styles.descriptionText}>
+            {invite.description}
+            {'\n\n'}Specializing in {invite.category.toLowerCase()} with{' '}
+            {invite.experience} of experience, catering to couples across Tamil Nadu. Minimum order of{' '}
+            {invite.minOrderQuantity} with a delivery time of {invite.turnaroundTime}.
+          </Text>
+
+          {/* MEDIA TABS */}
+          <View style={styles.mediaTabs}>
+            <View style={styles.mediaTabActiveContainer}>
+              <Text style={styles.mediaTabActive}>Photos ({invite.portfolio.length})</Text>
+              <View style={styles.mediaTabActiveIndicator} />
+            </View>
+            <Text style={styles.mediaTabInactive}>Videos</Text>
+          </View>
+          <View style={styles.mediaTabsLine} />
+
+          {/* PHOTO GRID (2x2) */}
+          <View style={styles.photoGrid}>
+            <TouchableOpacity
+              style={styles.photoGridItem}
+              onPress={() => setActivePhotoModal(portfolioImages[0])}
+            >
+              <Image source={{ uri: portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.photoGridItem}
+              onPress={() => setActivePhotoModal(portfolioImages[1])}
+            >
+              <Image source={{ uri: portfolioImages[1] }} style={styles.photoImg} resizeMode="cover" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.photoGridItem}
+              onPress={() => setActivePhotoModal(portfolioImages[2])}
+            >
+              <Image source={{ uri: portfolioImages[2] }} style={styles.photoImg} resizeMode="cover" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.photoGridItem}
+              onPress={() => setActivePhotoModal(portfolioImages[3])}
+            >
+              <Image source={{ uri: portfolioImages[3] }} style={styles.photoImg} resizeMode="cover" />
+              <View style={styles.morePhotosOverlay}>
+                <Text style={styles.morePhotosText}>
+                  +{Math.max(0, invite.portfolio.length - 3)}
+                </Text>
+                <Text style={styles.morePhotosSubtext}>More Photos</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* TAGS ROW */}
+          <View style={styles.tagsRow}>
+            <View style={styles.tagItem}>
+              <MapPin size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>{invite.location}, Tamil Nadu</Text>
+            </View>
+            <View style={styles.tagItem}>
+              <Package size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>Min: {invite.minOrderQuantity}</Text>
+            </View>
+            <View style={styles.tagItem}>
+              <Sparkles size={12} color="#7D6E70" />
+              <Text style={styles.tagText}>{invite.customizationOptions.split(',')[0]}</Text>
+            </View>
+          </View>
+
+          {/* BADGES */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.badgesScroll}
+          >
+            <View style={styles.badgeCard}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#4285F4', marginBottom: 4 }}>
+                G
+              </Text>
+              <Text style={styles.badgeTitle}>Google Reviews</Text>
+              <Text style={styles.badgeVal}>
+                {invite.rating}★
+              </Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <Instagram size={16} color="#E1306C" style={{ marginBottom: 4 }} />
+              <Text style={styles.badgeTitle}>Instagram</Text>
+              <Text style={styles.badgeVal}>@{invite.name.split(' ')[0].toLowerCase()}</Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <Award size={16} color="#D97706" style={{ marginBottom: 4 }} />
+              <Text style={styles.badgeTitle}>Awards</Text>
+              <Text style={styles.badgeVal}>3 Awards</Text>
+            </View>
+            <View style={styles.badgeCard}>
+              <ShieldCheck size={16} color="#10B981" style={{ marginBottom: 4 }} />
+              <Text style={styles.badgeTitle}>TOT Certified</Text>
+              <Text style={styles.badgeVal}>Verified Vendor</Text>
+            </View>
+          </ScrollView>
+
+          {/* POPULAR PACKAGES */}
+          <Text style={styles.sectionTitle}>Our Popular Packages</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.packagesScroll}
+          >
+            {invite.features.map((feat, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={styles.packagePill}
+                onPress={() => setShowQuoteModal(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.packagePillText}>{feat}</Text>
+              </TouchableOpacity>
+            ))}
+            {invite.specialties.slice(0, 2).map((spec, idx) => (
+              <TouchableOpacity
+                key={`s-${idx}`}
+                style={styles.packagePill}
+                onPress={() => setShowQuoteModal(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.packagePillText}>
+                  {spec.split(' ').slice(0, 3).join(' ')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* GOOGLE REVIEWS */}
+          <View style={styles.reviewsHeader}>
+            <Text style={styles.sectionTitle}>Google Reviews</Text>
+            <TouchableOpacity>
+              <Text style={styles.viewAllText}>View All</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.googleReviewCard}>
+            <View style={styles.gReviewHeader}>
+              <View style={styles.gReviewAvatar}>
+                <Text style={styles.gReviewAvatarText}>P</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.gReviewName}>Priya Venkatesh</Text>
+                <Text style={styles.gReviewTime}>2 weeks ago</Text>
+              </View>
+              <View style={styles.gReviewRating}>
+                <Text style={styles.gReviewRatingText}>5.0</Text>
+                <View style={{ flexDirection: 'row', gap: 2 }}>
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
                 </View>
-                <Text style={styles.packageDesc}>{pkg.description}</Text>
               </View>
-            ))}
+            </View>
+            <Text style={styles.gReviewComment}>
+              "The invitation cards were absolutely stunning! Our guests were wowed before even attending the wedding. Perfect gold foil finish and delivered right on time."
+            </Text>
+            <View style={{ alignItems: 'flex-end', marginTop: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#4285F4' }}>G</Text>
+            </View>
           </View>
-        )}
+
+          <View style={styles.googleReviewCard}>
+            <View style={styles.gReviewHeader}>
+              <View style={[styles.gReviewAvatar, { backgroundColor: '#7C3B1E' }]}>
+                <Text style={styles.gReviewAvatarText}>A</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.gReviewName}>Arun & Deepika</Text>
+                <Text style={styles.gReviewTime}>1 month ago</Text>
+              </View>
+              <View style={styles.gReviewRating}>
+                <Text style={styles.gReviewRatingText}>5.0</Text>
+                <View style={{ flexDirection: 'row', gap: 2 }}>
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                  <Star size={10} color="#FBBF24" fill="#FBBF24" />
+                </View>
+              </View>
+            </View>
+            <Text style={styles.gReviewComment}>
+              "Amazing quality gold foil work. The monogram came out exactly as we imagined. Highly recommend for luxury invitation cards!"
+            </Text>
+            <View style={{ alignItems: 'flex-end', marginTop: 8 }}>
+              <Text style={{ fontSize: 16, fontWeight: '900', color: '#4285F4' }}>G</Text>
+            </View>
+          </View>
+        </View>
       </ScrollView>
 
-      {/* BOTTOM ACTION BAR */}
-      <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting Price</Text>
-          <Text style={styles.bottomPriceValue}>{invite.startingPrice}</Text>
-        </View>
+      {/* STICKY BOTTOM ACTION BAR */}
+      <View style={styles.bottomBarNew}>
+        <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
+          <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
+          <Text style={styles.btnWhatsappText}>WhatsApp</Text>
+        </TouchableOpacity>
 
-        <View style={styles.bottomActionsRow}>
-          <TouchableOpacity
-            style={styles.circleCallBtn}
-            onPress={handleCall}
-            activeOpacity={0.8}
-          >
-            <Phone className="w-4 h-4 text-[#581420]" />
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.btnCall} onPress={handleCall} activeOpacity={0.8}>
+          <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
+          <Text style={styles.btnCallText}>Call Now</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.circleWhatsAppBtn}
-            onPress={handleWhatsApp}
-            activeOpacity={0.8}
-          >
-            <MessageCircle className="w-4 h-4 text-emerald-700" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.primaryQuoteBtn}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={styles.btnQuote}
+          onPress={() => setShowQuoteModal(true)}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.btnQuoteText}>Send Quotes</Text>
+        </TouchableOpacity>
       </View>
 
+      {/* PHOTO ZOOM MODAL */}
+      <Modal visible={Boolean(activePhotoModal)} transparent animationType="fade">
+        <View style={styles.photoModalContainer}>
+          <TouchableOpacity
+            style={styles.photoModalClose}
+            onPress={() => setActivePhotoModal(null)}
+          >
+            <X className="w-6 h-6 text-white" />
+          </TouchableOpacity>
+          {activePhotoModal && (
+            <Image
+              source={{ uri: activePhotoModal }}
+              style={styles.fullPhoto}
+              resizeMode="contain"
+            />
+          )}
+        </View>
+      </Modal>
+
       {/* REQUEST QUOTE MODAL */}
-      {showQuoteModal && (
-        <Modal
-          visible={showQuoteModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowQuoteModal(false)}
-        >
-          <View style={styles.modalBg}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-[92%] max-w-md bg-white rounded-2xl overflow-hidden shadow-2xl p-5"
-            >
-              <View style={styles.modalHeader}>
-                <View>
-                  <Text style={styles.modalTitle}>Request Invitation Quote</Text>
-                  <Text style={styles.modalSub}>{invite.name}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => setShowQuoteModal(false)}
-                  style={styles.modalCloseBtn}
-                >
-                  <X className="w-5 h-5 text-stone-500" />
-                </TouchableOpacity>
-              </View>
-
-              {quoteSuccess ? (
-                <View style={styles.successContainer}>
-                  <CheckCircle2 className="w-12 h-12 text-emerald-600 mb-2" />
-                  <Text style={styles.successTitle}>Quote Request Sent!</Text>
-                  <Text style={styles.successSub}>
-                    {invite.name} will share a custom design proof and quote via WhatsApp.
-                  </Text>
-                </View>
-              ) : (
-                <form onSubmit={handleSubmitQuote}>
-                  <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false}>
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Your Name *</Text>
-                      <TextInput
-                        style={styles.formInput}
-                        placeholder="e.g. Ananya & Karthik"
-                        value={guestName}
-                        onChangeText={setGuestName}
-                      />
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Phone Number *</Text>
-                      <TextInput
-                        style={styles.formInput}
-                        placeholder="e.g. +91 98765 43210"
-                        keyboardType="phone-pad"
-                        value={guestPhone}
-                        onChangeText={setGuestPhone}
-                      />
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Card Quantity Required</Text>
-                      <View style={styles.chipRow}>
-                        {['100 Cards', '250 Cards', '500 Cards', '1,000+ Cards'].map((q) => (
-                          <TouchableOpacity
-                            key={q}
-                            style={[
-                              styles.selectChip,
-                              cardQuantity === q && styles.selectChipActive,
-                            ]}
-                            onPress={() => setCardQuantity(q)}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipText,
-                                cardQuantity === q && styles.selectChipTextActive,
-                              ]}
-                            >
-                              {q}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Request Physical Sample Kit?</Text>
-                      <View style={styles.chipRow}>
-                        {['Yes, send sample kit', 'Digital proof only'].map((s) => (
-                          <TouchableOpacity
-                            key={s}
-                            style={[
-                              styles.selectChip,
-                              sampleKitRequested === s && styles.selectChipActive,
-                            ]}
-                            onPress={() => setSampleKitRequested(s)}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipText,
-                                sampleKitRequested === s && styles.selectChipTextActive,
-                              ]}
-                            >
-                              {s}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Customization & Language Needs</Text>
-                      <TextInput
-                        style={[styles.formInput, { height: 70, paddingTop: 8 }]}
-                        placeholder="e.g. Tamil & English inserts, Gold foil embossing, wax seal..."
-                        multiline
-                        numberOfLines={3}
-                        value={additionalNotes}
-                        onChangeText={setAdditionalNotes}
-                      />
-                    </View>
-                  </ScrollView>
-
-                  <TouchableOpacity
-                    style={styles.submitModalBtn}
-                    onPress={handleSubmitQuote as any}
-                    activeOpacity={0.85}
-                  >
-                    <Send className="w-4 h-4 text-white mr-1.5" />
-                    <Text style={styles.submitModalBtnText}>Send Invitation Quote Request</Text>
-                  </TouchableOpacity>
-                </form>
-              )}
-            </motion.div>
-          </View>
-        </Modal>
-      )}
+      <RequestQuoteModal
+        visible={showQuoteModal}
+        onClose={() => setShowQuoteModal(false)}
+        studioName={invite.name}
+        startingPrice={invite.startingPrice}
+        location={invite.location}
+        category="invitation"
+      />
     </View>
   );
 };
@@ -446,303 +497,464 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
+    maxHeight: '100%',
+    width: '100%',
     backgroundColor: '#FAF7F2',
+    overflow: 'hidden',
   },
-  topHeader: {
+
+  /* NAV HEADER */
+  navHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
-    zIndex: 30,
+    paddingHorizontal: 16,
+    zIndex: 20,
   },
-  headerTitleText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#3B2F2F',
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 10,
-  },
-  iconCircleBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#F3ECE4',
-    alignItems: 'center',
+  navBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.85)',
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(232, 223, 213, 0.5)',
   },
-  heroWrapper: {
-    position: 'relative',
-    width: '100%',
+
+  /* HERO */
+  heroContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     height: 320,
-    backgroundColor: '#1C1917',
+    zIndex: 0,
   },
   heroImage: {
     width: '100%',
     height: '100%',
   },
-  tierBadge: {
-    position: 'absolute',
-    top: 14,
-    left: 14,
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+  },
+
+  /* MAIN OVERLAPPING CARD */
+  mainCard: {
+    marginTop: 220,
+    backgroundColor: '#FAF7F2',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    minHeight: 800,
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    zIndex: 10,
+  },
+
+  /* TITLE ROW */
+  titleRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
+    alignItems: 'flex-start',
+    marginBottom: 20,
   },
-  tierBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#581420',
-  },
-  ratingOverlay: {
-    position: 'absolute',
-    top: 14,
-    right: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
-  },
-  ratingValueText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 13,
-  },
-  ratingCountText: {
-    color: '#E7E5E4',
-    fontSize: 11,
-    marginLeft: 3,
-  },
-  thumbRow: {
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 12,
-  },
-  thumbBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginRight: 8,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  thumbBoxActive: {
-    borderColor: '#581420',
-  },
-  thumbImage: {
-    width: '100%',
-    height: '100%',
-  },
-  detailsCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
+  logoThumbnail: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    marginRight: 16,
+    backgroundColor: '#FFF',
     borderWidth: 1,
     borderColor: '#E8DFD5',
   },
-  inviteTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#581420',
-    marginBottom: 6,
+  titleInfo: {
+    flex: 1,
   },
-  locationRow: {
+  studioName: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#2A2425',
+    marginBottom: 4,
+  },
+  totBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FDF6E3',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: '#F3E5AB',
+  },
+  totBadgeText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#92400E',
+    marginLeft: 4,
+  },
+  subtitleText: {
+    fontSize: 11,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  ratingText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#2A2425',
+    marginLeft: 4,
+  },
+  reviewsCount: {
+    fontWeight: '400',
+    color: '#6B7280',
+  },
+
+  /* QUICK INFO */
+  quickInfoBox: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    marginBottom: 24,
+  },
+  quickInfoItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  quickInfoVal: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginTop: 6,
+    marginBottom: 2,
+    textAlign: 'center',
+  },
+  quickInfoLbl: {
+    fontSize: 9,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  quickInfoDivider: {
+    width: 1,
+    height: '80%',
+    backgroundColor: '#E5E7EB',
+    alignSelf: 'center',
+  },
+
+  /* SECTION */
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#2A2425',
+    marginBottom: 10,
+  },
+  descriptionText: {
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: '#4B5563',
+    marginBottom: 24,
+  },
+
+  /* MEDIA TABS */
+  mediaTabs: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
   },
-  locationText: {
+  mediaTabActiveContainer: {
+    marginRight: 24,
+    alignItems: 'center',
+  },
+  mediaTabActive: {
     fontSize: 13,
-    color: '#6B5E5E',
-    fontWeight: '500',
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#F3ECE4',
-    color: '#581420',
-    fontSize: 12,
     fontWeight: '700',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 14,
+    color: '#2A2425',
+    marginBottom: 6,
   },
-  statsGrid: {
+  mediaTabActiveIndicator: {
+    width: 24,
+    height: 3,
+    backgroundColor: '#581420',
+    borderRadius: 2,
+  },
+  mediaTabInactive: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    marginBottom: 9,
+  },
+  mediaTabsLine: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 16,
+    marginTop: -8,
+  },
+
+  /* PHOTO GRID */
+  photoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    marginBottom: 16,
   },
-  statBox: {
-    width: '48%',
-    backgroundColor: '#FAF7F2',
-    padding: 10,
+  photoGridItem: {
+    width: '48.5%',
+    aspectRatio: 1.4,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
+    overflow: 'hidden',
   },
-  statLabel: {
+  photoImg: {
+    width: '100%',
+    height: '100%',
+  },
+  morePhotosOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  morePhotosText: {
+    color: '#FFF',
+    fontSize: 20,
+    fontWeight: '800',
+  },
+  morePhotosSubtext: {
+    color: '#FBBF24',
     fontSize: 11,
-    color: '#7D6E70',
     fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  statValue: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#3B2F2F',
     marginTop: 2,
   },
-  sectionCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  sectionHeaderTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#581420',
-    marginBottom: 10,
-  },
-  descriptionText: {
-    fontSize: 13.5,
-    color: '#524646',
-    lineHeight: 20,
-  },
-  amenitiesGrid: {
+
+  /* TAGS */
+  tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
+    marginBottom: 24,
   },
-  amenityChip: {
-    width: '47%',
+  tagItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAF7F2',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
+  },
+  tagText: {
+    fontSize: 11,
+    color: '#4B5563',
+    marginLeft: 4,
+  },
+
+  /* BADGES */
+  badgesScroll: {
+    gap: 12,
+    paddingRight: 16,
+    marginBottom: 24,
+  },
+  badgeCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  amenityText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#3B2F2F',
-  },
-  packageCard: {
-    backgroundColor: '#FAF7F2',
-    padding: 14,
+    borderColor: '#E5E7EB',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    marginBottom: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    minWidth: 100,
   },
-  packageHeader: {
+  badgeTitle: {
+    fontSize: 10,
+    color: '#4B5563',
+    marginBottom: 2,
+  },
+  badgeVal: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+
+  /* PACKAGES */
+  packagesScroll: {
+    gap: 10,
+    paddingRight: 16,
+    marginBottom: 28,
+  },
+  packagePill: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: '#FFF',
+  },
+  packagePillText: {
+    fontSize: 11.5,
+    color: '#374151',
+    fontWeight: '500',
+  },
+
+  /* REVIEWS */
+  reviewsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
   },
-  packageTitle: {
-    fontSize: 14,
+  viewAllText: {
+    fontSize: 12,
     fontWeight: '700',
     color: '#581420',
   },
-  packagePrice: {
-    fontSize: 13.5,
-    fontWeight: '800',
-    color: '#065F46',
+  googleReviewCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
   },
-  packageDesc: {
-    fontSize: 12.5,
-    color: '#6B5E5E',
+  gReviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  gReviewAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#581420',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  gReviewAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  gReviewName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1F2937',
+  },
+  gReviewTime: {
+    fontSize: 10,
+    color: '#9CA3AF',
+  },
+  gReviewRating: {
+    alignItems: 'flex-end',
+  },
+  gReviewRatingText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  gReviewComment: {
+    fontSize: 12,
+    color: '#4B5563',
     lineHeight: 18,
   },
-  bottomBar: {
+
+  /* BOTTOM BAR */
+  bottomBarNew: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: 68,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
     borderTopWidth: 1,
-    borderTopColor: '#E8DFD5',
+    borderTopColor: '#E5E7EB',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    zIndex: 40,
-  },
-  bottomPriceCol: {
-    flexDirection: 'column',
-    flexShrink: 1,
-    marginRight: 4,
-  },
-  bottomPriceLabel: {
-    fontSize: 9.5,
-    color: '#7D6E70',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  bottomPriceValue: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#581420',
-  },
-  bottomActionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flexShrink: 0,
-  },
-  circleCallBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3ECE4',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circleWhatsAppBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#DCFCE7',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryQuoteBtn: {
-    backgroundColor: '#581420',
     paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 18,
+    zIndex: 20,
+    gap: 8,
+  },
+  btnWhatsapp: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#A7F3D0',
   },
-  primaryQuoteBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+  btnWhatsappText: {
     fontSize: 12,
+    fontWeight: '700',
+    color: '#065F46',
   },
+  btnCall: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  btnCallText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  btnQuote: {
+    flex: 1.3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#380B13',
+  },
+  btnQuoteText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#F3E5AB',
+  },
+
+  /* PHOTO MODAL */
+  photoModalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.92)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  photoModalClose: {
+    position: 'absolute',
+    top: 24,
+    right: 24,
+    zIndex: 10,
+    padding: 8,
+  },
+  fullPhoto: {
+    width: '100%',
+    height: '80%',
+  },
+
+  /* QUOTE MODAL */
   modalBg: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.65)',
@@ -764,8 +976,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#7D6E70',
   },
-  modalCloseBtn: {
-    padding: 4,
+  successContainer: {
+    alignItems: 'center',
+    paddingVertical: 24,
+  },
+  successTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#065F46',
+    marginBottom: 6,
+  },
+  successSub: {
+    fontSize: 13,
+    color: '#6B5E5E',
+    textAlign: 'center',
+    lineHeight: 19,
   },
   formGroup: {
     marginBottom: 12,
@@ -800,44 +1025,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   selectChipActive: {
-    backgroundColor: '#581420',
+    backgroundColor: '#F3ECE4',
     borderColor: '#581420',
   },
   selectChipText: {
-    fontSize: 11.5,
-    color: '#524646',
-    fontWeight: '600',
+    fontSize: 12,
+    color: '#6B5E5E',
+    fontWeight: '500',
   },
   selectChipTextActive: {
-    color: '#FFFFFF',
+    color: '#581420',
+    fontWeight: '700',
   },
   submitModalBtn: {
     backgroundColor: '#581420',
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 13,
+    borderRadius: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   submitModalBtnText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 13.5,
-  },
-  successContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  successTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#065F46',
-    marginBottom: 4,
-  },
-  successSub: {
-    fontSize: 12.5,
-    color: '#4B5563',
-    textAlign: 'center',
+    fontSize: 13,
   },
 });
