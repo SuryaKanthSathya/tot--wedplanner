@@ -453,6 +453,12 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showCarsListing, setShowCarsListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
 
+  // My Quotes Modal States in My Wedding Screen
+  const [showQuoteDetailModal, setShowQuoteDetailModal] = useState(false);
+  const [showMyWeddingPaymentModal, setShowMyWeddingPaymentModal] = useState(false);
+  const [confirmedQuotePaymentStatus, setConfirmedQuotePaymentStatus] = useState<'pending' | 'partially_paid' | 'fully_paid'>('pending');
+  const [myWeddingPaymentOption, setMyWeddingPaymentOption] = useState<'advance' | 'full'>('advance');
+
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
@@ -1492,5 +1498,97 @@ const styles: any = StyleSheet.create({
     color: '#8A817C',
     marginTop: 1,
     textAlign: 'center',
+  },
+  myQuotesCard: {
+    width: '100%',
+    backgroundColor: '#FAF7F2',
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 16,
+  },
+  myQuotesHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  myQuotesCardTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  quoteBadgeCount: {
+    backgroundColor: '#F5EBE6',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  quoteBadgeCountText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#8B1E2F',
+  },
+  quoteItemBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+  },
+  quoteVendorTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  quoteCategorySubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  quotePriceTag: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#8B1E2F',
+  },
+  quoteStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 12,
+  },
+  quoteConfirmedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  quoteConfirmedText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#15803D',
+  },
+  quotePaymentPendingText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#D97706',
+  },
+  quoteViewBtn: {
+    backgroundColor: '#581420',
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quoteViewBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });

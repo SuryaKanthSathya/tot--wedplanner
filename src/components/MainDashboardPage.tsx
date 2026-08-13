@@ -11,6 +11,7 @@ import { DestinationWeddingFlow } from './DestinationWeddingFlow';
 import { SavedTabScreen } from './SavedTabScreen';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
+import { MyQuotesTabScreen } from './MyQuotesTabScreen';
 import {
   View,
   Text,
@@ -37,7 +38,7 @@ import {
   Grid,
   Home,
   Heart,
-  MessageSquare,
+  FileText,
   User,
   X,
   Phone,
@@ -63,7 +64,7 @@ interface MainDashboardPageProps {
     budget?: string;
     weddingStyle?: string;
   } | null;
-  initialTab?: 'home' | 'my-wedding' | 'saved' | 'messages' | 'profile';
+  initialTab?: 'home' | 'my-wedding' | 'saved' | 'quotes' | 'profile';
   onLogout?: () => void;
   onNavigateToCoupleOnboarding?: () => void;
 }
@@ -82,7 +83,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     weddingProfile && (weddingProfile.brideName || weddingProfile.marriageType)
   );
 
-  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'saved' | 'messages' | 'profile'>(
+  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'saved' | 'quotes' | 'profile'>(
     initialTab === 'my-wedding' && !isPlannerCreated ? 'home' : initialTab
   );
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
@@ -536,6 +537,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedInvite={toggleSavedInvite}
           onOpenSavedTab={() => setActiveTab('saved')}
         />
+      ) : activeTab === 'quotes' ? (
+        <MyQuotesTabScreen />
       ) : activeTab === 'saved' ? (
         <SavedTabScreen
           savedStudioIds={savedStudioIds}
@@ -902,20 +905,20 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
 
         <TouchableOpacity
           style={styles.tabItem}
-          onPress={() => setActiveTab('messages')}
+          onPress={() => setActiveTab('quotes')}
         >
-          <MessageSquare
+          <FileText
             className={`w-5 h-5 ${
-              activeTab === 'messages' ? 'text-[#581420]' : 'text-stone-400'
+              activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
             }`}
           />
           <Text
             style={[
               styles.tabLabel,
-              activeTab === 'messages' && styles.activeTabLabel,
+              activeTab === 'quotes' && styles.activeTabLabel,
             ]}
           >
-            Messages
+            My Quotes
           </Text>
         </TouchableOpacity>
 
