@@ -108,7 +108,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
   const [selectedArtist, setSelectedArtist] = useState<EntertainmentArtist | null>(null);
-  
+
   // Send Quote Modal State
   const [quoteArtist, setQuoteArtist] = useState<EntertainmentArtist | null>(null);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
@@ -119,7 +119,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   const [eventType, setEventType] = useState<'Wedding' | 'Reception' | 'Engagement' | 'Other'>('Wedding');
   const [entertainmentType, setEntertainmentType] = useState('Wedding Entertainment');
   const [showPhotoTypeDropdown, setShowPhotoTypeDropdown] = useState(false);
-  
+
   // Local fallback state if parent doesn't manage saved IDs
   const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Record<string, boolean>>(() => {
     try {
@@ -246,11 +246,10 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
             }}
           >
             <Heart
-              className={`w-5 h-5 ${
-                Object.values(bookmarkedIds).some(Boolean)
+              className={`w-5 h-5 ${Object.values(bookmarkedIds).some(Boolean)
                   ? 'text-[#8B1E2F] fill-[#8B1E2F]'
                   : 'text-[#2A2425]'
-              }`}
+                }`}
             />
           </TouchableOpacity>
         </View>
@@ -389,9 +388,8 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Bookmark
-                          className={`w-4 h-4 ${
-                            isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'
-                          }`}
+                          className={`w-4 h-4 ${isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'
+                            }`}
                         />
                       </TouchableOpacity>
                     </View>
