@@ -4,6 +4,8 @@ import christianCoupleImg from '../assets/images/christian_couple_arch_178646762
 import muslimCoupleImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
 import intercasteCoupleImg from '../assets/images/intercaste_couple_arch_new_1786468081966.jpg';
 import templeImg from '../assets/images/kanchipuram_temple_1786470394211.jpg';
+import churchImg from '../assets/images/christian_couple_arch_1786467622108.jpg';
+import masjidImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
 import {
   View,
   Text,
@@ -41,6 +43,7 @@ interface TellUsAboutCouplePageProps {
     location: string;
     guestCount?: string;
     budget?: string;
+    weddingStyle?: string;
   }) => void;
 }
 
@@ -885,7 +888,7 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
                     setSelectedLocation(e.target.value);
                     setIsLocationDropdownOpen(true);
                   }}
-                  placeholder="Select Tamil Nadu district or city"
+                  placeholder="Select a city"
                   className="w-full bg-transparent text-[#231F20] font-semibold text-[13.5px] outline-none font-['Plus_Jakarta_Sans',sans-serif] pr-8 placeholder:text-[#8C8283]"
                 />
                 {locationSearchQuery ? (
@@ -1192,10 +1195,18 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             <div className="w-full grid grid-cols-2 gap-3.5 my-2">
               {[
                 {
-                  id: 'Temple',
-                  label: 'Temple',
-                  image: templeImg,
-                  desc: 'Sacred Temple Mandap & Divine Rituals',
+                  id: marriageType === 'Christian' ? 'Church' : marriageType === 'Muslim' ? 'Masjid' : 'Temple',
+                  label: marriageType === 'Christian' ? 'Church' : marriageType === 'Muslim' ? 'Masjid' : 'Temple',
+                  image: marriageType === 'Christian' 
+                    ? churchImg
+                    : marriageType === 'Muslim'
+                    ? masjidImg
+                    : templeImg,
+                  desc: marriageType === 'Christian' 
+                    ? 'Classic Church Altar & Elegant Setup' 
+                    : marriageType === 'Muslim'
+                    ? 'Beautiful Masjid & Nikah Setup'
+                    : 'Sacred Temple Mandap & Divine Rituals',
                 },
                 {
                   id: 'Traditional',
