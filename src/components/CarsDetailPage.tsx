@@ -39,18 +39,18 @@ import {
   FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { EntertainmentItem as EntertainmentArtist } from '../constants/EntertainmentData';
+import { CarItem } from '../constants/CarsData';
 import { RequestQuoteModal } from './RequestQuoteModal';
 
-interface EntertainmentDetailPageProps {
-  artist: EntertainmentArtist;
+interface CarsDetailPageProps {
+  car: CarItem;
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
 }
 
-export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = ({
-  artist,
+export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
+  car,
   onBack,
   isBookmarked,
   onToggleBookmark,
@@ -66,9 +66,9 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [eventDate, setEventDate] = useState('15 December 2026');
-  const [eventLocation, setEventLocation] = useState(artist.location || 'Chennai, Tamil Nadu');
+  const [eventLocation, setEventLocation] = useState(car.location || 'Chennai, Tamil Nadu');
   const [eventType, setEventType] = useState<'Wedding' | 'Reception' | 'Engagement' | 'Other'>('Wedding');
-  const [entertainmentType, setEntertainmentType] = useState('Wedding Entertainment');
+  const [carsType, setCarsType] = useState('Wedding Cars');
   const [showPhotoTypeDropdown, setShowPhotoTypeDropdown] = useState(false);
 
   const showToast = (msg: string) => {
@@ -78,9 +78,9 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
     }, 3000);
   };
 
-  // Helper to get artist initials for logo
+  // Helper to get car initials for logo
   const getInitials = (name: string) => {
-    const words = name.replace(/entertainment/gi, '').trim().split(' ');
+    const words = name.replace(/cars/gi, '').trim().split(' ');
     if (words.length >= 2) {
       return (words[0][0] + words[1][0]).toUpperCase();
     }
@@ -89,7 +89,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
 
   // Sample photo gallery array
   const photoGallery = [
-    artist.image,
+    car.image,
     'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
@@ -100,15 +100,15 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
   const handleShare = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Artist link copied to clipboard!');
+      showToast('Car link copied to clipboard!');
     } else {
-      showToast('Sharing artist details...');
+      showToast('Sharing car details...');
     }
   };
 
   const handleWhatsApp = () => {
     const msg = encodeURIComponent(
-      `Hi ${artist.name}, I found your artist on the app. I would like to inquire about wedding entertainment packages in ${artist.location}.`
+      `Hi ${car.name}, I found your car on the app. I would like to inquire about wedding cars packages in ${car.location}.`
     );
     window.open(`https://wa.me/919876543210?text=${msg}`, '_blank');
   };
@@ -149,7 +149,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
       >
         {/* HERO COVER IMAGE & NAVIGATION BUTTONS */}
         <View style={styles.heroContainer}>
-          <Image source={{ uri: artist.image }} style={styles.heroImage} resizeMode="cover" />
+          <Image source={{ uri: car.image }} style={styles.heroImage} resizeMode="cover" />
 
           {/* Top Overlaid Action Bar */}
           <View style={styles.topOverlayBar}>
@@ -160,7 +160,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
             <View style={styles.topOverlayRightGroup}>
               <TouchableOpacity
                 style={styles.overlayCircleBtnLight}
-                onPress={() => onToggleBookmark(artist.id)}
+                onPress={() => onToggleBookmark(car.id)}
                 activeOpacity={0.8}
               >
                 <Heart
@@ -180,14 +180,14 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
         {/* OVERLAPPING MAIN STUDIO INFO CARD */}
         <View style={styles.mainContentCard}>
           {/* Logo Badge + Header Row */}
-          <View style={styles.artistHeaderRow}>
+          <View style={styles.carHeaderRow}>
             <View style={styles.logoBox}>
               <Camera className="w-6 h-6 text-[#E5A93C] mb-0.5" />
-              <Text style={styles.logoInitials}>{getInitials(artist.name)}</Text>
+              <Text style={styles.logoInitials}>{getInitials(car.name)}</Text>
             </View>
 
             <View style={styles.headerInfoCol}>
-              <Text style={styles.artistTitle}>{artist.name}</Text>
+              <Text style={styles.carTitle}>{car.name}</Text>
 
               {/* TOT CERTIFIED Gold Tag */}
               <View style={styles.certifiedBadge}>
@@ -196,14 +196,14 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
               </View>
 
               <Text style={styles.subtitleText}>
-                {artist.category} • <Text style={styles.tierHighlight}>{artist.tier}</Text> • {artist.location}
+                {car.category} • <Text style={styles.tierHighlight}>{car.tier}</Text> • {car.location}
               </Text>
 
               {/* Rating Row */}
               <View style={styles.ratingRow}>
                 <Star className="w-4 h-4 text-[#E5A93C] fill-[#E5A93C] mr-1" />
-                <Text style={styles.ratingBold}>{artist.rating}</Text>
-                <Text style={styles.reviewsCountText}> ({artist.reviewsCount} Reviews)</Text>
+                <Text style={styles.ratingBold}>{car.rating}</Text>
+                <Text style={styles.reviewsCountText}> ({car.reviewsCount} Reviews)</Text>
               </View>
             </View>
           </View>
@@ -212,7 +212,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
           <View style={styles.metricsBar}>
             <View style={styles.metricItem}>
               <Calendar className="w-4 h-4 text-[#8B1E2F] mb-1" />
-              <Text style={styles.metricVal}>{artist.experience || '8+ Years'}</Text>
+              <Text style={styles.metricVal}>{car.experience || '8+ Years'}</Text>
               <Text style={styles.metricLbl}>Exp.</Text>
             </View>
             <View style={styles.metricDivider} />
@@ -240,10 +240,10 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
 
           {/* ABOUT SECTION */}
           <View style={styles.sectionBlock}>
-            <Text style={styles.sectionTitle}>About {artist.name}</Text>
+            <Text style={styles.sectionTitle}>About {car.name}</Text>
             <Text style={styles.aboutText} numberOfLines={isReadMore ? undefined : 3}>
-              {artist.description ||
-                `${artist.name} is a team of passionate storytellers capturing real emotions and timeless wedding moments in ${artist.location}. Specializing in candid, traditional, cinematic and pre-wedding entertainment with modern lighting and high-resolution camera gear.`}
+              {car.description ||
+                `${car.name} is a team of passionate storytellers capturing real emotions and timeless wedding moments in ${car.location}. Specializing in candid, traditional, cinematic and pre-wedding cars with modern lighting and high-resolution camera gear.`}
             </Text>
             <TouchableOpacity onPress={() => setIsReadMore(!isReadMore)} style={styles.readMoreBtn}>
               <Text style={styles.readMoreText}>{isReadMore ? 'Read Less ▲' : 'Read More ▼'}</Text>
@@ -289,10 +289,10 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
                 {/* 4th slot with "+20 More Photos" overlay */}
                 <TouchableOpacity
                   style={styles.gridPhotoWrapper}
-                  onPress={() => setActivePhotoModal(photoGallery[3] || artist.image)}
+                  onPress={() => setActivePhotoModal(photoGallery[3] || car.image)}
                   activeOpacity={0.9}
                 >
-                  <Image source={{ uri: photoGallery[3] || artist.image }} style={styles.gridPhoto} resizeMode="cover" />
+                  <Image source={{ uri: photoGallery[3] || car.image }} style={styles.gridPhoto} resizeMode="cover" />
                   <View style={styles.morePhotosOverlay}>
                     <Text style={styles.morePhotosText}>+20</Text>
                     <Text style={styles.morePhotosSubtext}>More Photos</Text>
@@ -303,7 +303,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
               <View style={styles.videoPlaceholderBox}>
                 <Video className="w-8 h-8 text-[#8B1E2F] mb-2" />
                 <Text style={styles.videoBoxTitle}>4K Cinematic Teaser Reel Available</Text>
-                <Text style={styles.videoBoxSub}>Contact artist to view high resolution 4K wedding films.</Text>
+                <Text style={styles.videoBoxSub}>Contact car to view high resolution 4K wedding films.</Text>
               </View>
             )}
 
@@ -311,7 +311,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
             <View style={styles.quickInfoRow}>
               <View style={styles.quickChip}>
                 <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
-                <Text style={styles.quickChipText}>{artist.location}, Tamil Nadu</Text>
+                <Text style={styles.quickChipText}>{car.location}, Tamil Nadu</Text>
               </View>
 
               <View style={styles.quickChip}>
@@ -338,14 +338,14 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
                 <Text style={styles.googleIconG}>G</Text>
               </View>
               <Text style={styles.trustCardTitle}>Google Reviews</Text>
-              <Text style={styles.trustCardVal}>{artist.rating} ★</Text>
+              <Text style={styles.trustCardVal}>{car.rating} ★</Text>
             </View>
 
             <View style={styles.trustCard}>
               <Instagram className="w-5 h-5 text-[#E1306C] mb-1" />
               <Text style={styles.trustCardTitle}>Instagram</Text>
               <Text style={styles.trustCardVal} numberOfLines={1}>
-                @{artist.name.toLowerCase().replace(/[^a-z0-9]/g, '')}
+                @{car.name.toLowerCase().replace(/[^a-z0-9]/g, '')}
               </Text>
             </View>
 
@@ -439,9 +439,9 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
         visible={showQuoteModal}
-        vendorName={artist.name}
-        vendorLocation={artist.location}
-        category="entertainment"
+        vendorName={car.name}
+        vendorLocation={car.location}
+        category="cars"
         onQuoteSent={() => showToast('Quote Request Sent Successfully!')}
         onClose={() => setShowQuoteModal(false)}
       />
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 18,
   },
-  artistHeaderRow: {
+  carHeaderRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 16,
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
   headerInfoCol: {
     flex: 1,
   },
-  artistTitle: {
+  carTitle: {
     fontFamily: 'Playfair Display, Georgia, serif',
     fontSize: 19,
     fontWeight: '700',
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 6,
   },
-  topArtistCard: {
+  topCarCard: {
     backgroundColor: '#FAF2E8',
     borderWidth: 1,
     borderColor: '#EFE3D3',
@@ -1063,12 +1063,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 12,
   },
-  topArtistAvatar: {
+  topCarAvatar: {
     width: 58,
     height: 58,
     borderRadius: 14,
   },
-  topArtistInfo: {
+  topCarInfo: {
     flex: 1,
     marginLeft: 12,
   },
@@ -1077,7 +1077,7 @@ const styles = StyleSheet.create({
     color: '#786B6D',
     fontWeight: '500',
   },
-  topArtistName: {
+  topCarName: {
     fontFamily: 'Playfair Display, Georgia, serif',
     fontSize: 17,
     fontWeight: '800',
@@ -1085,11 +1085,11 @@ const styles = StyleSheet.create({
     marginTop: 1,
     marginBottom: 2,
   },
-  topArtistLocRow: {
+  topCarLocRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  topArtistLocText: {
+  topCarLocText: {
     fontSize: 12,
     color: '#6E5D60',
     fontWeight: '500',

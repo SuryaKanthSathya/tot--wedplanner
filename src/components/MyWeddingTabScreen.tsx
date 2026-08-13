@@ -125,6 +125,8 @@ interface MyWeddingTabScreenProps {
   onToggleSavedVenue?: (id: string) => void;
   savedEntIds?: Record<string, boolean>;
   onToggleSavedEnt?: (id: string) => void;
+  savedCarIds?: Record<string, boolean>;
+  onToggleSavedCar?: (id: string) => void;
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onOpenSavedTab?: () => void;
@@ -373,6 +375,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onToggleSavedVenue,
   savedEntIds,
   onToggleSavedEnt,
+  savedCarIds,
+  onToggleSavedCar,
   savedInviteIds,
   onToggleSavedInvite,
   onOpenSavedTab,

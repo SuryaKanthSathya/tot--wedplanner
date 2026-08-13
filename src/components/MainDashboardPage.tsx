@@ -5,6 +5,7 @@ import { MakeupListingPage } from './MakeupListingPage';
 import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
 import { EntertainmentListingPage } from './EntertainmentListingPage';
+import { CarsListingPage } from './CarsListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
 import { DestinationWeddingFlow } from './DestinationWeddingFlow';
 import { SavedTabScreen } from './SavedTabScreen';
@@ -86,7 +87,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showMakeupListing, setShowMakeupListing] = useState<boolean>(false);
   const [showDecorListing, setShowDecorListing] = useState<boolean>(false);
   const [showVenueListing, setShowVenueListing] = useState<boolean>(false);
-  const [showEntertainmentListing, setShowEntertainmentListing] = useState<boolean>(false);
+  const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
+  const [showCarsListing, setShowCarsListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState<boolean>(false);
   const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
@@ -197,11 +199,32 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
   });
 
+  const [savedCarIds, setSavedCarIds] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('saved_cars');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   const toggleSavedEnt = (id: string) => {
     setSavedEntIds((prev) => {
       const updated = { ...prev, [id]: !prev[id] };
       try {
         localStorage.setItem('saved_entertainment', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
+  const toggleSavedCar = (id: string) => {
+    setSavedCarIds((prev) => {
+      const updated = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem('saved_cars', JSON.stringify(updated));
       } catch (e) {
         console.error(e);
       }
@@ -262,6 +285,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
     if (featureName === 'Invitations' || featureName === 'Wedding Cards & Invites') {
       setShowInvitationListing(true);
+      return;
+    }
+    if (featureName === 'Cars') {
+      setShowCarsListing(true);
       return;
     }
     if (featureName === 'Destination Wedding') {
@@ -361,6 +388,20 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     );
   }
 
+  if (showCarsListing) {
+    return (
+      <CarsListingPage
+        onBack={() => setShowCarsListing(false)}
+        savedCarIds={savedCarIds}
+        onToggleSavedCar={toggleSavedCar}
+        onOpenSavedTab={() => {
+          setShowCarsListing(false);
+          setActiveTab('saved');
+        }}
+      />
+    );
+  }
+
   if (showInvitationListing) {
     return (
       <InvitationListingPage
@@ -403,6 +444,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedVenue={toggleSavedVenue}
           savedEntIds={savedEntIds}
           onToggleSavedEnt={toggleSavedEnt}
+          savedCarIds={savedCarIds}
+          onToggleSavedCar={toggleSavedCar}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onOpenSavedTab={() => setActiveTab('saved')}
@@ -420,10 +463,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onExploreDecor={() => setShowDecorListing(true)}
           savedVenueIds={savedVenueIds}
           onToggleSavedVenue={toggleSavedVenue}
-          onExploreVenues={() => setShowVenueListing(true)}
+          onExploreVenues={() => { setActiveTab('dashboard'); setShowVenueListing(true); }}
           savedEntIds={savedEntIds}
           onToggleSavedEnt={toggleSavedEnt}
-          onExploreEntertainment={() => setShowEntertainmentListing(true)}
+          onExploreEntertainment={() => { setActiveTab('dashboard'); setShowEntertainmentListing(true); }}
+          savedCarIds={savedCarIds}
+          onToggleSavedCar={toggleSavedCar}
+          onExploreCars={() => { setActiveTab('dashboard'); setShowCarsListing(true); }}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onExploreInvitations={() => setShowInvitationListing(true)}
