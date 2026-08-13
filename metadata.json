@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Remix Remix Tale of Two - Wedding Planning",
+  "description": "High-fidelity mobile landing page and interactive luxury wedding planning app.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

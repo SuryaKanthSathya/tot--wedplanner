@@ -1,0 +1,1210 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  StyleSheet,
+  TextInput,
+} from 'react-native-web';
+import {
+  ArrowLeft,
+  Star,
+  MapPin,
+  Heart,
+  Search,
+  Mail,
+  Users,
+  Eye,
+  Sparkles,
+  Bookmark,
+  Package,
+  Clock,
+  Printer,
+  Check,
+  X,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { InvitationItem, InvitationDetailPage } from './InvitationDetailPage';
+export type { InvitationItem };
+
+export const INVITATIONS_DATA: InvitationItem[] = [
+  {
+    id: 'inv-1',
+    name: 'Royal Crest Boxed Sweets & Gold Foil Card',
+    category: 'Boxed & Luxury',
+    city: 'Chennai',
+    location: 'T. Nagar, Chennai',
+    rating: 4.9,
+    reviewsCount: 215,
+    startingPrice: '₹280 / Box',
+    priceValue: 280,
+    tier: 'Luxury',
+    minOrderQuantity: '100 Boxes',
+    turnaroundTime: '10 - 12 Days',
+    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Rigid velvet or satin padded luxury gift box containing 3 inner inserts, gold electroplated metal couple monogram, and dual sweet/dry-fruit compartments.',
+    experience: '12+ Years',
+    customizationOptions: 'Full Custom Colors, Monograms & Inserts',
+    specialties: [
+      'Gold Electroplated Monograms',
+      'Velvet & Satin Box Finishing',
+      'Dry-fruit & Sweets Partition',
+      'Silk Ribbon Ribbon Seals',
+    ],
+    features: ['Luxury Box', 'Gold Monogram', 'Dry Fruit Compartment'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+    ],
+    packages: [
+      {
+        title: 'Rigid Boxed Sweets Suite',
+        price: '₹280 / Piece',
+        description: 'Includes Rigid Box + 3 Multi-color Inserts + Custom Monogram + Dry Fruit Trays.',
+      },
+    ],
+    phone: '+91 98421 22334',
+    whatsapp: '919842122334',
+  },
+  {
+    id: 'inv-2',
+    name: 'Kalyanam Paisley Gold Embossed Card',
+    category: 'Traditional Printed',
+    city: 'Chennai',
+    location: 'Sowcarpet, Chennai',
+    rating: 4.8,
+    reviewsCount: 180,
+    startingPrice: '₹45 / Card',
+    priceValue: 45,
+    tier: 'Signature',
+    minOrderQuantity: '200 Cards',
+    turnaroundTime: '5 - 7 Days',
+    image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Classic South Indian traditional wedding card crafted on metallic shimmer cardstock with intricate paisley gold foil stamping, Ganesha embossing, and Tamil/English insert options.',
+    experience: '18+ Years',
+    customizationOptions: 'Bilingual Tamil & English Text Printing',
+    specialties: [
+      'Ganesha & Paisley Gold Stamping',
+      'Shimmer Metallic Cardstock',
+      'Bilingual Tamil Insert Sheets',
+      'Matching Gold Stamped Envelopes',
+    ],
+    features: ['Traditional Paisley', 'Gold Stamping', 'Bilingual Tamil/English'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98422 33445',
+    whatsapp: '919842233445',
+  },
+  {
+    id: 'inv-3',
+    name: 'Anand 3D Animated Video & WhatsApp E-Invites',
+    category: '3D Animated & E-Invites',
+    city: 'Coimbatore',
+    location: 'RS Puram, Coimbatore',
+    rating: 4.9,
+    reviewsCount: 260,
+    startingPrice: '₹3,500 / Video Set',
+    priceValue: 3500,
+    tier: 'Popular',
+    minOrderQuantity: '1 Digital Master Set',
+    turnaroundTime: '2 - 3 Days',
+    image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Stunning HD 3D animated wedding invitation videos with custom audio background score, RSVP tracking links, interactive WhatsApp PDF cards, and Google Maps venue navigation buttons.',
+    experience: '6+ Years',
+    customizationOptions: 'Custom Audio Song, Photos & 3D Avatar Rendering',
+    specialties: [
+      'HD 60FPS Video Animation',
+      'WhatsApp One-Click Sharing',
+      'Google Maps Location Link',
+      'Interactive PDF Card Inserts',
+    ],
+    features: ['3D Video Invite', 'WhatsApp Instant Share', 'Maps Integration'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98423 44556',
+    whatsapp: '919842344556',
+  },
+  {
+    id: 'inv-4',
+    name: 'Custom Couple Caricature & Storyline Suite',
+    category: 'Caricature Cards',
+    city: 'Madurai',
+    location: 'KK Nagar, Madurai',
+    rating: 4.8,
+    reviewsCount: 142,
+    startingPrice: '₹85 / Card',
+    priceValue: 85,
+    tier: 'Premium',
+    minOrderQuantity: '150 Cards',
+    turnaroundTime: '7 - 10 Days',
+    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Charming hand-drawn digital caricatures of the couple depicting how they met, their favorite travel spots, and fun event dress code illustrations on textured art paper.',
+    experience: '8+ Years',
+    customizationOptions: 'Full Digital Portrait Sketching of Bride & Groom',
+    specialties: [
+      'Hand-Drawn Bride & Groom Art',
+      'Storyline Timeline Inserts',
+      'Textured 350GSM Art Cardstock',
+      'Fun Event Dress Code Icons',
+    ],
+    features: ['Custom Caricatures', 'Storyline Illustration', 'Art Cardstock'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98424 55667',
+    whatsapp: '919842455667',
+  },
+  {
+    id: 'inv-5',
+    name: 'Vriksha Plantable Seed Paper Green Invites',
+    category: 'Eco-Friendly Seed Paper',
+    city: 'Chennai',
+    location: 'Adyar, Chennai',
+    rating: 4.9,
+    reviewsCount: 165,
+    startingPrice: '₹60 / Card',
+    priceValue: 60,
+    tier: 'Popular',
+    minOrderQuantity: '100 Cards',
+    turnaroundTime: '6 - 8 Days',
+    image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+    description:
+      '100% biodegradable handmade cotton seed paper cards embedded with marigold and wildflower seeds that guests can plant in soil after the wedding to grow flowers.',
+    experience: '7+ Years',
+    customizationOptions: 'Organic Herbal Inks & Deckle Edge Envelopes',
+    specialties: [
+      'Embedded Marigold & Herb Seeds',
+      'Handmade Deckle Edge Envelopes',
+      'Organic Chemical-Free Printing',
+      'Zero-Waste Sustainable Cards',
+    ],
+    features: ['Plantable Seed Paper', '100% Organic Cotton', 'Zero Waste'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98425 66778',
+    whatsapp: '919842566778',
+  },
+  {
+    id: 'inv-6',
+    name: 'Glass Clear Acrylic & Mirror Gold Foil Suite',
+    category: 'Acrylic & Gold Foil',
+    city: 'Coimbatore',
+    location: 'Race Course, Coimbatore',
+    rating: 4.9,
+    reviewsCount: 138,
+    startingPrice: '₹190 / Piece',
+    priceValue: 190,
+    tier: 'Luxury',
+    minOrderQuantity: '100 Pieces',
+    turnaroundTime: '10 - 14 Days',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Ultra-modern 3mm thick crystal clear glass acrylic plaques silk-screen printed with metallic gold ink, UV lacquer finish, and velvet envelopment sleeves.',
+    experience: '9+ Years',
+    customizationOptions: 'Clear, Frosted, or Mirror Gold Acrylic Finishes',
+    specialties: [
+      '3mm Beveled Crystal Clear Acrylic',
+      'UV Metallic Gold Ink Screen Printing',
+      'Velvet Suede Pocket Envelopes',
+      'Monogram Laser Engraving',
+    ],
+    features: ['Clear Acrylic Plaque', 'Metallic Gold Ink', 'Velvet Sleeve'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98426 77889',
+    whatsapp: '919842677889',
+  },
+  {
+    id: 'inv-7',
+    name: 'Vintage Royal Letterpress & Cotton Paper',
+    category: 'Letterpress',
+    city: 'Chennai',
+    location: 'Alwarpet, Chennai',
+    rating: 4.8,
+    reviewsCount: 110,
+    startingPrice: '₹120 / Card',
+    priceValue: 120,
+    tier: 'Signature',
+    minOrderQuantity: '150 Cards',
+    turnaroundTime: '8 - 10 Days',
+    image: 'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Tactile deep impression debossed letterpress printing on 600GSM heavy cotton paper featuring hand-gilded gold leaf edges and custom calligraphy font typography.',
+    experience: '14+ Years',
+    customizationOptions: 'Hand Gilded Edges & Custom Wax Seal Stamp',
+    specialties: [
+      'Deep Debossed Letterpress Impression',
+      '600GSM Heavy Cotton Paper',
+      'Hand Gilded 24K Gold Foil Edges',
+      'Bespoke Calligraphy Font',
+    ],
+    features: ['Deep Debossed', '600GSM Cotton Paper', '24K Gold Foil Edges'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98427 88990',
+    whatsapp: '919842788990',
+  },
+  {
+    id: 'inv-8',
+    name: 'Royal Velvet Pocket & Wax Seal Cards',
+    category: 'Wax-Sealed Pocket Cards',
+    city: 'Tiruchirappalli',
+    location: 'Thillai Nagar, Trichy',
+    rating: 4.8,
+    reviewsCount: 125,
+    startingPrice: '₹110 / Card',
+    priceValue: 110,
+    tier: 'Popular',
+    minOrderQuantity: '150 Cards',
+    turnaroundTime: '7 - 9 Days',
+    image: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Three-tier pocket fold invitations enclosed in a rich burgundy or royal blue velvet pocket, sealed with a brass monogrammed wax stamp and satin ribbon band.',
+    experience: '10+ Years',
+    customizationOptions: 'Custom Wax Stamp Monogram & Ribbon Colors',
+    specialties: [
+      'Custom Brass Monogram Wax Seals',
+      'Royal Velvet Pocket Fold Sleeve',
+      '3 Tier Layered Insert Cards',
+      'Satin Ribbon Band Fastening',
+    ],
+    features: ['Wax Seal Stamp', 'Velvet Pocket Fold', 'Satin Ribbon'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98428 99001',
+    whatsapp: '919842899001',
+  },
+  {
+    id: 'inv-9',
+    name: 'Teakwood Carved Sweets Box Invites',
+    category: 'Wooden Box Invites',
+    city: 'Erode',
+    location: 'Perundurai Road, Erode',
+    rating: 4.9,
+    reviewsCount: 95,
+    startingPrice: '₹340 / Box',
+    priceValue: 340,
+    tier: 'Luxury',
+    minOrderQuantity: '75 Boxes',
+    turnaroundTime: '12 - 15 Days',
+    image: 'https://images.unsplash.com/photo-1532635241-17e820acc59f?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Handcrafted natural polished teakwood carved keepsake box with magnetic brass clasp, laser etched wedding details on lid, and brass dry fruit jars.',
+    experience: '15+ Years',
+    customizationOptions: 'Laser Etched Carvings & Brass Jar Compartments',
+    specialties: [
+      'Handcrafted Natural Teakwood',
+      'Laser Etched Lid Carving',
+      'Brass Magnetic Clasp Lock',
+      'Brass Dry Fruit Jar Set',
+    ],
+    features: ['Teakwood Box', 'Laser Carved Lid', 'Brass Dry Fruit Jars'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1532635241-17e820acc59f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98429 00112',
+    whatsapp: '919842900112',
+  },
+  {
+    id: 'inv-10',
+    name: 'Interactive Website & AR Scan WhatsApp Suite',
+    category: 'Interactive WhatsApp Suite',
+    city: 'Chennai',
+    location: 'Nungambakkam, Chennai',
+    rating: 4.9,
+    reviewsCount: 210,
+    startingPrice: '₹4,500 / Website',
+    priceValue: 4500,
+    tier: 'Signature',
+    minOrderQuantity: '1 Digital Suite',
+    turnaroundTime: '2 - 4 Days',
+    image: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&q=80',
+    description:
+      'Bespoke wedding website micro-site featuring couple love story, event schedule countdown timer, guest RSVP form, accommodation details, and WhatsApp invitation cards.',
+    experience: '5+ Years',
+    customizationOptions: 'Custom Domain Name, Photo Gallery & RSVP Dashboard',
+    specialties: [
+      'Custom Couple Domain (.com)',
+      'Live Guest RSVP Tracking',
+      'Event Countdown Timer',
+      'Photo Gallery & Location Maps',
+    ],
+    features: ['Wedding Microsite', 'Live Guest RSVP', 'Custom Domain'],
+    portfolio: [
+      'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+    ],
+    phone: '+91 98430 11223',
+    whatsapp: '919843011223',
+  },
+];
+
+const TAMIL_NADU_DISTRICTS = [
+  'All Cities',
+  'Chennai',
+  'Coimbatore',
+  'Madurai',
+  'Trichy',
+  'Salem',
+  'Tirunelveli',
+  'Erode',
+  'Vellore',
+  'Kanchipuram',
+  'Thanjavur',
+  'Dindigul',
+  'Ooty',
+  'Tiruppur',
+  'Nagercoil',
+  'Hosur',
+  'Cuddalore',
+  'Karur',
+  'Ramanathapuram',
+  'Pudukkottai',
+  'Namakkal',
+];
+
+const BUDGET_OPTIONS = [
+  { id: 'All', label: 'All Budgets' },
+  { id: 'under-100', label: 'Under ₹100 / card' },
+  { id: '100-300', label: '₹100 - ₹300 / card' },
+  { id: '300-600', label: '₹300 - ₹600 / card' },
+  { id: 'above-600', label: '₹600+ / card' },
+];
+
+const RATING_OPTIONS = [
+  { id: 'All', label: 'All Ratings' },
+  { id: '4.8', label: '4.8★ & above' },
+  { id: '4.9', label: '4.9★ & above' },
+];
+
+const TIER_OPTIONS = [
+  { id: 'All', label: 'All Tiers' },
+  { id: 'Luxury', label: 'Luxury' },
+  { id: 'Signature', label: 'Signature' },
+  { id: 'Premium', label: 'Premium' },
+];
+
+const TYPE_OPTIONS = [
+  'All Types',
+  'Boxed & Luxury',
+  'Traditional',
+  'Digital / Video',
+  'Acrylic',
+  'Seed Paper',
+  'Letterpress',
+  'Wooden Box',
+];
+
+interface InvitationListingPageProps {
+  onBack: () => void;
+  savedInviteIds?: Record<string, boolean>;
+  onToggleSavedInvite?: (id: string) => void;
+  onOpenSavedTab?: () => void;
+}
+
+export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
+  onBack,
+  savedInviteIds = {},
+  onToggleSavedInvite = (_id?: string) => {},
+  onOpenSavedTab,
+}) => {
+  const [selectedCity, setSelectedCity] = useState<string>('All Cities');
+  const [selectedBudget, setSelectedBudget] = useState<string>('All');
+  const [selectedRating, setSelectedRating] = useState<string>('All');
+  const [selectedTier, setSelectedTier] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
+  const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
+  const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const filteredInvites = INVITATIONS_DATA.filter((invite) => {
+    const matchesCity =
+      selectedCity === 'All Cities' ||
+      selectedCity === 'All' ||
+      invite.city.toLowerCase() === selectedCity.toLowerCase() ||
+      invite.location.toLowerCase().includes(selectedCity.toLowerCase()) ||
+      selectedCity.toLowerCase().includes(invite.city.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === 'All Types' ||
+      invite.category.toLowerCase().includes(selectedCategory.toLowerCase());
+
+    const matchesSearch =
+      searchQuery.trim() === '' ||
+      invite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invite.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invite.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesRating =
+      selectedRating === 'All'
+        ? true
+        : selectedRating === '4.8'
+        ? invite.rating >= 4.8
+        : invite.rating >= 4.9;
+
+    const matchesTier = selectedTier === 'All' ? true : invite.tier === selectedTier;
+
+    let matchesBudget = true;
+    if (selectedBudget === 'under-100') matchesBudget = invite.priceValue < 100;
+    else if (selectedBudget === '100-300') matchesBudget = invite.priceValue >= 100 && invite.priceValue <= 300;
+    else if (selectedBudget === '300-600') matchesBudget = invite.priceValue > 300 && invite.priceValue <= 600;
+    else if (selectedBudget === 'above-600') matchesBudget = invite.priceValue > 600;
+
+    return matchesCity && matchesCategory && matchesSearch && matchesRating && matchesTier && matchesBudget;
+  });
+
+  if (selectedInvite) {
+    return (
+      <InvitationDetailPage
+        invite={selectedInvite}
+        onBack={() => setSelectedInvite(null)}
+        isBookmarked={Boolean(savedInviteIds[selectedInvite.id])}
+        onToggleBookmark={onToggleSavedInvite}
+      />
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={onBack} activeOpacity={0.8}>
+          <ArrowLeft className="w-5 h-5 text-stone-800" />
+        </TouchableOpacity>
+
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text style={styles.headerTitle}>Wedding Invitations</Text>
+          <Text style={styles.headerSubtitle}>Boxed, Digital, Traditional & Custom Cards</Text>
+        </View>
+
+        {onOpenSavedTab && (
+          <TouchableOpacity style={styles.savedBadgeBtn} onPress={onOpenSavedTab} activeOpacity={0.8}>
+            <Bookmark className="w-4 h-4 text-[#581420]" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* SEARCH BAR */}
+      <View style={styles.searchBarWrapper}>
+        <Search className="w-4 h-4 text-stone-400 mr-2" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search Boxed, Acrylic, 3D Video, Traditional..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <X className="w-4 h-4 text-stone-400" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* FILTER CHIPS ROW */}
+      <View style={styles.filterRowContainer}>
+        <TouchableOpacity
+          style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
+          onPress={() => setActiveFilterModal('city')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.filterChipText, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+            {selectedCity === 'All Cities' || selectedCity === 'All' ? 'All Cities ▼' : `${selectedCity} ▼`}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
+          onPress={() => setActiveFilterModal('budget')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.filterChipText, selectedBudget !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+            {selectedBudget === 'All' ? 'Budget ▼' : `${BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'} ▼`}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
+          onPress={() => setActiveFilterModal('rating')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.filterChipText, selectedRating !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+            {selectedRating === 'All' ? 'Rating ▼' : `${selectedRating}★ ▼`}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
+          onPress={() => setActiveFilterModal('tier')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.filterChipText, selectedTier !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+            {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.filterChip, selectedCategory !== 'All Types' && styles.filterChipActive]}
+          onPress={() => setActiveFilterModal('type')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.filterChipText, selectedCategory !== 'All Types' && styles.filterChipTextActive]} numberOfLines={1}>
+            {selectedCategory === 'All Types' ? 'Category ▼' : `${selectedCategory} ▼`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* LIST OF CARDS */}
+      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
+        {filteredInvites.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Mail className="w-12 h-12 text-stone-300 mb-2" />
+            <Text style={styles.emptyTitle}>No Invitations Found</Text>
+            <Text style={styles.emptySub}>Try adjusting your search or category filters.</Text>
+          </View>
+        ) : (
+          filteredInvites.map((invite) => {
+            const isSaved = Boolean(savedInviteIds[invite.id]);
+            return (
+              <motion.div key={invite.id} whileHover={{ y: -2 }} className="w-full mb-4">
+                <TouchableOpacity
+                  style={styles.cardContainer}
+                  onPress={() => setSelectedInvite(invite)}
+                  activeOpacity={0.9}
+                >
+                  <View style={styles.imageWrapper}>
+                    <Image source={{ uri: invite.image }} style={styles.cardImage} resizeMode="cover" />
+
+                    <View style={styles.badgeRow}>
+                      <View style={styles.tierTag}>
+                        <Sparkles className="w-3 h-3 text-amber-600 mr-1" />
+                        <Text style={styles.tierTagText}>{invite.tier}</Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={styles.bookmarkBtn}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          onToggleSavedInvite(invite.id);
+                        }}
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${
+                            isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
+                          }`}
+                        />
+                      </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.ratingBadge}>
+                      <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
+                      <Text style={styles.ratingText}>{invite.rating}</Text>
+                      <Text style={styles.reviewsText}>({invite.reviewsCount})</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.cardBody}>
+                    <Text style={styles.inviteName} numberOfLines={1}>{invite.name}</Text>
+                    
+                    <View style={styles.locationRow}>
+                      <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
+                      <Text style={styles.locationText}>{invite.location}, {invite.city}</Text>
+                    </View>
+
+                    <View style={styles.capacityRow}>
+                      <Package className="w-3.5 h-3.5 text-stone-500 mr-1" />
+                      <Text style={styles.capacityText}>Min: {invite.minOrderQuantity} • Delivery: {invite.turnaroundTime}</Text>
+                    </View>
+
+                    <View style={styles.featuresRow}>
+                      {invite.features.slice(0, 3).map((feat, idx) => (
+                        <View key={idx} style={styles.featureChip}>
+                          <Text style={styles.featureChipText}>{feat}</Text>
+                        </View>
+                      ))}
+                    </View>
+
+                    <View style={styles.cardDivider} />
+
+                    <View style={styles.cardFooter}>
+                      <View>
+                        <Text style={styles.priceLabel}>STARTING PRICE</Text>
+                        <Text style={styles.priceValue}>{invite.startingPrice}</Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={styles.viewDetailsBtn}
+                        onPress={() => setSelectedInvite(invite)}
+                        activeOpacity={0.85}
+                      >
+                        <Eye className="w-3.5 h-3.5 text-white mr-1.5" />
+                        <Text style={styles.viewDetailsBtnText}>View Details</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </motion.div>
+            );
+          })
+        )}
+      </ScrollView>
+
+      {/* FILTER DROPDOWN MODAL */}
+      <AnimatePresence>
+        {activeFilterModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={styles.modalBackdrop}
+            onClick={() => setActiveFilterModal(null)}
+          >
+            <motion.div
+              initial={{ y: 120, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 120, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              style={styles.modalSheet}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <View style={styles.filterModalHeader}>
+                <Text style={styles.filterModalTitle}>
+                  {activeFilterModal === 'city' && 'Select District / City'}
+                  {activeFilterModal === 'budget' && 'Select Budget Range'}
+                  {activeFilterModal === 'rating' && 'Select Minimum Rating'}
+                  {activeFilterModal === 'tier' && 'Select Tier'}
+                  {activeFilterModal === 'type' && 'Select Category'}
+                </Text>
+                <TouchableOpacity
+                  style={styles.filterModalClose}
+                  onPress={() => setActiveFilterModal(null)}
+                >
+                  <X className="w-5 h-5 text-[#2A2425]" />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+                {activeFilterModal === 'city' && (
+                  <View style={styles.optionsList}>
+                    {TAMIL_NADU_DISTRICTS.map((district) => {
+                      const isSelected = selectedCity === district || (district === 'All Cities' && selectedCity === 'All');
+                      return (
+                        <div
+                          key={district}
+                          onClick={() => {
+                            setSelectedCity(district);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                            transition: 'background-color 0.15s ease',
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontWeight: isSelected ? '700' : '500',
+                              color: isSelected ? '#581420' : '#3B2F2F',
+                            }}
+                          >
+                            {district}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {activeFilterModal === 'budget' && (
+                  <View style={styles.optionsList}>
+                    {BUDGET_OPTIONS.map((b) => {
+                      const isSelected = selectedBudget === b.id;
+                      return (
+                        <div
+                          key={b.id}
+                          onClick={() => {
+                            setSelectedBudget(b.id);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
+                            {b.label}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {activeFilterModal === 'rating' && (
+                  <View style={styles.optionsList}>
+                    {RATING_OPTIONS.map((r) => {
+                      const isSelected = selectedRating === r.id;
+                      return (
+                        <div
+                          key={r.id}
+                          onClick={() => {
+                            setSelectedRating(r.id);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
+                            {r.label}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {activeFilterModal === 'tier' && (
+                  <View style={styles.optionsList}>
+                    {TIER_OPTIONS.map((t) => {
+                      const isSelected = selectedTier === t.id;
+                      return (
+                        <div
+                          key={t.id}
+                          onClick={() => {
+                            setSelectedTier(t.id);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
+                            {t.label}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {activeFilterModal === 'type' && (
+                  <View style={styles.optionsList}>
+                    {TYPE_OPTIONS.map((type) => {
+                      const isSelected = selectedCategory === type;
+                      return (
+                        <div
+                          key={type}
+                          onClick={() => {
+                            setSelectedCategory(type);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
+                            {type}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+              </ScrollView>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: '100%',
+    backgroundColor: '#FAF7F2',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8DFD5',
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3ECE4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#581420',
+  },
+  headerSubtitle: {
+    fontSize: 11.5,
+    color: '#7D6E70',
+  },
+  savedBadgeBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3ECE4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchBarWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 14,
+    marginTop: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 13,
+    color: '#1C1917',
+    outlineStyle: 'none',
+  },
+  filterRowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    gap: 6,
+    overflowX: 'auto' as any,
+  },
+  filterChip: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  filterChipActive: {
+    backgroundColor: '#F3ECE4',
+    borderColor: '#581420',
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4A3B3C',
+  },
+  filterChipTextActive: {
+    color: '#581420',
+    fontWeight: '700',
+  },
+  modalBackdrop: {
+    position: 'fixed' as any,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 9999,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalSheet: {
+    width: '100%',
+    maxWidth: 500,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+  },
+  filterModalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3ECE4',
+    marginBottom: 12,
+  },
+  filterModalTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#581420',
+  },
+  filterModalClose: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3ECE4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionsList: {
+    paddingVertical: 4,
+  },
+  listContent: {
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 100,
+  },
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+  },
+  imageWrapper: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: '#27272A',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  badgeRow: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tierTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  tierTagText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#581420',
+  },
+  bookmarkBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ratingBadge: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  ratingText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  reviewsText: {
+    color: '#D6D3D1',
+    fontSize: 10.5,
+    marginLeft: 3,
+  },
+  cardBody: {
+    padding: 14,
+  },
+  inviteName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#581420',
+    marginBottom: 4,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  locationText: {
+    fontSize: 12.5,
+    color: '#6B5E5E',
+  },
+  capacityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  capacityText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#3B2F2F',
+  },
+  featuresRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  featureChip: {
+    backgroundColor: '#FAF7F2',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  featureChipText: {
+    fontSize: 11,
+    color: '#581420',
+    fontWeight: '600',
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#E8DFD5',
+    marginBottom: 10,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  priceLabel: {
+    fontSize: 9.5,
+    color: '#7D6E70',
+    fontWeight: '700',
+  },
+  priceValue: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#581420',
+  },
+  viewDetailsBtn: {
+    backgroundColor: '#581420',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+  viewDetailsBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 50,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#3B2F2F',
+  },
+  emptySub: {
+    fontSize: 12.5,
+    color: '#7D6E70',
+    marginTop: 4,
+  },
+});
