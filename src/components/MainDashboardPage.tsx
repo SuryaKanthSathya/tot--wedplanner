@@ -641,7 +641,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               onClick={() => handleOptionPress('Decor')}
             >
               <View style={styles.serviceIconBox}>
-                <Palette className="w-5 h-5 text-[#581420]" />
+                <Flower2 className="w-5 h-5 text-[#581420]" />
               </View>
               <Text style={styles.serviceLabel}>Decor</Text>
             </motion.div>

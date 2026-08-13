@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Palette, Building2, Music, Mail } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -292,7 +292,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
 
               {onExploreDecor && (
                 <TouchableOpacity style={styles.exploreBtn} onPress={onExploreDecor} activeOpacity={0.8}>
-                  <Palette className="w-4 h-4 text-white mr-1.5" />
+                  <Flower2 className="w-4 h-4 text-white mr-1.5" />
                   <Text style={styles.exploreBtnText}>Decor</Text>
                 </TouchableOpacity>
               )}
