@@ -108,7 +108,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
   const [selectedArtist, setSelectedArtist] = useState<EntertainmentArtist | null>(null);
-  
+
   // Send Quote Modal State
   const [quoteArtist, setQuoteArtist] = useState<EntertainmentArtist | null>(null);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
@@ -119,7 +119,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   const [eventType, setEventType] = useState<'Wedding' | 'Reception' | 'Engagement' | 'Other'>('Wedding');
   const [entertainmentType, setEntertainmentType] = useState('Wedding Entertainment');
   const [showPhotoTypeDropdown, setShowPhotoTypeDropdown] = useState(false);
-  
+
   // Local fallback state if parent doesn't manage saved IDs
   const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Record<string, boolean>>(() => {
     try {
@@ -246,11 +246,10 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
             }}
           >
             <Heart
-              className={`w-5 h-5 ${
-                Object.values(bookmarkedIds).some(Boolean)
+              className={`w-5 h-5 ${Object.values(bookmarkedIds).some(Boolean)
                   ? 'text-[#8B1E2F] fill-[#8B1E2F]'
                   : 'text-[#2A2425]'
-              }`}
+                }`}
             />
           </TouchableOpacity>
         </View>
@@ -389,9 +388,8 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Bookmark
-                          className={`w-4 h-4 ${
-                            isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'
-                          }`}
+                          className={`w-4 h-4 ${isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'
+                            }`}
                         />
                       </TouchableOpacity>
                     </View>
@@ -408,7 +406,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                           styles.tierPill,
                           artist.tier === 'Signature' && { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#FDE68A' },
                           (artist.tier === 'Premium' || artist.tier === 'Luxury') && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
-                          artist.tier === 'Popular' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
+                          (artist.tier as any === 'Essential' || artist.tier === 'Popular') && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
                         ]}
                       >
                         <Text
@@ -416,7 +414,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                             styles.tierPillText,
                             artist.tier === 'Signature' && { color: '#92400E' },
                             (artist.tier === 'Premium' || artist.tier === 'Luxury') && { color: '#581420' },
-                            artist.tier === 'Popular' && { color: '#137333' },
+                            (artist.tier as any === 'Essential' || artist.tier === 'Popular') && { color: '#137333' },
                           ]}
                         >
                           {artist.tier}

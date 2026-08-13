@@ -38,6 +38,7 @@ import {
   Grid,
   Trash2,
   Flower2,
+  Palette,
 } from 'lucide-react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
@@ -148,7 +149,7 @@ function calculateDaysLeft(dateString?: string): number {
   if (!dateString) return 126;
   try {
     let targetDate: Date | null = null;
-    
+
     // Try native Date parsing first
     const nativeParsed = new Date(dateString);
     if (!isNaN(nativeParsed.getTime())) {
@@ -456,7 +457,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showInvitationListing, setShowInvitationListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
 
-  
+
   if (showMehendiListing) {
     return (
       <MehendiListingPage
@@ -543,6 +544,17 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
         onBack={() => setShowInvitationListing(false)}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={onToggleSavedInvite}
+        onOpenSavedTab={onOpenSavedTab}
+      />
+    );
+  }
+
+  if (showCarsListing) {
+    return (
+      <CarsListingPage
+        onBack={() => setShowCarsListing(false)}
+        savedCarIds={savedCarIds}
+        onToggleSavedCar={onToggleSavedCar}
         onOpenSavedTab={onOpenSavedTab}
       />
     );
@@ -791,7 +803,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
           <View style={styles.countdownCard}>
             <View style={styles.countdownLeft}>
               <Text style={styles.countdownCardTitle}>Wedding Countdown</Text>
-              
+
               <View style={styles.numberWrapper}>
                 <Text style={styles.countdownNumber}>{daysLeft}</Text>
                 <Text style={styles.daysLabel}>DAYS</Text>
@@ -944,6 +956,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                             setShowInvitationListing(true);
                             return;
                           }
+                          if (t.includes('car') || t.includes('bus') || t.includes('transport')) {
+                            setShowCarsListing(true);
+                            return;
+                          }
                           toggleChecklist(item.id);
                         }}
                         style={{ flex: 1, marginLeft: 10 }}
@@ -1009,7 +1025,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 {[
                   { name: 'Photography', icon: Camera },
                   { name: 'Makeup Artist', icon: Sparkles },
-                  { name: 'Decor & Flowers', icon: Flower2 },
+                  { name: 'Decor & Flowers', icon: Palette },
                   { name: 'Catering & Food', icon: Utensils },
                   { name: 'DJ & Music', icon: Music },
                   { name: 'Travel & Stay', icon: Plane },
@@ -1048,6 +1064,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                           if (sname.includes('invit') || sname.includes('card')) {
                             setShowServicesModal(false);
                             setShowInvitationListing(true);
+                            return;
+                          }
+                          if (sname.includes('car') || sname.includes('bus') || sname.includes('transport')) {
+                            setShowServicesModal(false);
+                            setShowCarsListing(true);
                             return;
                           }
 

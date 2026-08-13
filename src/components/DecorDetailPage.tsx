@@ -29,7 +29,9 @@ import {
   ShieldCheck,
   Building,
   Flower2,
+  Palette,
   Image as ImageIcon,
+  Instagram,
 } from 'lucide-react';
 
 export interface DecorStudio {
@@ -49,6 +51,7 @@ export interface DecorStudio {
   portfolio?: string[];
   phone?: string;
   themesProvided?: string[];
+  instagram?: string;
 }
 
 interface DecorDetailPageProps {
@@ -100,6 +103,12 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
       `Hi ${studio.name}, I found your wedding decor profile on Tale of Two app. I would like to check availability and package details!`
     );
     window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
+  };
+
+  const handleInstagram = () => {
+    const handle = studio.instagram || '@taleoftwo_weddings';
+    const username = handle.replace('@', '');
+    window.open(`https://instagram.com/${username}`, '_blank');
   };
 
   // Ensure 100% distinct portfolio images
@@ -215,7 +224,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
             <Text style={styles.highlightPillText}>Verified Decor Partner</Text>
           </View>
           <View style={styles.highlightPill}>
-            <Flower2 className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+            <Palette className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
             <Text style={styles.highlightPillText}>Fresh Flowers & Custom Lighting</Text>
           </View>
         </View>
@@ -284,7 +293,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
                   'Table Centerpieces & Dining Decor',
                 ].map((s, idx) => (
                   <View key={idx} style={styles.serviceChip}>
-                    <Flower2 className="w-3.5 h-3.5 text-[#C5A880] mr-1.5" />
+                    <Palette className="w-3.5 h-3.5 text-[#C5A880] mr-1.5" />
                     <Text style={styles.serviceChipText}>{s}</Text>
                   </View>
                 ))}
@@ -443,6 +452,16 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
           >
             <MessageCircle className="w-4 h-4 text-[#15803D]" />
           </TouchableOpacity>
+
+          {studio.instagram && (
+            <TouchableOpacity
+              style={styles.circleInstagramBtn}
+              onPress={handleInstagram}
+              activeOpacity={0.85}
+            >
+              <Instagram className="w-4 h-4 text-[#C13584]" />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={styles.primaryQuoteBtn}
@@ -943,6 +962,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: '#DCFCE7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  circleInstagramBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FCE7F3',
     alignItems: 'center',
     justifyContent: 'center',
   },

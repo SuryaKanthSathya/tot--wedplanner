@@ -8,14 +8,16 @@ import {
   StyleSheet,
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
-import { X,
+import {
+  X,
   Calendar,
   MapPin,
   Check,
   CheckCircle2,
   Camera,
   Sparkles,
-  Flower2, Palette, Utensils } from 'lucide-react';
+  Flower2, Palette, Utensils
+} from 'lucide-react';
 
 export interface RequestQuoteModalProps {
   visible: boolean;
@@ -237,10 +239,10 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
         isEntertainment
           ? 'Please select at least one entertainment service.'
           : isDecor
-          ? 'Please select at least one decor service.'
-          : isMakeup
-          ? 'Please select at least one makeup service.'
-          : 'Please select at least one photography service.'
+            ? 'Please select at least one decor service.'
+            : isMakeup
+              ? 'Please select at least one makeup service.'
+              : 'Please select at least one photography service.'
       );
       return;
     }
@@ -334,7 +336,7 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                   {/* HEADER */}
                   <View style={styles.headerRow}>
                     {isDecor ? (
-                      <Flower2 className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                      <Palette className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : isMakeup ? (
                       <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : (
@@ -475,12 +477,12 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       {isEntertainment
                         ? 'Special Theme Ideas / Music Genre & Requirements (Optional)'
                         : isDecor
-                        ? 'Special Theme Ideas / Stage Dimensions & Venue Notes (Optional)'
-                        : isMakeup
-                        ? 'Special Instructions / Skin & Saree Details (Optional)'
-                        : isCars
-                        ? 'Special Requests / Rental Details (Optional)'
-                        : 'Special Instructions / Venue Notes (Optional)'}
+                          ? 'Special Theme Ideas / Stage Dimensions & Venue Notes (Optional)'
+                          : isMakeup
+                            ? 'Special Instructions / Skin & Saree Details (Optional)'
+                            : isCars
+                              ? 'Special Requests / Rental Details (Optional)'
+                              : 'Special Instructions / Venue Notes (Optional)'}
                     </Text>
                     <View style={styles.textAreaBox}>
                       <TextInput
@@ -491,12 +493,12 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                           isEntertainment
                             ? 'e.g. We need a live band that plays 90s hits and a DJ who mixes Tamil and English'
                             : isDecor
-                            ? 'e.g. Traditional jasmine mandap + fairy light canopy for reception'
-                            : isMakeup
-                            ? 'e.g. Need 9-yard saree draping, airbrush makeup for bride + 2 family members'
-                            : isCars
-                            ? 'e.g. Need a vintage car for 3 hours, and 2 vans for 12 hours.'
-                            : 'e.g. Need 2 photographers for Muhurtham, outdoor pre-wedding in Ooty'
+                              ? 'e.g. Traditional jasmine mandap + fairy light canopy for reception'
+                              : isMakeup
+                                ? 'e.g. Need 9-yard saree draping, airbrush makeup for bride + 2 family members'
+                                : isCars
+                                  ? 'e.g. Need a vintage car for 3 hours, and 2 vans for 12 hours.'
+                                  : 'e.g. Need 2 photographers for Muhurtham, outdoor pre-wedding in Ooty'
                         }
                         placeholderTextColor="#9CA3AF"
                         multiline
@@ -562,12 +564,12 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       {isCars
                         ? 'Send Car Quote Request'
                         : isEntertainment
-                        ? 'Send Entertainment Quote Request'
-                        : isDecor
-                        ? 'Send Decor Quote Request'
-                        : isMakeup
-                        ? 'Send Makeup Quote Request'
-                        : 'Send Photography Quote Request'}
+                          ? 'Send Entertainment Quote Request'
+                          : isDecor
+                            ? 'Send Decor Quote Request'
+                            : isMakeup
+                              ? 'Send Makeup Quote Request'
+                              : 'Send Photography Quote Request'}
                     </Text>
                   </TouchableOpacity>
                 </View>
