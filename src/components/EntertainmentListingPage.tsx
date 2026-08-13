@@ -407,16 +407,16 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                         style={[
                           styles.tierPill,
                           artist.tier === 'Signature' && { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#FDE68A' },
-                          artist.tier === 'Premium' || artist.tier === 'Luxury' && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
-                          artist.tier === 'Essential' || artist.tier === 'Popular' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
+                          (artist.tier === 'Premium' || artist.tier === 'Luxury') && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
+                          artist.tier === 'Popular' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
                         ]}
                       >
                         <Text
                           style={[
                             styles.tierPillText,
                             artist.tier === 'Signature' && { color: '#92400E' },
-                            artist.tier === 'Premium' || artist.tier === 'Luxury' && { color: '#581420' },
-                            artist.tier === 'Essential' || artist.tier === 'Popular' && { color: '#137333' },
+                            (artist.tier === 'Premium' || artist.tier === 'Luxury') && { color: '#581420' },
+                            artist.tier === 'Popular' && { color: '#137333' },
                           ]}
                         >
                           {artist.tier}
