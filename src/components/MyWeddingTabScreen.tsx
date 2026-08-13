@@ -34,11 +34,13 @@ import {
   Plane,
   Grid,
   Trash2,
+  Flower2,
 } from 'lucide-react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
 import stageEntertainmentImg from '../assets/images/guest_banquet_hall_stage_1786471284070.jpg';
 import mehendiFullForearmsImg from '../assets/images/mehendi_full_forearms.svg';
+import decorMandapImg from '../assets/images/royal_mandap_decor_pure.jpg';
 
 const SERVICES_DATA = [
   {
@@ -57,7 +59,7 @@ const SERVICES_DATA = [
     id: 'decor',
     name: 'Decor',
     vendors: '76 Vendors',
-    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?q=80&w=600&auto=format&fit=crop',
+    image: decorMandapImg,
   },
   {
     id: 'mehendi',
@@ -959,7 +961,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 {[
                   { name: 'Photography', icon: Camera },
                   { name: 'Makeup Artist', icon: Sparkles },
-                  { name: 'Decor & Flowers', icon: Store },
+                  { name: 'Decor & Flowers', icon: Flower2 },
                   { name: 'Catering & Food', icon: Utensils },
                   { name: 'DJ & Music', icon: Music },
                   { name: 'Travel & Stay', icon: Plane },
