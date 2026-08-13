@@ -17,6 +17,7 @@ import {
   Camera,
   Sparkles,
   Flower2,
+  Palette,
 } from 'lucide-react';
 
 export interface RequestQuoteModalProps {
@@ -302,7 +303,7 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                   {/* HEADER */}
                   <View style={styles.headerRow}>
                     {isDecor ? (
-                      <Flower2 className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                      <Palette className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : isMakeup ? (
                       <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : (

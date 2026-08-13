@@ -32,6 +32,7 @@ import {
   Clock,
   ShieldCheck,
   ChevronRight,
+  Instagram,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -64,6 +65,7 @@ export interface VenueItem {
   }[];
   phone?: string;
   whatsapp?: string;
+  instagram?: string;
 }
 
 interface VenueDetailPageProps {
@@ -101,9 +103,15 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(
-      `Hi ${venue.name}, I am interested in booking your venue in ${venue.city} via Tale of Two App. Please share date availability and rental package details.`
+      `Hi ${venue.name}, I am interested in booking your wedding venue in ${venue.city} via Tale of Two App. Please share date availability and rental package details.`
     );
     Linking.openURL(`https://wa.me/${whatsappNum}?text=${text}`);
+  };
+
+  const handleInstagram = () => {
+    const handle = venue.instagram || '@taleoftwo_weddings';
+    const username = handle.replace('@', '');
+    Linking.openURL(`https://instagram.com/${username}`);
   };
 
   const handleSubmitQuote = (e: React.FormEvent) => {
@@ -330,6 +338,16 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
           >
             <MessageCircle className="w-4 h-4 text-emerald-700" />
           </TouchableOpacity>
+
+          {venue.instagram && (
+            <TouchableOpacity
+              style={styles.circleInstagramBtn}
+              onPress={handleInstagram}
+              activeOpacity={0.85}
+            >
+              <Instagram className="w-4 h-4 text-[#C13584]" />
+            </TouchableOpacity>
+          )}
 
           <TouchableOpacity
             style={styles.primaryQuoteBtn}
@@ -848,6 +866,14 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     backgroundColor: '#DCFCE7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  circleInstagramBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#FCE7F3',
     alignItems: 'center',
     justifyContent: 'center',
   },

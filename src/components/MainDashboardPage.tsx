@@ -52,6 +52,7 @@ interface MainDashboardPageProps {
   userName: string;
   userMobile: string;
   userEmail: string;
+  userId?: string;
   weddingProfile?: {
     marriageType?: string;
     brideName?: string;
@@ -71,6 +72,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   userName,
   userMobile,
   userEmail,
+  userId = '',
   weddingProfile,
   initialTab = 'home',
   onLogout,
@@ -365,10 +367,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   };
 
   // Extract first name for greeting
-  const rawName = userName.trim() || 'Ananya';
-  const firstName = rawName.split(' ')[0] || 'Ananya';
-  const displayMobile = userMobile.trim() || '+91 98765 43210';
-  const displayEmail = userEmail.trim() || 'ananya@gmail.com';
+  const rawName = userName.trim();
+  const firstName = rawName ? rawName.split(' ')[0] : 'Guest';
+  const displayMobile = userMobile.trim();
+  const displayEmail = userEmail.trim();
 
   const handleProfilePress = () => {
     setShowProfileModal(true);
@@ -725,7 +727,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               onClick={() => handleOptionPress('Decor')}
             >
               <View style={styles.serviceIconBox}>
-                <Flower2 className="w-5 h-5 text-[#581420]" />
+                <Palette className="w-5 h-5 text-[#581420]" />
               </View>
               <Text style={styles.serviceLabel}>Decor</Text>
             </motion.div>
@@ -972,7 +974,12 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                 <View style={styles.modalAvatarCircle}>
                   <User className="w-8 h-8 text-[#581420]" />
                 </View>
-                <Text style={styles.modalUserName}>{rawName}</Text>
+                <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
+                {userId ? (
+                  <Text style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 11, fontWeight: '600', color: '#8C8283', marginTop: -2 }}>
+                    ID: {userId}
+                  </Text>
+                ) : null}
                 <View style={styles.verifiedBadge}>
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
                   <Text style={styles.verifiedBadgeText}>Verified Account</Text>
@@ -981,6 +988,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
 
               {/* User Details Cards */}
               <View style={styles.modalDetailsList}>
+
+
                 {/* 1. Full Name */}
                 <View style={styles.modalDetailRow}>
                   <View style={styles.modalIconBox}>

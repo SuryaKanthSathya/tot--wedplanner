@@ -35,6 +35,7 @@ import {
   Grid,
   Trash2,
   Flower2,
+  Palette,
 } from 'lucide-react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
@@ -965,7 +966,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 {[
                   { name: 'Photography', icon: Camera },
                   { name: 'Makeup Artist', icon: Sparkles },
-                  { name: 'Decor & Flowers', icon: Flower2 },
+                  { name: 'Decor & Flowers', icon: Palette },
                   { name: 'Catering & Food', icon: Utensils },
                   { name: 'DJ & Music', icon: Music },
                   { name: 'Travel & Stay', icon: Plane },

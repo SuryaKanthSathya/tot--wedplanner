@@ -27,8 +27,8 @@ export const CreateAccountPage: React.FC<CreateAccountPageProps> = ({
 
   const handleSubmit = () => {
     onSuccessSubmit({
-      name: fullName || 'Ananya Sharma',
-      mobile: mobileNumber || '+91 98765 43210',
+      name: fullName,
+      mobile: mobileNumber,
       email: email,
     });
   };

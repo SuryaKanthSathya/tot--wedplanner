@@ -34,12 +34,14 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
   loginSuccessTrigger,
 }) => {
   const { width } = useWindowDimensions();
+  const isMobile = width < 768;
   const theme = THEMES[currentTheme];
   const [activeScreen, setActiveScreen] = useState<'landing' | 'create-account' | 'verify-otp' | 'dashboard' | 'tell-us-about-couple'>('landing');
   const [initialDashboardTab, setInitialDashboardTab] = useState<'home' | 'my-wedding'>('home');
   const [userName, setUserName] = useState<string>('');
   const [userMobile, setUserMobile] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
   const [weddingProfile, setWeddingProfile] = useState<{
     marriageType?: string;
     brideName?: string;
@@ -53,6 +55,9 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
 
   useEffect(() => {
     if (loginSuccessTrigger && loginSuccessTrigger > 0) {
+      const currentId = userId || 'TOT-' + Math.floor(100000 + Math.random() * 900000);
+      setUserId(currentId);
+      saveUserDataToStorage(userName, userMobile, userEmail, currentId, weddingProfile);
       setActiveScreen('dashboard');
     }
   }, [loginSuccessTrigger]);
@@ -66,6 +71,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
         if (parsed.userName) setUserName(parsed.userName);
         if (parsed.userMobile) setUserMobile(parsed.userMobile);
         if (parsed.userEmail) setUserEmail(parsed.userEmail);
+        if (parsed.userId) setUserId(parsed.userId);
         if (parsed.weddingProfile) setWeddingProfile(parsed.weddingProfile);
       }
     } catch (e) {
@@ -78,6 +84,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     nameVal: string,
     mobileVal: string,
     emailVal: string,
+    idVal: string,
     profileVal: typeof weddingProfile
   ) => {
     try {
@@ -87,6 +94,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
           userName: nameVal,
           userMobile: mobileVal,
           userEmail: emailVal,
+          userId: idVal,
           weddingProfile: profileVal,
         })
       );
@@ -106,14 +114,19 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     const newName = data.name || '';
     const newMobile = data.mobile || '';
     const newEmail = data.email || '';
+    const generatedId = 'TOT-' + Math.floor(100000 + Math.random() * 900000);
     setUserName(newName);
     setUserMobile(newMobile);
     setUserEmail(newEmail);
-    saveUserDataToStorage(newName, newMobile, newEmail, weddingProfile);
+    setUserId(generatedId);
+    saveUserDataToStorage(newName, newMobile, newEmail, generatedId, weddingProfile);
     setActiveScreen('verify-otp');
   };
 
   const handleVerifySuccess = () => {
+    const currentId = userId || 'TOT-' + Math.floor(100000 + Math.random() * 900000);
+    setUserId(currentId);
+    saveUserDataToStorage(userName, userMobile, userEmail, currentId, weddingProfile);
     setActiveScreen('dashboard');
   };
 
@@ -124,7 +137,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
       updatedName = `${data.brideName} & ${data.groomName}`;
       setUserName(updatedName);
     }
-    saveUserDataToStorage(updatedName, userMobile, userEmail, data);
+    saveUserDataToStorage(updatedName, userMobile, userEmail, userId, data);
     setInitialDashboardTab('my-wedding');
     setActiveScreen('dashboard');
   };
@@ -133,8 +146,10 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     setUserName('');
     setUserMobile('');
     setUserEmail('');
+    setUserId('');
     setWeddingProfile(null);
     try {
+      localStorage.removeItem('wedding_app_data');
       localStorage.removeItem('wedding_app_user_data');
     } catch (e) {
       console.error(e);
@@ -228,7 +243,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
   );
 
   return (
-    <View style={styles.exactCardContainer}>
+    <View style={[styles.exactCardContainer, isMobile ? styles.exactCardContainerMobile : styles.exactCardContainerDesktop]}>
       <AnimatePresence mode="wait">
         {activeScreen === 'landing' && (
           <motion.div
@@ -287,6 +302,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
               userName={userName}
               userMobile={userMobile}
               userEmail={userEmail}
+              userId={userId}
               weddingProfile={weddingProfile}
               initialTab={initialDashboardTab}
               onLogout={handleLogout}
@@ -325,7 +341,7 @@ const styles = StyleSheet.create({
   },
   topPhotoSection: {
     position: 'relative',
-    height: '58%' as DimensionValue,
+    height: '56%' as DimensionValue,
     width: '100%',
     overflow: 'hidden',
     justifyContent: 'space-between',
@@ -408,6 +424,9 @@ const styles = StyleSheet.create({
   },
   exactCardContainer: {
     width: '100%',
+    backgroundColor: '#FAF6EE',
+  },
+  exactCardContainerDesktop: {
     maxWidth: 330,
     height: 680,
     maxHeight: '92vh' as any,
@@ -416,7 +435,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e2ddd5',
     marginHorizontal: 'auto',
-    backgroundColor: '#FAF6EE',
     boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.65)',
+  },
+  exactCardContainerMobile: {
+    height: '100%',
+    flex: 1,
   },
 });

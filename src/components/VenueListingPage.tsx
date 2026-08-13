@@ -83,6 +83,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98401 22334',
     whatsapp: '919840122334',
+    instagram: '@grandroyal_convention',
   },
   {
     id: 'venue-2',
@@ -121,6 +122,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98402 33445',
     whatsapp: '919840233445',
+    instagram: '@leelapalace_chennai',
   },
   {
     id: 'venue-3',
@@ -158,6 +160,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98403 44556',
     whatsapp: '919840344556',
+    instagram: '@ananya_heritage_cbe',
   },
   {
     id: 'venue-4',
@@ -195,6 +198,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98404 55667',
     whatsapp: '919840455667',
+    instagram: '@radissonblu_mahabs',
   },
   {
     id: 'venue-5',
@@ -232,6 +236,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98405 66778',
     whatsapp: '919840566778',
+    instagram: '@madurai_heritage_palace',
   },
   {
     id: 'venue-6',
@@ -269,6 +274,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98406 77889',
     whatsapp: '919840677889',
+    instagram: '@sivam_convention_trichy',
   },
   {
     id: 'venue-7',
@@ -306,6 +312,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98407 88990',
     whatsapp: '919840788990',
+    instagram: '@erode_imperial_resort',
   },
   {
     id: 'venue-8',
@@ -343,6 +350,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98408 99001',
     whatsapp: '919840899001',
+    instagram: '@tajconnemara_chennai',
   },
   {
     id: 'venue-9',
@@ -380,6 +388,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98409 00112',
     whatsapp: '919840900112',
+    instagram: '@kovaigrandpalace',
   },
   {
     id: 'venue-10',
@@ -417,6 +426,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98410 11223',
     whatsapp: '919841011223',
+    instagram: '@shoretempleview_resort',
   },
   {
     id: 'venue-11',
@@ -454,6 +464,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98411 22334',
     whatsapp: '919841122334',
+    instagram: '@kanyakumari_ocean_resort',
   },
   {
     id: 'venue-12',
@@ -491,6 +502,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98412 33445',
     whatsapp: '919841233445',
+    instagram: '@nilgiri_tea_estate',
   },
   {
     id: 'venue-13',
@@ -528,6 +540,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98413 44556',
     whatsapp: '919841344556',
+    instagram: '@kallanai_riverview',
   },
   {
     id: 'venue-14',
@@ -565,6 +578,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98414 55667',
     whatsapp: '919841455667',
+    instagram: '@gingeefort_courtyard',
   },
   {
     id: 'venue-15',
@@ -602,6 +616,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98415 66778',
     whatsapp: '919841566778',
+    instagram: '@courtallam_fallsview',
   },
   {
     id: 'venue-16',
@@ -639,6 +654,7 @@ export const VENUES_DATA: VenueItem[] = [
     ],
     phone: '+91 98416 77889',
     whatsapp: '919841677889',
+    instagram: '@kodaikanal_pineforest',
   },
 ];
 
