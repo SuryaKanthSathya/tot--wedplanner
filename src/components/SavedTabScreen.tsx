@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Palette, Building2, Music, Mail } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -17,10 +17,12 @@ import { DecorStudio, DecorDetailPage } from './DecorDetailPage';
 import { DECOR_STUDIOS_DATA } from './DecorListingPage';
 import { VenueItem, VENUES_DATA } from './VenueListingPage';
 import { VenueDetailPage } from './VenueDetailPage';
-import { EntertainmentItem, ENTERTAINMENT_DATA } from './EntertainmentListingPage';
+import { EntertainmentItem, ENTERTAINMENT_DATA } from '../constants/EntertainmentData';
 import { EntertainmentDetailPage } from './EntertainmentDetailPage';
 import { InvitationItem, INVITATIONS_DATA } from './InvitationListingPage';
 import { InvitationDetailPage } from './InvitationDetailPage';
+import { CarItem, CARS_DATA } from '../constants/CarsData';
+import { CarsDetailPage } from './CarsDetailPage';
 
 interface SavedTabScreenProps {
   savedStudioIds: Record<string, boolean>;
@@ -38,6 +40,9 @@ interface SavedTabScreenProps {
   savedEntIds?: Record<string, boolean>;
   onToggleSavedEnt?: (id: string) => void;
   onExploreEntertainment?: () => void;
+  savedCarIds?: Record<string, boolean>;
+  onToggleSavedCar?: (id: string) => void;
+  onExploreCars?: () => void;
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onExploreInvitations?: () => void;
@@ -59,17 +64,21 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   savedEntIds = {},
   onToggleSavedEnt,
   onExploreEntertainment,
+  savedCarIds = {},
+  onToggleSavedCar,
+  onExploreCars,
   savedInviteIds = {},
   onToggleSavedInvite,
   onExploreInvitations,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Invitations'>('All');
+  const [activeCategory, setActiveCategory] = useState<'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Cars' | 'Invitations'>('All');
   const [selectedStudio, setSelectedStudio] = useState<PhotographyStudio | null>(null);
   const [selectedMakeup, setSelectedMakeup] = useState<MakeupStudio | null>(null);
   const [selectedDecor, setSelectedDecor] = useState<DecorStudio | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(null);
   const [selectedEnt, setSelectedEnt] = useState<EntertainmentItem | null>(null);
   const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(null);
+  const [selectedCar, setSelectedCar] = useState<CarItem | null>(null);
 
   const savedStudios = STUDIOS_DATA.filter((s) => Boolean(savedStudioIds[s.id]));
   const savedMakeups = MAKEUP_STUDIOS_DATA.filter((m) => Boolean(savedMakeupIds[m.id]));
@@ -77,6 +86,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   const savedVenues = VENUES_DATA.filter((v) => Boolean(savedVenueIds[v.id]));
   const savedEnts = ENTERTAINMENT_DATA.filter((e) => Boolean(savedEntIds[e.id]));
   const savedInvites = INVITATIONS_DATA.filter((i) => Boolean(savedInviteIds[i.id]));
+  const savedCars = CARS_DATA.filter((c) => Boolean(savedCarIds[c.id]));
 
   if (selectedStudio) {
     return (
@@ -133,6 +143,18 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     );
   }
 
+
+  if (selectedCar) {
+    return (
+      <CarsDetailPage
+        car={selectedCar}
+        onBack={() => setSelectedCar(null)}
+        isBookmarked={Boolean(savedCarIds[selectedCar.id])}
+        onToggleBookmark={(id) => onToggleSavedCar && onToggleSavedCar(id)}
+      />
+    );
+  }
+
   if (selectedInvite) {
     return (
       <InvitationDetailPage
@@ -150,6 +172,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     savedDecors.length +
     savedVenues.length +
     savedEnts.length +
+    savedCars.length +
     savedInvites.length;
 
   return (
@@ -223,6 +246,16 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
             </Text>
           </TouchableOpacity>
 
+
+          <TouchableOpacity
+            style={[styles.filterChip, activeCategory === 'Cars' && styles.filterChipActive]}
+            onPress={() => setActiveCategory('Cars')}
+          >
+            <Text style={[styles.filterChipText, activeCategory === 'Cars' && styles.filterChipTextActive]}>
+              Cars ({savedCars.length})
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.filterChip, activeCategory === 'Invitations' && styles.filterChipActive]}
             onPress={() => setActiveCategory('Invitations')}
@@ -259,7 +292,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
 
               {onExploreDecor && (
                 <TouchableOpacity style={styles.exploreBtn} onPress={onExploreDecor} activeOpacity={0.8}>
-                  <Palette className="w-4 h-4 text-white mr-1.5" />
+                  <Flower2 className="w-4 h-4 text-white mr-1.5" />
                   <Text style={styles.exploreBtnText}>Decor</Text>
                 </TouchableOpacity>
               )}
@@ -275,6 +308,13 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                 <TouchableOpacity style={styles.exploreBtn} onPress={onExploreEntertainment} activeOpacity={0.8}>
                   <Music className="w-4 h-4 text-white mr-1.5" />
                   <Text style={styles.exploreBtnText}>Entertainment</Text>
+                </TouchableOpacity>
+              )}
+
+
+              {onExploreCars && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreCars} activeOpacity={0.8}>
+                  <Text style={styles.exploreBtnText}>Cars</Text>
                 </TouchableOpacity>
               )}
 
@@ -504,12 +544,64 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               </View>
             )}
 
+
+            {/* CARS SECTION */}
+            {(activeCategory === 'All' || activeCategory === 'Cars') && savedCars.length > 0 && (
+              <View style={{ marginBottom: 20 }}>
+                <View style={styles.sectionHeaderRow}>
+                  <Text style={styles.sectionTitle}>Cars ({savedCars.length})</Text>
+                  {onExploreCars && (
+                    <TouchableOpacity onPress={onExploreCars}>
+                      <Text style={styles.browseMoreText}>+ Explore More</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {savedCars.map((c) => (
+                  <motion.div key={c.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full mb-3.5">
+                    <View style={styles.studioCard}>
+                      <Image source={{ uri: c.image }} style={styles.studioImage} resizeMode="cover" />
+                      <View style={styles.cardRightCol}>
+                        <View style={styles.cardHeaderRow}>
+                          <Text style={styles.studioName} numberOfLines={1}>{c.name}</Text>
+                          <TouchableOpacity onPress={() => onToggleSavedCar && onToggleSavedCar(c.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Bookmark className="w-4 h-4 text-[#8B1E2F] fill-[#8B1E2F]" />
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.ratingRow}>
+                          <Star className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-1" />
+                          <Text style={styles.ratingText}>{c.rating} <Text style={styles.reviewsText}>({c.reviewsCount})</Text></Text>
+                        </View>
+                        <View style={styles.locationRow}>
+                          <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
+                          <Text style={styles.locationText}>{c.location}</Text>
+                        </View>
+                        <View style={styles.cardBottomRow}>
+                          <Text style={styles.priceText}>{c.startingPrice}</Text>
+                          <TouchableOpacity style={styles.viewDetailsBtn} onPress={() => setSelectedCar(c)} activeOpacity={0.8}>
+                            <Text style={styles.viewDetailsBtnText}>View Details</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </motion.div>
+                ))}
+              </View>
+            )}
+
             {/* INVITATIONS SECTION */}
             {(activeCategory === 'All' || activeCategory === 'Invitations') && savedInvites.length > 0 && (
               <View style={{ marginBottom: 20 }}>
                 <View style={styles.sectionHeaderRow}>
                   <Text style={styles.sectionTitle}>Invitations ({savedInvites.length})</Text>
-                  {onExploreInvitations && (
+    
+              {onExploreCars && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreCars} activeOpacity={0.8}>
+                  <Text style={styles.exploreBtnText}>Cars</Text>
+                </TouchableOpacity>
+              )}
+
+              {onExploreInvitations && (
                     <TouchableOpacity onPress={onExploreInvitations}>
                       <Text style={styles.browseMoreText}>+ Explore More</Text>
                     </TouchableOpacity>

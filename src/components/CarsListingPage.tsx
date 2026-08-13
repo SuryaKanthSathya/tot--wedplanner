@@ -9,9 +9,9 @@ import {
   TextInput,
   Modal,
 } from 'react-native';
-import { EntertainmentDetailPage } from './EntertainmentDetailPage';
-import { EntertainmentItem as EntertainmentArtist, ENTERTAINMENT_DATA } from '../constants/EntertainmentData';
 import { motion, AnimatePresence } from 'motion/react';
+import { CarsDetailPage } from './CarsDetailPage';
+import { CarItem, CARS_DATA } from '../constants/CarsData';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import {
   ChevronLeft,
@@ -80,23 +80,23 @@ const RATING_OPTIONS = [
 
 const TIER_OPTIONS = [
   { id: 'All', label: 'All Tiers' },
-  { id: 'Signature', label: 'Signature', desc: 'Top Tier • Luxury & Bespoke Entertainment' },
+  { id: 'Signature', label: 'Signature', desc: 'Top Tier • Luxury & Bespoke Cars' },
   { id: 'Premium', label: 'Premium', desc: 'Second Tier • High Quality & Experienced Teams' },
   { id: 'Essential', label: 'Essential', desc: 'Last Tier • Value & Pocket-Friendly Packages' },
 ];
 
 
-export interface EntertainmentListingPageProps {
+export interface CarsListingPageProps {
   onBack: () => void;
-  savedEntIds?: Record<string, boolean>;
-  onToggleSavedEnt?: (id: string) => void;
+  savedCarIds?: Record<string, boolean>;
+  onToggleSavedCar?: (id: string) => void;
   onOpenSavedTab?: () => void;
 }
 
-export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> = ({
+export const CarsListingPage: React.FC<CarsListingPageProps> = ({
   onBack,
-  savedEntIds,
-  onToggleSavedEnt,
+  savedCarIds,
+  onToggleSavedCar,
   onOpenSavedTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -107,28 +107,28 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
 
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedArtist, setSelectedArtist] = useState<EntertainmentArtist | null>(null);
+  const [selectedCar, setSelectedCar] = useState<CarItem | null>(null);
   
   // Send Quote Modal State
-  const [quoteArtist, setQuoteArtist] = useState<EntertainmentArtist | null>(null);
+  const [quoteCar, setQuoteCar] = useState<CarItem | null>(null);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [eventDate, setEventDate] = useState('15 December 2026');
   const [eventLocation, setEventLocation] = useState('');
   const [eventType, setEventType] = useState<'Wedding' | 'Reception' | 'Engagement' | 'Other'>('Wedding');
-  const [entertainmentType, setEntertainmentType] = useState('Wedding Entertainment');
+  const [carsType, setCarsType] = useState('Wedding Cars');
   const [showPhotoTypeDropdown, setShowPhotoTypeDropdown] = useState(false);
   
   // Local fallback state if parent doesn't manage saved IDs
   const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Record<string, boolean>>(() => {
     try {
-      const saved = localStorage.getItem('saved_entertainment_artists');
+      const saved = localStorage.getItem('saved_cars_cars');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed['artist-1']) {
-          delete parsed['artist-1'];
-          localStorage.setItem('saved_entertainment_artists', JSON.stringify(parsed));
+        if (parsed['car-1']) {
+          delete parsed['car-1'];
+          localStorage.setItem('saved_cars_cars', JSON.stringify(parsed));
         }
         return parsed;
       }
@@ -138,16 +138,16 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
     }
   });
 
-  const bookmarkedIds = savedEntIds || localBookmarkedIds;
+  const bookmarkedIds = savedCarIds || localBookmarkedIds;
 
   const toggleBookmark = (id: string) => {
-    if (onToggleSavedEnt) {
-      onToggleSavedEnt(id);
+    if (onToggleSavedCar) {
+      onToggleSavedCar(id);
     } else {
       setLocalBookmarkedIds((prev) => {
         const updated = { ...prev, [id]: !prev[id] };
         try {
-          localStorage.setItem('saved_entertainment_artists', JSON.stringify(updated));
+          localStorage.setItem('saved_cars_cars', JSON.stringify(updated));
         } catch (e) {
           console.error(e);
         }
@@ -156,27 +156,27 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
     }
   };
 
-  // Filter Artists Logic
-  const filteredArtists = ENTERTAINMENT_DATA.filter((artist) => {
+  // Filter Cars Logic
+  const filteredCars = CARS_DATA.filter((car) => {
     // Search Query
     const matchesSearch =
-      artist.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist.location.toLowerCase().includes(searchQuery.toLowerCase());
+      car.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      car.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      car.location.toLowerCase().includes(searchQuery.toLowerCase());
 
     // City Filter
     const matchesCity =
       selectedCity === 'All' ||
       selectedCity === 'All Cities' ||
-      artist.location.toLowerCase() === selectedCity.toLowerCase() ||
-      selectedCity.toLowerCase().includes(artist.location.toLowerCase());
+      car.location.toLowerCase() === selectedCity.toLowerCase() ||
+      selectedCity.toLowerCase().includes(car.location.toLowerCase());
 
     // Budget Filter
     let matchesBudget = true;
     if (selectedBudget !== 'All') {
       const bObj = BUDGET_OPTIONS.find((b) => b.id === selectedBudget);
       if (bObj && bObj.min !== undefined && bObj.max !== undefined) {
-        matchesBudget = artist.priceValue >= bObj.min && artist.priceValue <= bObj.max;
+        matchesBudget = car.priceValue >= bObj.min && car.priceValue <= bObj.max;
       }
     }
 
@@ -185,14 +185,14 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
     if (selectedRating !== 'All') {
       const rObj = RATING_OPTIONS.find((r) => r.id === selectedRating);
       if (rObj && rObj.minRating !== undefined) {
-        matchesRating = artist.rating >= rObj.minRating;
+        matchesRating = car.rating >= rObj.minRating;
       }
     }
 
     // Tier Filter
     let matchesTier = true;
     if (selectedTier !== 'All') {
-      matchesTier = artist.tier === selectedTier;
+      matchesTier = car.tier === selectedTier;
     }
 
     return matchesSearch && matchesCity && matchesBudget && matchesRating && matchesTier;
@@ -209,12 +209,12 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   const isAnyFilterActive =
     selectedCity !== 'All' || selectedBudget !== 'All' || selectedRating !== 'All' || selectedTier !== 'All';
 
-  if (selectedArtist) {
+  if (selectedCar) {
     return (
-      <EntertainmentDetailPage
-        artist={selectedArtist}
-        onBack={() => setSelectedArtist(null)}
-        isBookmarked={Boolean(bookmarkedIds[selectedArtist.id])}
+      <CarsDetailPage
+        car={selectedCar}
+        onBack={() => setSelectedCar(null)}
+        isBookmarked={Boolean(bookmarkedIds[selectedCar.id])}
         onToggleBookmark={toggleBookmark}
       />
     );
@@ -228,7 +228,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
           <ChevronLeft className="w-6 h-6 text-[#2A2425]" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Entertainment</Text>
+        <Text style={styles.headerTitle}>Cars</Text>
 
         <View style={styles.headerRightIcons}>
           {isAnyFilterActive && (
@@ -261,7 +261,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
         <Search className="w-4 h-4 text-[#8C7A7C] mr-2" />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by artist, category, or district..."
+          placeholder="Search by car, category, or district..."
           placeholderTextColor="#9A888A"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -337,22 +337,22 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
       {/* Subtitle Section & Result Count */}
       <View style={styles.recommendedRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.recommendedTitle}>Recommended Artists</Text>
+          <Text style={styles.recommendedTitle}>Recommended Cars</Text>
           <Sparkles className="w-4 h-4 text-[#C28E38] ml-1.5" />
         </View>
-        <Text style={styles.resultCountText}>{filteredArtists.length} artists</Text>
+        <Text style={styles.resultCountText}>{filteredCars.length} cars</Text>
       </View>
 
-      {/* Artists Vertical List */}
+      {/* Cars Vertical List */}
       <ScrollView
         style={[styles.listScrollView, { overflowY: 'auto' } as any]}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       >
-        {filteredArtists.length === 0 ? (
+        {filteredCars.length === 0 ? (
           <View style={styles.emptyStateContainer}>
             <SlidersHorizontal className="w-10 h-10 text-[#C2B5A8] mb-2" />
-            <Text style={styles.emptyStateTitle}>No artists found</Text>
+            <Text style={styles.emptyStateTitle}>No cars found</Text>
             <Text style={styles.emptyStateSub}>
               Try adjusting your city, budget range, or rating filter.
             </Text>
@@ -361,31 +361,31 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
             </TouchableOpacity>
           </View>
         ) : (
-          filteredArtists.map((artist) => {
-            const isBookmarked = Boolean(bookmarkedIds[artist.id]);
+          filteredCars.map((car) => {
+            const isBookmarked = Boolean(bookmarkedIds[car.id]);
             return (
               <motion.div
-                key={artist.id}
+                key={car.id}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full mb-3.5"
               >
-                <View style={styles.artistCard}>
+                <View style={styles.carCard}>
                   {/* Left Photo */}
                   <Image
-                    source={{ uri: artist.image }}
-                    style={styles.artistImage}
+                    source={{ uri: car.image }}
+                    style={styles.carImage}
                     resizeMode="cover"
                   />
 
                   {/* Right Info Details */}
                   <View style={styles.cardRightCol}>
                     <View style={styles.cardHeaderRow}>
-                      <Text style={styles.artistName} numberOfLines={1}>
-                        {artist.name}
+                      <Text style={styles.carName} numberOfLines={1}>
+                        {car.name}
                       </Text>
                       <TouchableOpacity
-                        onPress={() => toggleBookmark(artist.id)}
+                        onPress={() => toggleBookmark(car.id)}
                         hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Bookmark
@@ -400,26 +400,26 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                     <View style={styles.ratingRow}>
                       <Star className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-1" />
                       <Text style={styles.ratingText}>
-                        {artist.rating}{' '}
-                        <Text style={styles.reviewsText}>({artist.reviewsCount})</Text>
+                        {car.rating}{' '}
+                        <Text style={styles.reviewsText}>({car.reviewsCount})</Text>
                       </Text>
                       <View
                         style={[
                           styles.tierPill,
-                          artist.tier === 'Signature' && { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#FDE68A' },
-                          artist.tier === 'Premium' || artist.tier === 'Luxury' && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
-                          artist.tier === 'Essential' || artist.tier === 'Popular' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
+                          car.tier === 'Signature' && { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#FDE68A' },
+                          car.tier === 'Premium' && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
+                          car.tier === 'Essential' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
                         ]}
                       >
                         <Text
                           style={[
                             styles.tierPillText,
-                            artist.tier === 'Signature' && { color: '#92400E' },
-                            artist.tier === 'Premium' || artist.tier === 'Luxury' && { color: '#581420' },
-                            artist.tier === 'Essential' || artist.tier === 'Popular' && { color: '#137333' },
+                            car.tier === 'Signature' && { color: '#92400E' },
+                            car.tier === 'Premium' && { color: '#581420' },
+                            car.tier === 'Essential' && { color: '#137333' },
                           ]}
                         >
-                          {artist.tier}
+                          {car.tier}
                         </Text>
                       </View>
                     </View>
@@ -427,21 +427,21 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                     {/* Location */}
                     <View style={styles.locationRow}>
                       <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
-                      <Text style={styles.locationText}>{artist.location}</Text>
+                      <Text style={styles.locationText}>{car.location}</Text>
                     </View>
 
                     {/* Category */}
                     <Text style={styles.categoryText} numberOfLines={1}>
-                      {artist.category}
+                      {car.category}
                     </Text>
 
                     {/* Starting Price */}
-                    <Text style={styles.priceText}>{artist.startingPrice}</Text>
+                    <Text style={styles.priceText}>{car.startingPrice}</Text>
 
                     {/* View Details Pill Button */}
                     <TouchableOpacity
                       style={styles.viewDetailsBtn}
-                      onPress={() => setSelectedArtist(artist)}
+                      onPress={() => setSelectedCar(car)}
                       activeOpacity={0.8}
                     >
                       <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -651,11 +651,11 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
 
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
-        visible={Boolean(quoteArtist)}
-        vendorName={quoteArtist?.name || ''}
-        vendorLocation={quoteArtist?.location || ''}
-        category="entertainment"
-        onClose={() => setQuoteArtist(null)}
+        visible={Boolean(quoteCar)}
+        vendorName={quoteCar?.name || ''}
+        vendorLocation={quoteCar?.location || ''}
+        category="cars"
+        onClose={() => setQuoteCar(null)}
       />
     </View>
   );
@@ -786,7 +786,7 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
   },
-  artistCard: {
+  carCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 2,
   },
-  artistImage: {
+  carImage: {
     width: 105,
     height: 125,
     borderRadius: 10,
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  artistName: {
+  carName: {
     fontSize: 14,
     fontWeight: '700',
     color: '#1A1415',
@@ -1051,7 +1051,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 18,
   },
-  callArtistBtn: {
+  callCarBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -1061,7 +1061,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
   },
-  callArtistBtnText: {
+  callCarBtnText: {
     color: '#8B1E2F',
     fontWeight: '600',
     fontSize: 13,
@@ -1118,7 +1118,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 6,
   },
-  topArtistCard: {
+  topCarCard: {
     backgroundColor: '#FAF2E8',
     borderWidth: 1,
     borderColor: '#EFE3D3',
@@ -1129,12 +1129,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     marginTop: 12,
   },
-  topArtistAvatar: {
+  topCarAvatar: {
     width: 58,
     height: 58,
     borderRadius: 14,
   },
-  topArtistInfo: {
+  topCarInfo: {
     flex: 1,
     marginLeft: 12,
   },
@@ -1143,7 +1143,7 @@ const styles = StyleSheet.create({
     color: '#786B6D',
     fontWeight: '500',
   },
-  topArtistName: {
+  topCarName: {
     fontFamily: 'Playfair Display, Georgia, serif',
     fontSize: 17,
     fontWeight: '800',
@@ -1151,11 +1151,11 @@ const styles = StyleSheet.create({
     marginTop: 1,
     marginBottom: 2,
   },
-  topArtistLocRow: {
+  topCarLocRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  topArtistLocText: {
+  topCarLocText: {
     fontSize: 12,
     color: '#6E5D60',
     fontWeight: '500',

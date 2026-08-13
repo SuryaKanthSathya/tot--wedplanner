@@ -25,7 +25,6 @@ import {
   Calendar,
   Check,
   X,
-  Palette,
   Eye,
   ShieldCheck,
   Building,

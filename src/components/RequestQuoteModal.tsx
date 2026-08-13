@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   Camera,
   Sparkles,
-  Palette,
+  Flower2,
 } from 'lucide-react';
 
 export interface RequestQuoteModalProps {
@@ -63,6 +63,16 @@ const PHOTOGRAPHY_SERVICES = [
   'Designer Photobook Album',
 ];
 
+const ENTERTAINMENT_SERVICES = [
+  'Sangeet Night DJ',
+  'Live Wedding Band',
+  'Classical & Nadaswaram',
+  'Anchor / MC',
+  'Dance Choreography',
+  'Chenda Melam & Percussion',
+  'Cold Pyro & Stage SFX',
+];
+
 const EVENT_OPTIONS = [
   'Muhurtham / Wedding',
   'Reception',
@@ -72,10 +82,10 @@ const EVENT_OPTIONS = [
 ];
 
 const MAKEUP_BUDGET_RANGES = [
-  'Under ₹25,000',
-  '₹25,000 - ₹50,000',
-  '₹50,000 - ₹100,000',
-  '₹100,000+',
+  'Under ₹15,000',
+  '₹15,000 - ₹30,000',
+  '₹30,000 - ₹50,000',
+  '₹50,000+',
 ];
 
 const DECOR_BUDGET_RANGES = [
@@ -90,6 +100,28 @@ const PHOTOGRAPHY_BUDGET_RANGES = [
   '₹50,000 - ₹1,000,000',
   '₹1,000,000 - ₹2,000,000',
   '₹2,000,000+',
+];
+
+const ENTERTAINMENT_BUDGET_RANGES = [
+  'Under ₹30,000',
+  '₹30,000 - ₹60,000',
+  '₹60,000 - ₹1,00,000',
+  '₹1,00,000+',
+];
+
+const CARS_SERVICES = [
+  'Vintage Car',
+  'Luxury Sedan',
+  'Tempo Traveller',
+  'AC Bus/Van',
+  'Bridal Car Decoration',
+];
+
+const CARS_BUDGET_RANGES = [
+  'Under ₹10,000',
+  '₹10,000 - ₹25,000',
+  '₹25,000 - ₹50,000',
+  '₹50,000+',
 ];
 
 export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
@@ -108,23 +140,17 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
   const catLower = category?.toLowerCase() || '';
   const isMakeup = catLower === 'makeup';
   const isDecor = catLower === 'decor';
+  const isEntertainment = catLower === 'entertainment';
+  const isCars = catLower === 'cars';
 
-  const servicesList = isDecor ? DECOR_SERVICES : isMakeup ? MAKEUP_SERVICES : PHOTOGRAPHY_SERVICES;
-  const budgetList = isDecor ? DECOR_BUDGET_RANGES : isMakeup ? MAKEUP_BUDGET_RANGES : PHOTOGRAPHY_BUDGET_RANGES;
+  const servicesList = isCars ? CARS_SERVICES : isEntertainment ? ENTERTAINMENT_SERVICES : isDecor ? DECOR_SERVICES : isMakeup ? MAKEUP_SERVICES : PHOTOGRAPHY_SERVICES;
+  const budgetList = isCars ? CARS_BUDGET_RANGES : isEntertainment ? ENTERTAINMENT_BUDGET_RANGES : isDecor ? DECOR_BUDGET_RANGES : isMakeup ? MAKEUP_BUDGET_RANGES : PHOTOGRAPHY_BUDGET_RANGES;
 
   const [weddingDate, setWeddingDate] = useState('');
   const [weddingLocation, setWeddingLocation] = useState(finalLocation);
-  const [selectedServices, setSelectedServices] = useState<string[]>(
-    isDecor
-      ? ['Stage & Mandap Decor', 'Lighting, Trusses & Chandelier']
-      : isMakeup
-      ? ['HD Bridal Makeup', 'Saree Draping & Styling']
-      : ['Candid Photography', 'Cinematic Video & Teaser']
-  );
-  const [selectedEvents, setSelectedEvents] = useState<string[]>(['Muhurtham / Wedding']);
-  const [selectedBudget, setSelectedBudget] = useState<string>(
-    isDecor ? '₹1,00,000 - ₹2,50,000' : isMakeup ? '₹25,000 - ₹50,000' : '₹50,000 - ₹1,000,000'
-  );
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
+  const [selectedBudget, setSelectedBudget] = useState<string>('');
   const [customerName, setCustomerName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [notes, setNotes] = useState('');
@@ -135,18 +161,11 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
   useEffect(() => {
     if (visible) {
       setWeddingLocation(finalLocation);
-      if (isDecor) {
-        setSelectedServices(['Stage & Mandap Decor', 'Lighting, Trusses & Chandelier']);
-        setSelectedBudget('₹1,00,000 - ₹2,50,000');
-      } else if (isMakeup) {
-        setSelectedServices(['HD Bridal Makeup', 'Saree Draping & Styling']);
-        setSelectedBudget('₹25,000 - ₹50,000');
-      } else {
-        setSelectedServices(['Candid Photography', 'Cinematic Video & Teaser']);
-        setSelectedBudget('₹50,000 - ₹1,000,000');
-      }
+      setSelectedServices([]);
+      setSelectedEvents([]);
+      setSelectedBudget('');
     }
-  }, [visible, category, finalLocation, isDecor, isMakeup]);
+  }, [visible, category, finalLocation, isDecor, isMakeup, isEntertainment, isCars]);
 
   const toggleService = (service: string) => {
     setValidationError(null);
@@ -183,7 +202,9 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
     }
     if (selectedServices.length === 0) {
       setValidationError(
-        isDecor
+        isEntertainment
+          ? 'Please select at least one entertainment service.'
+          : isDecor
           ? 'Please select at least one decor service.'
           : isMakeup
           ? 'Please select at least one makeup service.'
@@ -250,10 +271,10 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                     <CheckCircle2 className="w-16 h-16 text-[#15803D]" />
                   </View>
                   <Text style={styles.successTitle}>
-                    {isDecor ? 'Decor Quote Request Sent!' : isMakeup ? 'Makeup Quote Request Sent!' : 'Quote Request Sent!'}
+                    {isCars ? 'Car Quote Request Sent!' : isEntertainment ? 'Entertainment Quote Request Sent!' : isDecor ? 'Decor Quote Request Sent!' : isMakeup ? 'Makeup Quote Request Sent!' : 'Quote Request Sent!'}
                   </Text>
                   <Text style={styles.successSubtitle}>
-                    Your {isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : 'photography'} requirements have been sent to{' '}
+                    Your {isCars ? 'transport/car' : isEntertainment ? 'entertainment' : isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : 'photography'} requirements have been sent to{' '}
                     <Text style={{ fontWeight: '700', color: '#581420' }}>{finalVendorName}</Text>. They
                     will reach out to you shortly via WhatsApp / Phone with full pricing and custom
                     package details.
@@ -281,25 +302,25 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                   {/* HEADER */}
                   <View style={styles.headerRow}>
                     {isDecor ? (
-                      <Palette className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                      <Flower2 className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : isMakeup ? (
                       <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : (
                       <Camera className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     )}
                     <Text style={styles.modalTitle}>
-                      {isDecor ? 'Wedding Decor Quote Request' : isMakeup ? 'Bridal Makeup Quote Request' : 'Photography Quote Request'}
+                      {isCars ? 'Car Rental Quote Request' : isEntertainment ? 'Entertainment Quote Request' : isDecor ? 'Wedding Decor Quote Request' : isMakeup ? 'Bridal Makeup Quote Request' : 'Photography Quote Request'}
                     </Text>
                   </View>
                   <Text style={styles.modalSubtitle}>
-                    Share your {isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : 'photography'} details to receive an exact quotation from{' '}
+                    Share your {isCars ? 'transportation' : isEntertainment ? 'entertainment' : isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : 'photography'} details to receive an exact quotation from{' '}
                     <Text style={{ fontWeight: '700', color: '#581420' }}>{finalVendorName}</Text>.
                   </Text>
 
                   {/* SECTION 1 — Services Required */}
                   <View style={styles.fieldGroup}>
                     <Text style={styles.fieldLabel}>
-                      1. {isDecor ? 'Decor Services Needed' : isMakeup ? 'Makeup Services Needed' : 'Photography Services Needed'}{' '}
+                      1. {isCars ? 'Vehicle/Services Needed' : isEntertainment ? 'Entertainment Services Needed' : isDecor ? 'Decor Services Needed' : isMakeup ? 'Makeup Services Needed' : 'Photography Services Needed'}{' '}
                       <Text style={styles.asterisk}>*</Text>
                     </Text>
                     <View style={styles.chipsRow}>
@@ -352,7 +373,7 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                   {/* SECTION 3 — Estimated Budget Range */}
                   <View style={styles.fieldGroup}>
                     <Text style={styles.fieldLabel}>
-                      3. {isDecor ? 'Estimated Decor Budget' : isMakeup ? 'Estimated Makeup Budget' : 'Estimated Photography Budget'}
+                      3. {isCars ? 'Estimated Rental Budget' : isEntertainment ? 'Estimated Entertainment Budget' : isDecor ? 'Estimated Decor Budget' : isMakeup ? 'Estimated Makeup Budget' : 'Estimated Photography Budget'}
                     </Text>
                     <View style={styles.chipsRow}>
                       {budgetList.map((b) => {
@@ -419,10 +440,14 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                   {/* SECTION 5 — Special Requests / Notes */}
                   <View style={styles.fieldGroup}>
                     <Text style={styles.fieldLabel}>
-                      {isDecor
+                      {isEntertainment
+                        ? 'Special Theme Ideas / Music Genre & Requirements (Optional)'
+                        : isDecor
                         ? 'Special Theme Ideas / Stage Dimensions & Venue Notes (Optional)'
                         : isMakeup
                         ? 'Special Instructions / Skin & Saree Details (Optional)'
+                        : isCars
+                        ? 'Special Requests / Rental Details (Optional)'
                         : 'Special Instructions / Venue Notes (Optional)'}
                     </Text>
                     <View style={styles.textAreaBox}>
@@ -431,10 +456,14 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                         value={notes}
                         onChangeText={setNotes}
                         placeholder={
-                          isDecor
+                          isEntertainment
+                            ? 'e.g. We need a live band that plays 90s hits and a DJ who mixes Tamil and English'
+                            : isDecor
                             ? 'e.g. Traditional jasmine mandap + fairy light canopy for reception'
                             : isMakeup
                             ? 'e.g. Need 9-yard saree draping, airbrush makeup for bride + 2 family members'
+                            : isCars
+                            ? 'e.g. Need a vintage car for 3 hours, and 2 vans for 12 hours.'
                             : 'e.g. Need 2 photographers for Muhurtham, outdoor pre-wedding in Ooty'
                         }
                         placeholderTextColor="#9CA3AF"
@@ -498,7 +527,11 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                     activeOpacity={0.85}
                   >
                     <Text style={styles.submitBtnText}>
-                      {isDecor
+                      {isCars
+                        ? 'Send Car Quote Request'
+                        : isEntertainment
+                        ? 'Send Entertainment Quote Request'
+                        : isDecor
                         ? 'Send Decor Quote Request'
                         : isMakeup
                         ? 'Send Makeup Quote Request'
