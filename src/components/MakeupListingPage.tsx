@@ -103,6 +103,24 @@ const TIER_OPTIONS = ['All Tiers', 'Signature', 'Premium', 'Essential'];
 
 export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
   {
+    id: 'pkg_makeup_1',
+    name: 'Glow Studio',
+    category: 'Premium Bridal Makeup',
+    city: 'All Cities',
+    location: 'Destination Weddings',
+    rating: 4.8,
+    reviewsCount: 198,
+    startingPrice: '₹30,000 onwards',
+    priceValue: 30000,
+    services: ['Airbrush Makeup', 'HD Makeup', 'Hairstyling', 'Draping'],
+    brands: ['MAC', 'Huda Beauty', 'Bobbi Brown', 'Charlotte Tilbury'],
+    image: '/src/assets/images/pastel_reception_stage.jpg',
+    description: 'Expert bridal makeup artists for a flawless, long-lasting look.',
+    experience: '6+ Years',
+    studioLocation: 'Available Worldwide',
+    trialAvailable: 'Paid Trial Available',
+  },
+  {
     id: 'makeup-1',
     name: 'Glow & Grace Bridal Artistry',
     rating: 4.9,

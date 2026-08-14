@@ -103,6 +103,24 @@ const TIER_OPTIONS = [
 
 export const CATERING_DATA: CateringVendor[] = [
   {
+    id: 'pkg_catering_1',
+    name: 'Flavors Catering',
+    category: 'Premium Multi-Cuisine Catering',
+    city: 'All Cities',
+    location: 'Destination Weddings',
+    rating: 4.8,
+    reviewsCount: 420,
+    startingPrice: '₹800 per plate',
+    priceValue: 800,
+    cuisineSpecialty: 'South Indian & Multi-Cuisine',
+    image: '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+    description: 'A curated multi-cuisine feast prepared by top chefs.',
+    experience: '15+ Years',
+    capacity: '100-2000 Guests',
+    foodTypes: 'Pure Veg & Non-Veg',
+    services: ['Live Counters', 'Dessert Bars', 'Waitstaff', 'Crockery'],
+  },
+  {
     id: 'caterer-1',
     name: 'Sri Amirtham Catering',
     rating: 4.8,

@@ -31,6 +31,24 @@ export type { InvitationItem };
 
 export const INVITATIONS_DATA: InvitationItem[] = [
   {
+    id: 'pkg_inv_1',
+    name: 'Paper & Peonies',
+    category: 'Custom Digital & Physical Invites',
+    city: 'All Cities',
+    location: 'Worldwide Delivery',
+    rating: 4.9,
+    reviewsCount: 289,
+    startingPrice: '₹15,000 onwards',
+    priceValue: 15000,
+    turnaroundTime: '1-2 Weeks',
+    image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
+    description: 'Custom designed, eco-friendly digital and physical invitations.',
+    experience: '7+ Years',
+    minimumOrder: '50 Invites',
+    printingTypes: 'Foil Stamping, Letterpress, Digital',
+    services: ['Digital Invites', 'Boxed Invites', 'E-Invites', 'Save the Date'],
+  },
+  {
     id: 'inv-1',
     name: 'Royal Crest Boxed Sweets & Gold Foil Card',
     category: 'Boxed & Luxury',
