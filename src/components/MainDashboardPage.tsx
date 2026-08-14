@@ -12,6 +12,7 @@ import { SavedTabScreen } from './SavedTabScreen';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
+import { FindVendorsPage } from './FindVendorsPage';
 import {
   View,
   Text,
@@ -99,6 +100,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
   const [showCateringListing, setShowCateringListing] = useState<boolean>(false);
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
+  const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
 
   // Persisted Saved Studios State
@@ -390,6 +392,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowCateringListing(true);
       return;
     }
+    if (featureName === 'Find Individual Vendors') {
+      setShowFindVendorsPage(true);
+      return;
+    }
     if (featureName === 'Plan My Entire Wedding') {
       if (onNavigateToCoupleOnboarding) {
         onNavigateToCoupleOnboarding();
@@ -412,6 +418,18 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const handleProfilePress = () => {
     setShowProfileModal(true);
   };
+
+  if (showFindVendorsPage) {
+    return (
+      <FindVendorsPage
+        onBack={() => setShowFindVendorsPage(false)}
+        onSelectCategory={(category) => {
+          setShowFindVendorsPage(false);
+          handleOptionPress(category);
+        }}
+      />
+    );
+  }
 
   if (showPhotographyListing) {
     return (
