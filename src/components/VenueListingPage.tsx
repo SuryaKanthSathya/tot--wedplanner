@@ -723,7 +723,7 @@ interface VenueListingPageProps {
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   onBack,
   savedVenueIds = {},
-  onToggleSavedVenue = (_id?: string) => {},
+  onToggleSavedVenue = (_id?: string) => { },
   onOpenSavedTab,
   onNavigateToQuotesTab,
 }) => {
@@ -758,8 +758,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
       selectedRating === 'All'
         ? true
         : selectedRating === '4.8'
-        ? venue.rating >= 4.8
-        : venue.rating >= 4.9;
+          ? venue.rating >= 4.8
+          : venue.rating >= 4.9;
 
     const matchesTier = selectedTier === 'All' ? true : venue.tier === selectedTier;
 
@@ -907,9 +907,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                         }}
                       >
                         <Heart
-                          className={`w-4 h-4 ${
-                            isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
-                          }`}
+                          className={`w-4 h-4 ${isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
+                            }`}
                         />
                       </TouchableOpacity>
                     </View>
@@ -924,7 +923,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                   {/* CARD DETAILS */}
                   <View style={styles.cardBody}>
                     <Text style={styles.venueName} numberOfLines={1}>{venue.name}</Text>
-                    
+
                     <View style={styles.locationRow}>
                       <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
                       <Text style={styles.locationText}>{venue.location}, {venue.city}</Text>
@@ -994,7 +993,6 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                   {activeFilterModal === 'budget' && 'Select Budget Range'}
                   {activeFilterModal === 'rating' && 'Select Minimum Rating'}
                   {activeFilterModal === 'tier' && 'Select Venue Tier'}
-                  {activeFilterModal === 'type' && 'Select Venue Type'}
                 </Text>
                 <TouchableOpacity
                   style={styles.filterModalClose}
@@ -1144,38 +1142,6 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                   </View>
                 )}
 
-                {activeFilterModal === 'type' && (
-                  <View style={styles.optionsList}>
-                    {TYPE_OPTIONS.map((type) => {
-                      const isSelected = selectedCategory === type;
-                      return (
-                        <div
-                          key={type}
-                          onClick={() => {
-                            setSelectedCategory(type);
-                            setActiveFilterModal(null);
-                          }}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '12px 16px',
-                            borderRadius: '12px',
-                            marginBottom: '4px',
-                            cursor: 'pointer',
-                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
-                          }}
-                        >
-                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
-                            {type}
-                          </Text>
-                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
-                        </div>
-                      );
-                    })}
-                  </View>
-                )}
               </ScrollView>
             </motion.div>
           </motion.div>
@@ -1285,7 +1251,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modalBackdrop: {
-    position: 'fixed' as any,
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

@@ -463,7 +463,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
-        onBack={() => setShowPhotographyListing(false)}
+        onBack={() => {
+          setShowPhotographyListing(false);
+          setActiveTab('home');
+        }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
         onOpenSavedTab={() => {
@@ -481,7 +484,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMakeupListing) {
     return (
       <MakeupListingPage
-        onBack={() => setShowMakeupListing(false)}
+        onBack={() => {
+          setShowMakeupListing(false);
+          setActiveTab('home');
+        }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
         onOpenSavedTab={() => {
@@ -499,7 +505,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDecorListing) {
     return (
       <DecorListingPage
-        onBack={() => setShowDecorListing(false)}
+        onBack={() => {
+          setShowDecorListing(false);
+          setActiveTab('home');
+        }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
         onOpenSavedTab={() => {
@@ -517,7 +526,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showVenueListing) {
     return (
       <VenueListingPage
-        onBack={() => setShowVenueListing(false)}
+        onBack={() => {
+          setShowVenueListing(false);
+          setActiveTab('home');
+        }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
         onOpenSavedTab={() => {
@@ -535,7 +547,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showEntertainmentListing) {
     return (
       <EntertainmentListingPage
-        onBack={() => setShowEntertainmentListing(false)}
+        onBack={() => {
+          setShowEntertainmentListing(false);
+          setActiveTab('home');
+        }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
         onOpenSavedTab={() => {
@@ -553,7 +568,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCarsListing) {
     return (
       <CarsListingPage
-        onBack={() => setShowCarsListing(false)}
+        onBack={() => {
+          setShowCarsListing(false);
+          setActiveTab('home');
+        }}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
         onOpenSavedTab={() => {
@@ -571,7 +589,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showInvitationListing) {
     return (
       <InvitationListingPage
-        onBack={() => setShowInvitationListing(false)}
+        onBack={() => {
+          setShowInvitationListing(false);
+          setActiveTab('home');
+        }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
         onOpenSavedTab={() => {
@@ -589,7 +610,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDestinationWeddingFlow) {
     return (
       <DestinationWeddingFlow
-        onBack={() => setShowDestinationWeddingFlow(false)}
+        onBack={() => {
+          setShowDestinationWeddingFlow(false);
+          setActiveTab('home');
+        }}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
@@ -601,7 +625,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMehendiListing) {
     return (
       <MehendiListingPage
-        onBack={() => setShowMehendiListing(false)}
+        onBack={() => {
+          setShowMehendiListing(false);
+          setActiveTab('home');
+        }}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
         onOpenSavedTab={() => {
@@ -619,7 +646,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCateringListing) {
     return (
       <CateringListingPage
-        onBack={() => setShowCateringListing(false)}
+        onBack={() => {
+          setShowCateringListing(false);
+          setActiveTab('home');
+        }}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
         onOpenSavedTab={() => {
@@ -669,13 +699,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onOpenSavedTab={() => setActiveTab('saved')}
-          onOpenQuotesTab={() => setActiveTab('quotes')}
-          onHideTabBar={setHideTabBar}
-        />
-      ) : activeTab === 'quotes' ? (
-        <MyQuotesTabScreen
-          onHideTabBar={setHideTabBar}
-          onExploreVendors={() => setActiveTab('dashboard')}
+          onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'saved' ? (
         <SavedTabScreen
@@ -700,13 +724,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onExploreInvitations={() => setShowInvitationListing(true)}
-          savedMehendiIds={savedMehendiIds}
-          onToggleSavedMehendi={toggleSavedMehendi}
-          onExploreMehendi={() => setShowMehendiListing(true)}
-          savedCateringIds={savedCateringIds}
-          onToggleSavedCatering={toggleSavedCatering}
-          onExploreCatering={() => setShowCateringListing(true)}
-          onHideTabBar={setHideTabBar}
+          onNavigateToHome={() => setActiveTab('home')}
         />
       ) : (
         /* Scrollable Main Content */
@@ -715,271 +733,271 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-        {/* ================= HEADER SECTION ================= */}
-        <View style={styles.headerRow}>
-          {/* Left Greeting */}
-          <View style={styles.greetingContainer}>
-            <Text style={styles.greetingTitle}>
-              Hi, {firstName} <Text style={{ fontSize: 18 }}>👋</Text>
-            </Text>
-            <Text style={styles.greetingSubtitle}>
-              Let's plan your perfect wedding
-            </Text>
-          </View>
-
-          {/* Right Header Icons */}
-          <View style={styles.headerRightActions}>
-            {/* Notification Bell */}
-            <TouchableOpacity activeOpacity={0.7} style={styles.bellButton}>
-              <Bell className="w-5 h-5 text-stone-700" />
-              <View style={styles.bellBadge} />
-            </TouchableOpacity>
-
-            {/* Neutral Gender-Free Profile Avatar Button */}
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={handleProfilePress}
-              style={styles.profileAvatarButton}
-            >
-              {/* Simple neutral minimal icon avatar */}
-              <View style={styles.avatarInnerCircle}>
-                <User className="w-5 h-5 text-stone-600" />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* ================= SECTION 1: "How can Tale of Two help you?" ================= */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionTitle}>
-            How can Tale of Two{'\n'}help you?
-          </Text>
-
-          {/* 2 Side-by-side Cards */}
-          <View style={styles.helpCardsRow}>
-            {/* Card 1: Plan My Entire Wedding */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.94 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-              className="flex-1 cursor-pointer"
-              onClick={() => handleOptionPress('Plan My Entire Wedding')}
-            >
-              <View style={[styles.helpCard, { width: '100%' }]}>
-                <View style={styles.iconCircle}>
-                  <Building2 className="w-5 h-5 text-white" />
-                </View>
-                <Text style={styles.helpCardTitle}>
-                  Plan My Entire{'\n'}Wedding
-                </Text>
-                <Text style={styles.helpCardSubtext}>
-                  AI-powered complete wedding planning
-                </Text>
-              </View>
-            </motion.div>
-
-            {/* Card 2: Find Individual Vendors */}
-            <motion.div
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.94 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-              className="flex-1 cursor-pointer"
-              onClick={() => handleOptionPress('Find Individual Vendors')}
-            >
-              <View style={[styles.helpCard, { width: '100%' }]}>
-                <View style={styles.iconCircle}>
-                  <Store className="w-5 h-5 text-white" />
-                </View>
-                <Text style={styles.helpCardTitle}>
-                  Find Individual{'\n'}Vendors
-                </Text>
-                <Text style={styles.helpCardSubtext}>
-                  Explore and book best vendors
-                </Text>
-              </View>
-            </motion.div>
-          </View>
-        </View>
-
-        {/* ================= SECTION 2: Destination Wedding Banner ================= */}
-        <motion.div
-          whileHover={{ scale: 1.03, y: -2 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-          className="w-full cursor-pointer"
-          onClick={() => handleOptionPress('Destination Wedding')}
-        >
-          <View style={styles.destinationBanner}>
-            <View style={styles.bannerTextCol}>
-              <Text style={styles.bannerTitle}>Destination Wedding</Text>
-              <Text style={styles.bannerSubtext}>
-                Plan your dream wedding at exotic locations
+          {/* ================= HEADER SECTION ================= */}
+          <View style={styles.headerRow}>
+            {/* Left Greeting */}
+            <View style={styles.greetingContainer}>
+              <Text style={styles.greetingTitle}>
+                Hi, {firstName} <Text style={{ fontSize: 18 }}>👋</Text>
+              </Text>
+              <Text style={styles.greetingSubtitle}>
+                Let's plan your perfect wedding
               </Text>
             </View>
 
-            {/* Tropical Palm Image Right */}
-            <View style={styles.bannerImageWrapper}>
-              <Image
-                source={{
-                  uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80',
-                }}
-                style={styles.bannerImage}
-                resizeMode="cover"
-              />
+            {/* Right Header Icons */}
+            <View style={styles.headerRightActions}>
+              {/* Notification Bell */}
+              <TouchableOpacity activeOpacity={0.7} style={styles.bellButton}>
+                <Bell className="w-5 h-5 text-stone-700" />
+                <View style={styles.bellBadge} />
+              </TouchableOpacity>
+
+              {/* Neutral Gender-Free Profile Avatar Button */}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={handleProfilePress}
+                style={styles.profileAvatarButton}
+              >
+                {/* Simple neutral minimal icon avatar */}
+                <View style={styles.avatarInnerCircle}>
+                  <User className="w-5 h-5 text-stone-600" />
+                </View>
+              </TouchableOpacity>
             </View>
           </View>
-        </motion.div>
 
-        {/* ================= SECTION 3: Popular Services ================= */}
-        <View style={styles.servicesSection}>
-          <View style={styles.servicesHeaderRow}>
-            <Text style={styles.servicesTitle}>Popular Services</Text>
+          {/* ================= SECTION 1: "How can Tale of Two help you?" ================= */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>
+              How can Tale of Two{'\n'}help you?
+            </Text>
+
+            {/* 2 Side-by-side Cards */}
+            <View style={styles.helpCardsRow}>
+              {/* Card 1: Plan My Entire Wedding */}
+              <motion.div
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="flex-1 cursor-pointer"
+                onClick={() => handleOptionPress('Plan My Entire Wedding')}
+              >
+                <View style={[styles.helpCard, { width: '100%' }]}>
+                  <View style={styles.iconCircle}>
+                    <Building2 className="w-5 h-5 text-white" />
+                  </View>
+                  <Text style={styles.helpCardTitle}>
+                    Plan My Entire{'\n'}Wedding
+                  </Text>
+                  <Text style={styles.helpCardSubtext}>
+                    AI-powered complete wedding planning
+                  </Text>
+                </View>
+              </motion.div>
+
+              {/* Card 2: Find Individual Vendors */}
+              <motion.div
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="flex-1 cursor-pointer"
+                onClick={() => handleOptionPress('Find Individual Vendors')}
+              >
+                <View style={[styles.helpCard, { width: '100%' }]}>
+                  <View style={styles.iconCircle}>
+                    <Store className="w-5 h-5 text-white" />
+                  </View>
+                  <Text style={styles.helpCardTitle}>
+                    Find Individual{'\n'}Vendors
+                  </Text>
+                  <Text style={styles.helpCardSubtext}>
+                    Explore and book best vendors
+                  </Text>
+                </View>
+              </motion.div>
+            </View>
           </View>
 
-          {/* Grid Icons (4 columns grid with perfect vertical alignment) */}
-          <div className="grid grid-cols-4 gap-x-2 gap-y-4 w-full justify-items-center">
-            {/* 1. Photography */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Photography')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Camera className="w-5 h-5 text-[#581420]" />
+          {/* ================= SECTION 2: Destination Wedding Banner ================= */}
+          <motion.div
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+            className="w-full cursor-pointer"
+            onClick={() => handleOptionPress('Destination Wedding')}
+          >
+            <View style={styles.destinationBanner}>
+              <View style={styles.bannerTextCol}>
+                <Text style={styles.bannerTitle}>Destination Wedding</Text>
+                <Text style={styles.bannerSubtext}>
+                  Plan your dream wedding at exotic locations
+                </Text>
               </View>
-              <Text style={styles.serviceLabel}>Photography</Text>
-            </motion.div>
 
-            {/* 2. Makeup */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Makeup')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Sparkles className="w-5 h-5 text-[#581420]" />
+              {/* Tropical Palm Image Right */}
+              <View style={styles.bannerImageWrapper}>
+                <Image
+                  source={{
+                    uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80',
+                  }}
+                  style={styles.bannerImage}
+                  resizeMode="cover"
+                />
               </View>
-              <Text style={styles.serviceLabel}>Makeup</Text>
-            </motion.div>
+            </View>
+          </motion.div>
 
-            {/* 3. Decor */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Decor')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Palette className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Decor</Text>
-            </motion.div>
+          {/* ================= SECTION 3: Popular Services ================= */}
+          <View style={styles.servicesSection}>
+            <View style={styles.servicesHeaderRow}>
+              <Text style={styles.servicesTitle}>Popular Services</Text>
+            </View>
 
-            {/* 4. Venue */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Venue')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Building2 className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Venue</Text>
-            </motion.div>
+            {/* Grid Icons (4 columns grid with perfect vertical alignment) */}
+            <div className="grid grid-cols-4 gap-x-2 gap-y-4 w-full justify-items-center">
+              {/* 1. Photography */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Photography')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Camera className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Photography</Text>
+              </motion.div>
 
-            {/* 5. Entertainment */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Entertainment')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Music className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Entertainment</Text>
-            </motion.div>
+              {/* 2. Makeup */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Makeup')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Sparkles className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Makeup</Text>
+              </motion.div>
 
-            {/* 6. Invitations */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Invitations')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Mail className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Invitations</Text>
-            </motion.div>
+              {/* 3. Decor */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Decor')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Palette className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Decor</Text>
+              </motion.div>
 
-            {/* 7. Catering */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Catering')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Utensils className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Catering</Text>
-            </motion.div>
+              {/* 4. Venue */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Venue')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Building2 className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Venue</Text>
+              </motion.div>
 
-            {/* 8. Cars */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Cars')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Car className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Cars</Text>
-            </motion.div>
+              {/* 5. Entertainment */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Entertainment')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Music className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Entertainment</Text>
+              </motion.div>
 
-            {/* 9. Mehendi */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Mehendi')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Flower2 className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Mehendi</Text>
-            </motion.div>
+              {/* 6. Invitations */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Invitations')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Mail className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Invitations</Text>
+              </motion.div>
 
-            {/* 10. Rituals */}
-            <motion.div
-              whileHover={{ scale: 1.12, y: -3 }}
-              whileTap={{ scale: 0.88 }}
-              transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-              className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Rituals')}
-            >
-              <View style={styles.serviceIconBox}>
-                <Flame className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.serviceLabel}>Rituals</Text>
-            </motion.div>
-          </div>
-        </View>
-      </ScrollView>
+              {/* 7. Catering */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Catering')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Utensils className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Catering</Text>
+              </motion.div>
+
+              {/* 8. Cars */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Cars')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Car className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Cars</Text>
+              </motion.div>
+
+              {/* 9. Mehendi */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Mehendi')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Flower2 className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Mehendi</Text>
+              </motion.div>
+
+              {/* 10. Rituals */}
+              <motion.div
+                whileHover={{ scale: 1.12, y: -3 }}
+                whileTap={{ scale: 0.88 }}
+                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                className="w-full cursor-pointer flex flex-col items-center gap-1"
+                onClick={() => handleOptionPress('Rituals')}
+              >
+                <View style={styles.serviceIconBox}>
+                  <Flame className="w-5 h-5 text-[#581420]" />
+                </View>
+                <Text style={styles.serviceLabel}>Rituals</Text>
+              </motion.div>
+            </div>
+          </View>
+        </ScrollView>
       )}
 
       {/* ================= BOTTOM TAB BAR ================= */}
@@ -990,9 +1008,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             onPress={() => setActiveTab('home')}
           >
             <Home
-              className={`w-5 h-5 ${
-                activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'
-              }`}
+              className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'
+                }`}
             />
             <Text
               style={[
@@ -1016,9 +1033,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             }}
           >
             <Sparkles
-              className={`w-5 h-5 ${
-                activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'
-              }`}
+              className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'
+                }`}
             />
             <Text
               style={[
@@ -1035,9 +1051,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             onPress={() => setActiveTab('saved')}
           >
             <Heart
-              className={`w-5 h-5 ${
-                activeTab === 'saved' ? 'text-[#581420]' : 'text-stone-400'
-              }`}
+              className={`w-5 h-5 ${activeTab === 'saved' ? 'text-[#581420]' : 'text-stone-400'
+                }`}
             />
             <Text
               style={[
@@ -1054,9 +1069,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             onPress={() => setActiveTab('quotes')}
           >
             <FileText
-              className={`w-5 h-5 ${
-                activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
-              }`}
+              className={`w-5 h-5 ${activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
+                }`}
             />
             <Text
               style={[
@@ -1076,9 +1090,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             }}
           >
             <User
-              className={`w-5 h-5 ${
-                activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'
-              }`}
+              className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'
+                }`}
             />
             <Text
               style={[

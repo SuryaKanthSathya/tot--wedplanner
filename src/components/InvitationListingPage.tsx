@@ -446,7 +446,7 @@ interface InvitationListingPageProps {
 export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
   onBack,
   savedInviteIds = {},
-  onToggleSavedInvite = (_id?: string) => {},
+  onToggleSavedInvite = (_id?: string) => { },
   onOpenSavedTab,
   onNavigateToQuotesTab,
 }) => {
@@ -481,8 +481,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
       selectedRating === 'All'
         ? true
         : selectedRating === '4.8'
-        ? invite.rating >= 4.8
-        : invite.rating >= 4.9;
+          ? invite.rating >= 4.8
+          : invite.rating >= 4.9;
 
     const matchesTier = selectedTier === 'All' ? true : invite.tier === selectedTier;
 
@@ -629,9 +629,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
                         }}
                       >
                         <Heart
-                          className={`w-4 h-4 ${
-                            isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
-                          }`}
+                          className={`w-4 h-4 ${isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
+                            }`}
                         />
                       </TouchableOpacity>
                     </View>
@@ -645,7 +644,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
 
                   <View style={styles.cardBody}>
                     <Text style={styles.inviteName} numberOfLines={1}>{invite.name}</Text>
-                    
+
                     <View style={styles.locationRow}>
                       <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
                       <Text style={styles.locationText}>{invite.location}, {invite.city}</Text>
@@ -1004,7 +1003,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   modalBackdrop: {
-    position: 'fixed' as any,
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

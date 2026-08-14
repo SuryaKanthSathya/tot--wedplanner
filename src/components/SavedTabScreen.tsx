@@ -249,9 +249,16 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Saved Items</Text>
-          <Text style={styles.headerSubtitle}>Your bookmarked vendors and inspirations</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {onNavigateToHome && (
+            <TouchableOpacity onPress={onNavigateToHome} style={{ marginRight: 12 }}>
+              <ArrowLeft className="w-6 h-6 text-stone-800" />
+            </TouchableOpacity>
+          )}
+          <View>
+            <Text style={styles.headerTitle}>Saved Items</Text>
+            <Text style={styles.headerSubtitle}>Your bookmarked vendors and inspirations</Text>
+          </View>
         </View>
         <View style={styles.countBadge}>
           <Heart className="w-3.5 h-3.5 text-[#581420] fill-[#581420] mr-1" />
