@@ -818,7 +818,12 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
       </View>
 
       {/* FILTER CHIPS ROW */}
-      <View style={styles.filterRowContainer}>
+      <View style={{ marginBottom: 8 }}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 14, gap: 6, alignItems: 'center' }}
+        >
         <TouchableOpacity
           style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('city')}
@@ -859,15 +864,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.filterChip, selectedCategory !== 'All Types' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('type')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedCategory !== 'All Types' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedCategory === 'All Types' ? 'Venue Type ▼' : `${selectedCategory} ▼`}
-          </Text>
-        </TouchableOpacity>
+        </ScrollView>
       </View>
 
       {/* LIST OF VENUE CARDS */}
@@ -993,7 +990,6 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                   {activeFilterModal === 'budget' && 'Select Budget Range'}
                   {activeFilterModal === 'rating' && 'Select Minimum Rating'}
                   {activeFilterModal === 'tier' && 'Select Venue Tier'}
-                  {activeFilterModal === 'type' && 'Select Venue Type'}
                 </Text>
                 <TouchableOpacity
                   style={styles.filterModalClose}
@@ -1143,38 +1139,6 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                   </View>
                 )}
 
-                {activeFilterModal === 'type' && (
-                  <View style={styles.optionsList}>
-                    {TYPE_OPTIONS.map((type) => {
-                      const isSelected = selectedCategory === type;
-                      return (
-                        <div
-                          key={type}
-                          onClick={() => {
-                            setSelectedCategory(type);
-                            setActiveFilterModal(null);
-                          }}
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '12px 16px',
-                            borderRadius: '12px',
-                            marginBottom: '4px',
-                            cursor: 'pointer',
-                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
-                          }}
-                        >
-                          <Text style={{ fontSize: 14, fontWeight: isSelected ? '700' : '500', color: isSelected ? '#581420' : '#3B2F2F' }}>
-                            {type}
-                          </Text>
-                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
-                        </div>
-                      );
-                    })}
-                  </View>
-                )}
               </ScrollView>
             </motion.div>
           </motion.div>
@@ -1244,11 +1208,11 @@ const styles = StyleSheet.create({
   },
   filterRowContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     paddingHorizontal: 14,
     paddingVertical: 8,
     gap: 6,
-    overflowX: 'auto' as any,
+    width: '100%',
   },
   filterChip: {
     backgroundColor: '#FFFFFF',
@@ -1257,22 +1221,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
     backgroundColor: '#F3ECE4',
     borderColor: '#581420',
   },
   filterChipText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#4A3B3C',
+    textAlign: 'center',
   },
   filterChipTextActive: {
     color: '#581420',
     fontWeight: '700',
   },
   modalBackdrop: {
-    position: 'fixed' as any,
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

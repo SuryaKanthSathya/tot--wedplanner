@@ -541,7 +541,12 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
       </View>
 
       {/* FILTER CHIPS ROW */}
-      <View style={styles.filterRowContainer}>
+      <View style={{ marginBottom: 8 }}>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingHorizontal: 14, gap: 6, alignItems: 'center' }}
+        >
         <TouchableOpacity
           style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('city')}
@@ -591,6 +596,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
             {selectedCategory === 'All Types' ? 'Category ▼' : `${selectedCategory} ▼`}
           </Text>
         </TouchableOpacity>
+        </ScrollView>
       </View>
 
       {/* LIST OF CARDS */}
@@ -963,11 +969,11 @@ const styles = StyleSheet.create({
   },
   filterRowContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     paddingHorizontal: 14,
     paddingVertical: 8,
     gap: 6,
-    overflowX: 'auto' as any,
+    width: '100%',
   },
   filterChip: {
     backgroundColor: '#FFFFFF',
@@ -976,22 +982,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
     backgroundColor: '#F3ECE4',
     borderColor: '#581420',
   },
   filterChipText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: '#4A3B3C',
+    textAlign: 'center',
   },
   filterChipTextActive: {
     color: '#581420',
     fontWeight: '700',
   },
   modalBackdrop: {
-    position: 'fixed' as any,
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

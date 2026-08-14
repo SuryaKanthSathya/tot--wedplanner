@@ -136,6 +136,7 @@ interface MyWeddingTabScreenProps {
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToHome?: () => void;
 }
 
 interface ChecklistItem {
@@ -383,11 +384,12 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onToggleSavedEnt,
   savedCarIds,
   onToggleSavedCar,
-  savedInviteIds,
+  savedInviteIds = {},
   onToggleSavedInvite,
   onOpenSavedTab,
+  onNavigateToHome,
 }) => {
-  // Extract couple names dynamically from registered weddingProfile or userName
+  const [activeSegment, setActiveSegment] = useState<'overview' | 'checklist' | 'guests' | 'budget'>('overview');
   let brideName = '';
   let groomName = '';
 
@@ -461,8 +463,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showMehendiListing) {
     return (
       <MehendiListingPage
-        onBack={() => setShowMehendiListing(false)}
-        savedArtistIds={[]} // Add default empty array to avoid undefined errors if props change
+        onBack={() => {
+          setShowMehendiListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
+        savedMehendiIds={{}}
       />
     );
   }
@@ -470,7 +475,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showCateringListing) {
     return (
       <CateringListingPage
-        onBack={() => setShowCateringListing(false)}
+        onBack={() => {
+          setShowCateringListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
+        savedCateringIds={{}}
       />
     );
   }
@@ -478,7 +487,13 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showCarsListing) {
     return (
       <CarsListingPage
-        onBack={() => setShowCarsListing(false)}
+        onBack={() => {
+          setShowCarsListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
+        savedCarIds={savedCarIds}
+        onToggleSavedCar={onToggleSavedCar}
+        onOpenSavedTab={onOpenSavedTab}
       />
     );
   }
@@ -486,7 +501,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
-        onBack={() => setShowPhotographyListing(false)}
+        onBack={() => {
+          setShowPhotographyListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={onToggleSavedStudio}
         onOpenSavedTab={onOpenSavedTab}
@@ -497,7 +515,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showMakeupListing) {
     return (
       <MakeupListingPage
-        onBack={() => setShowMakeupListing(false)}
+        onBack={() => {
+          setShowMakeupListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={onToggleSavedMakeup}
         onOpenSavedTab={onOpenSavedTab}
@@ -508,7 +529,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showDecorListing) {
     return (
       <DecorListingPage
-        onBack={() => setShowDecorListing(false)}
+        onBack={() => {
+          setShowDecorListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={onToggleSavedDecor}
         onOpenSavedTab={onOpenSavedTab}
@@ -519,7 +543,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showVenueListing) {
     return (
       <VenueListingPage
-        onBack={() => setShowVenueListing(false)}
+        onBack={() => {
+          setShowVenueListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={onToggleSavedVenue}
         onOpenSavedTab={onOpenSavedTab}
@@ -530,7 +557,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showEntertainmentListing) {
     return (
       <EntertainmentListingPage
-        onBack={() => setShowEntertainmentListing(false)}
+        onBack={() => {
+          setShowEntertainmentListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={onToggleSavedEnt}
         onOpenSavedTab={onOpenSavedTab}
@@ -541,7 +571,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   if (showInvitationListing) {
     return (
       <InvitationListingPage
-        onBack={() => setShowInvitationListing(false)}
+        onBack={() => {
+          setShowInvitationListing(false);
+          if (onNavigateToHome) onNavigateToHome();
+        }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={onToggleSavedInvite}
         onOpenSavedTab={onOpenSavedTab}
@@ -549,16 +582,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
     );
   }
 
-  if (showCarsListing) {
-    return (
-      <CarsListingPage
-        onBack={() => setShowCarsListing(false)}
-        savedCarIds={savedCarIds}
-        onToggleSavedCar={onToggleSavedCar}
-        onOpenSavedTab={onOpenSavedTab}
-      />
-    );
-  }
+
 
   const toggleChecklist = (id: string) => {
     setChecklist((prev) =>

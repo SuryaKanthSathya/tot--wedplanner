@@ -379,7 +379,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
-        onBack={() => setShowPhotographyListing(false)}
+        onBack={() => {
+          setShowPhotographyListing(false);
+          setActiveTab('home');
+        }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
         onOpenSavedTab={() => {
@@ -393,7 +396,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMakeupListing) {
     return (
       <MakeupListingPage
-        onBack={() => setShowMakeupListing(false)}
+        onBack={() => {
+          setShowMakeupListing(false);
+          setActiveTab('home');
+        }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
         onOpenSavedTab={() => {
@@ -407,7 +413,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDecorListing) {
     return (
       <DecorListingPage
-        onBack={() => setShowDecorListing(false)}
+        onBack={() => {
+          setShowDecorListing(false);
+          setActiveTab('home');
+        }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
         onOpenSavedTab={() => {
@@ -421,7 +430,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showVenueListing) {
     return (
       <VenueListingPage
-        onBack={() => setShowVenueListing(false)}
+        onBack={() => {
+          setShowVenueListing(false);
+          setActiveTab('home');
+        }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
         onOpenSavedTab={() => {
@@ -435,7 +447,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showEntertainmentListing) {
     return (
       <EntertainmentListingPage
-        onBack={() => setShowEntertainmentListing(false)}
+        onBack={() => {
+          setShowEntertainmentListing(false);
+          setActiveTab('home');
+        }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
         onOpenSavedTab={() => {
@@ -449,7 +464,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCarsListing) {
     return (
       <CarsListingPage
-        onBack={() => setShowCarsListing(false)}
+        onBack={() => {
+          setShowCarsListing(false);
+          setActiveTab('home');
+        }}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
         onOpenSavedTab={() => {
@@ -463,7 +481,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showInvitationListing) {
     return (
       <InvitationListingPage
-        onBack={() => setShowInvitationListing(false)}
+        onBack={() => {
+          setShowInvitationListing(false);
+          setActiveTab('home');
+        }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
         onOpenSavedTab={() => {
@@ -477,7 +498,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDestinationWeddingFlow) {
     return (
       <DestinationWeddingFlow
-        onBack={() => setShowDestinationWeddingFlow(false)}
+        onBack={() => {
+          setShowDestinationWeddingFlow(false);
+          setActiveTab('home');
+        }}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
@@ -489,7 +513,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMehendiListing) {
     return (
       <MehendiListingPage
-        onBack={() => setShowMehendiListing(false)}
+        onBack={() => {
+          setShowMehendiListing(false);
+          setActiveTab('home');
+        }}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
         onOpenSavedTab={() => {
@@ -503,7 +530,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCateringListing) {
     return (
       <CateringListingPage
-        onBack={() => setShowCateringListing(false)}
+        onBack={() => {
+          setShowCateringListing(false);
+          setActiveTab('home');
+        }}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
         onOpenSavedTab={() => {
@@ -535,6 +565,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onOpenSavedTab={() => setActiveTab('saved')}
+          onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'saved' ? (
         <SavedTabScreen
@@ -559,6 +590,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onExploreInvitations={() => setShowInvitationListing(true)}
+          onNavigateToHome={() => setActiveTab('home')}
         />
       ) : (
         /* Scrollable Main Content */

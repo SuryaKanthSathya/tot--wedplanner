@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, ArrowLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -46,6 +46,7 @@ interface SavedTabScreenProps {
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onExploreInvitations?: () => void;
+  onNavigateToHome?: () => void;
 }
 
 export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
@@ -70,6 +71,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   savedInviteIds = {},
   onToggleSavedInvite,
   onExploreInvitations,
+  onNavigateToHome,
 }) => {
   const [activeCategory, setActiveCategory] = useState<'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Cars' | 'Invitations'>('All');
   const [selectedStudio, setSelectedStudio] = useState<PhotographyStudio | null>(null);
@@ -179,9 +181,16 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Saved Items</Text>
-          <Text style={styles.headerSubtitle}>Your bookmarked vendors and inspirations</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {onNavigateToHome && (
+            <TouchableOpacity onPress={onNavigateToHome} style={{ marginRight: 12 }}>
+              <ArrowLeft className="w-6 h-6 text-stone-800" />
+            </TouchableOpacity>
+          )}
+          <View>
+            <Text style={styles.headerTitle}>Saved Items</Text>
+            <Text style={styles.headerSubtitle}>Your bookmarked vendors and inspirations</Text>
+          </View>
         </View>
         <View style={styles.countBadge}>
           <Heart className="w-3.5 h-3.5 text-[#581420] fill-[#581420] mr-1" />

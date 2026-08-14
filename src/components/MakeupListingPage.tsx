@@ -520,12 +520,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
   const [selectedTier, setSelectedTier] = useState('All Tiers');
   const [selectedSpecialization, setSelectedSpecialization] = useState('All Types');
 
-  // Active Dropdowns
-  const [showCityDropdown, setShowCityDropdown] = useState(false);
-  const [showBudgetDropdown, setShowBudgetDropdown] = useState(false);
-  const [showRatingDropdown, setShowRatingDropdown] = useState(false);
-  const [showTierDropdown, setShowTierDropdown] = useState(false);
-  const [showSpecializationDropdown, setShowSpecializationDropdown] = useState(false);
+  const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'specialization' | null>(null);
 
   // Selected Studio for Detail Screen or Quote Modal
   const [selectedStudio, setSelectedStudio] = useState<MakeupStudio | null>(null);
@@ -668,12 +663,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         {/* 1. City Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedCity !== 'All' && styles.filterChipActive]}
-          onPress={() => {
-            setShowCityDropdown(!showCityDropdown);
-            setShowBudgetDropdown(false);
-            setShowRatingDropdown(false);
-            setShowTierDropdown(false);
-          }}
+          onPress={() => setActiveFilterModal('city')}
           activeOpacity={0.8}
         >
           <Text
@@ -687,12 +677,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         {/* 2. Budget Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedBudget !== 'All Budgets' && styles.filterChipActive]}
-          onPress={() => {
-            setShowBudgetDropdown(!showBudgetDropdown);
-            setShowCityDropdown(false);
-            setShowRatingDropdown(false);
-            setShowTierDropdown(false);
-          }}
+          onPress={() => setActiveFilterModal('budget')}
           activeOpacity={0.8}
         >
           <Text
@@ -706,12 +691,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         {/* 3. Rating Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedRating !== 'All Ratings' && styles.filterChipActive]}
-          onPress={() => {
-            setShowRatingDropdown(!showRatingDropdown);
-            setShowCityDropdown(false);
-            setShowBudgetDropdown(false);
-            setShowTierDropdown(false);
-          }}
+          onPress={() => setActiveFilterModal('rating')}
           activeOpacity={0.8}
         >
           <Text
@@ -725,12 +705,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         {/* 4. Tier Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedTier !== 'All Tiers' && styles.filterChipActive]}
-          onPress={() => {
-            setShowTierDropdown(!showTierDropdown);
-            setShowCityDropdown(false);
-            setShowBudgetDropdown(false);
-            setShowRatingDropdown(false);
-          }}
+          onPress={() => setActiveFilterModal('tier')}
           activeOpacity={0.8}
         >
           <Text
@@ -742,143 +717,229 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* DROPDOWN MODAL MODES */}
-      {/* CITY MODAL */}
+      {/* FILTER DROPDOWN MODAL (CITY, BUDGET, RATING, TIER, SPECIALIZATION) */}
       <AnimatePresence>
-        {showCityDropdown && (
+        {activeFilterModal && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[138px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] max-h-[220px] overflow-y-auto flex flex-col gap-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={styles.modalBackdrop}
           >
-            {TAMIL_NADU_DISTRICTS.map((district) => (
-              <TouchableOpacity
-                key={district}
-                style={[styles.dropdownOption, selectedCity === district && styles.dropdownOptionActive]}
-                onPress={() => {
-                  setSelectedCity(district);
-                  setShowCityDropdown(false);
-                }}
-              >
-                <Text style={[styles.dropdownOptionText, selectedCity === district && styles.dropdownOptionTextActive]}>
-                  {district}
+            <motion.div
+              initial={{ y: 100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 100, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              style={styles.modalSheet}
+            >
+              {/* Modal Header */}
+              <View style={styles.filterModalHeader}>
+                <Text style={styles.filterModalTitle}>
+                  {activeFilterModal === 'city' && 'Select City'}
+                  {activeFilterModal === 'budget' && 'Select Budget'}
+                  {activeFilterModal === 'rating' && 'Select Rating'}
+                  {activeFilterModal === 'tier' && 'Select Tier'}
+                  {activeFilterModal === 'specialization' && 'Select Specialization'}
                 </Text>
-                {selectedCity === district && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <TouchableOpacity
+                  style={styles.filterModalClose}
+                  onPress={() => setActiveFilterModal(null)}
+                >
+                  <X className="w-5 h-5 text-[#2A2425]" />
+                </TouchableOpacity>
+              </View>
 
-      {/* SPECIALIZATION MODAL */}
-      <AnimatePresence>
-        {showSpecializationDropdown && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[138px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] max-h-[220px] overflow-y-auto flex flex-col gap-1"
-          >
-            {MAKEUP_SPECIALIZATIONS.map((spec) => (
-              <TouchableOpacity
-                key={spec}
-                style={[styles.dropdownOption, selectedSpecialization === spec && styles.dropdownOptionActive]}
-                onPress={() => {
-                  setSelectedSpecialization(spec);
-                  setShowSpecializationDropdown(false);
-                }}
-              >
-                <Text style={[styles.dropdownOptionText, selectedSpecialization === spec && styles.dropdownOptionTextActive]}>
-                  {spec}
-                </Text>
-                {selectedSpecialization === spec && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+                {/* 1. CITY FILTER OPTIONS */}
+                {activeFilterModal === 'city' && (
+                  <View style={styles.optionsList}>
+                    {TAMIL_NADU_DISTRICTS.map((district) => {
+                      const isSelected = selectedCity === district || (district === 'All Cities' && selectedCity === 'All');
+                      return (
+                        <div
+                          key={district}
+                          onClick={() => {
+                            setSelectedCity(district === 'All Cities' ? 'All' : district);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                            transition: 'background-color 0.15s ease',
+                          }}
+                        >
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontWeight: isSelected ? '700' : '500',
+                              color: isSelected ? '#581420' : '#3B2F2F',
+                            }}
+                          >
+                            {district}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#581420] stroke-[2.5]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
 
-      {/* BUDGET MODAL */}
-      <AnimatePresence>
-        {showBudgetDropdown && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[138px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1"
-          >
-            {BUDGET_RANGES.map((b) => (
-              <TouchableOpacity
-                key={b}
-                style={[styles.dropdownOption, selectedBudget === b && styles.dropdownOptionActive]}
-                onPress={() => {
-                  setSelectedBudget(b);
-                  setShowBudgetDropdown(false);
-                }}
-              >
-                <Text style={[styles.dropdownOptionText, selectedBudget === b && styles.dropdownOptionTextActive]}>
-                  {b}
-                </Text>
-                {selectedBudget === b && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {/* 2. BUDGET FILTER OPTIONS */}
+                {activeFilterModal === 'budget' && (
+                  <View style={styles.optionsList}>
+                    {BUDGET_RANGES.map((b) => {
+                      const isSelected = selectedBudget === b;
+                      return (
+                        <div
+                          key={b}
+                          onClick={() => {
+                            setSelectedBudget(b);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 14px',
+                            borderRadius: '10px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text
+                            style={isSelected ? styles.optionItemTextSelected : styles.optionItemText}
+                          >
+                            {b}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#8B1E2F]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
 
-      {/* RATING MODAL */}
-      <AnimatePresence>
-        {showRatingDropdown && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[138px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1"
-          >
-            {RATING_OPTIONS.map((r) => (
-              <TouchableOpacity
-                key={r}
-                style={[styles.dropdownOption, selectedRating === r && styles.dropdownOptionActive]}
-                onPress={() => {
-                  setSelectedRating(r);
-                  setShowRatingDropdown(false);
-                }}
-              >
-                <Text style={[styles.dropdownOptionText, selectedRating === r && styles.dropdownOptionTextActive]}>
-                  {r}
-                </Text>
-                {selectedRating === r && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {/* 3. RATING FILTER OPTIONS */}
+                {activeFilterModal === 'rating' && (
+                  <View style={styles.optionsList}>
+                    {RATING_OPTIONS.map((r) => {
+                      const isSelected = selectedRating === r;
+                      return (
+                        <div
+                          key={r}
+                          onClick={() => {
+                            setSelectedRating(r);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 14px',
+                            borderRadius: '10px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Star className="w-4 h-4 text-[#E5A93C] fill-[#E5A93C] mr-2" />
+                            <Text
+                              style={isSelected ? styles.optionItemTextSelected : styles.optionItemText}
+                            >
+                              {r}
+                            </Text>
+                          </View>
+                          {isSelected && <Check className="w-4 h-4 text-[#8B1E2F]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
 
-      {/* TIER MODAL */}
-      <AnimatePresence>
-        {showTierDropdown && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[138px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1"
-          >
-            {TIER_OPTIONS.map((t) => (
-              <TouchableOpacity
-                key={t}
-                style={[styles.dropdownOption, selectedTier === t && styles.dropdownOptionActive]}
-                onPress={() => {
-                  setSelectedTier(t);
-                  setShowTierDropdown(false);
-                }}
-              >
-                <Text style={[styles.dropdownOptionText, selectedTier === t && styles.dropdownOptionTextActive]}>
-                  {t}
-                </Text>
-                {selectedTier === t && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
+                {/* 4. TIER FILTER OPTIONS */}
+                {activeFilterModal === 'tier' && (
+                  <View style={styles.optionsList}>
+                    {TIER_OPTIONS.map((t) => {
+                      const isSelected = selectedTier === t;
+                      return (
+                        <div
+                          key={t}
+                          onClick={() => {
+                            setSelectedTier(t);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 14px',
+                            borderRadius: '10px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text
+                            style={isSelected ? styles.optionItemTextSelected : styles.optionItemText}
+                          >
+                            {t}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#8B1E2F]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {/* 5. SPECIALIZATION FILTER OPTIONS */}
+                {activeFilterModal === 'specialization' && (
+                  <View style={styles.optionsList}>
+                    {MAKEUP_SPECIALIZATIONS.map((s) => {
+                      const isSelected = selectedSpecialization === s;
+                      return (
+                        <div
+                          key={s}
+                          onClick={() => {
+                            setSelectedSpecialization(s);
+                            setActiveFilterModal(null);
+                          }}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '12px 14px',
+                            borderRadius: '10px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: isSelected ? '#F3ECE4' : 'transparent',
+                          }}
+                        >
+                          <Text
+                            style={isSelected ? styles.optionItemTextSelected : styles.optionItemText}
+                          >
+                            {s}
+                          </Text>
+                          {isSelected && <Check className="w-4 h-4 text-[#8B1E2F]" />}
+                        </div>
+                      );
+                    })}
+                  </View>
+                )}
+              </ScrollView>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -1145,6 +1206,54 @@ const styles = StyleSheet.create({
   dropdownOptionTextActive: {
     color: '#581420',
     fontWeight: '800',
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 100,
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: '#FAF7F2',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '85%',
+    overflow: 'hidden',
+  },
+  filterModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EFE7DE',
+  },
+  filterModalTitle: {
+    fontFamily: 'Playfair Display, Georgia, serif',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  filterModalClose: {
+    padding: 4,
+  },
+  optionsList: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  optionItemText: {
+    fontSize: 13,
+    color: '#2A2425',
+    fontWeight: '500',
+  },
+  optionItemTextSelected: {
+    fontWeight: '700',
+    color: '#8B1E2F',
   },
   resultsHeader: {
     flexDirection: 'row',
