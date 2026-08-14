@@ -12,7 +12,11 @@ import { SavedTabScreen } from './SavedTabScreen';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
+<<<<<<< HEAD
 import { RitualsFlow } from './RitualsFlow';
+=======
+import { FindVendorsPage } from './FindVendorsPage';
+>>>>>>> 8d56fcdd3d2ffb9e6737244731bdf6fbaddd3034
 import {
   View,
   Text,
@@ -100,7 +104,11 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
   const [showCateringListing, setShowCateringListing] = useState<boolean>(false);
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
+<<<<<<< HEAD
   const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
+=======
+  const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
+>>>>>>> 8d56fcdd3d2ffb9e6737244731bdf6fbaddd3034
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
 
   // Persisted Saved Studios State
@@ -415,8 +423,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowCateringListing(true);
       return;
     }
+<<<<<<< HEAD
     if (featureName === 'Rituals') {
       setShowRitualsFlow(true);
+=======
+    if (featureName === 'Find Individual Vendors') {
+      setShowFindVendorsPage(true);
+>>>>>>> 8d56fcdd3d2ffb9e6737244731bdf6fbaddd3034
       return;
     }
     if (featureName === 'Plan My Entire Wedding') {
@@ -441,6 +454,18 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const handleProfilePress = () => {
     setShowProfileModal(true);
   };
+
+  if (showFindVendorsPage) {
+    return (
+      <FindVendorsPage
+        onBack={() => setShowFindVendorsPage(false)}
+        onSelectCategory={(category) => {
+          setShowFindVendorsPage(false);
+          handleOptionPress(category);
+        }}
+      />
+    );
+  }
 
   if (showPhotographyListing) {
     return (
