@@ -12,6 +12,7 @@ import { SavedTabScreen } from './SavedTabScreen';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
+import { RitualsFlow } from './RitualsFlow';
 import {
   View,
   Text,
@@ -99,6 +100,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
   const [showCateringListing, setShowCateringListing] = useState<boolean>(false);
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
+  const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
 
   // Persisted Saved Studios State
@@ -306,6 +308,28 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     });
   };
 
+  // Persisted Saved Rituals State
+  const [savedRitualsIds, setSavedRitualsIds] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem('saved_rituals');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleSavedRitual = (id: string) => {
+    setSavedRitualsIds((prev) => {
+      const updated = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem('saved_rituals', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
   useEffect(() => {
     if (initialTab === 'my-wedding' && !isPlannerCreated) {
       setActiveTab('home');
@@ -328,6 +352,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         setShowInvitationListing(false);
         setShowMehendiListing(false);
         setShowCateringListing(false);
+        setShowRitualsFlow(false);
       }
     };
     const handleSavedReset = () => {
@@ -388,6 +413,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
     if (featureName === 'Catering') {
       setShowCateringListing(true);
+      return;
+    }
+    if (featureName === 'Rituals') {
+      setShowRitualsFlow(true);
       return;
     }
     if (featureName === 'Plan My Entire Wedding') {
@@ -583,6 +612,20 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowCateringListing(false);
           setActiveTab('quotes');
         }}
+      />
+    );
+  }
+
+  if (showRitualsFlow) {
+    return (
+      <RitualsFlow
+        onBack={() => setShowRitualsFlow(false)}
+        onNavigateToQuotesTab={() => {
+          setShowRitualsFlow(false);
+          setActiveTab('quotes');
+        }}
+        savedRitualsIds={savedRitualsIds}
+        onToggleSavedRitual={toggleSavedRitual}
       />
     );
   }
@@ -903,18 +946,18 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               <Text style={styles.serviceLabel}>Mehendi</Text>
             </motion.div>
 
-            {/* 10. Priest */}
+            {/* 10. Rituals */}
             <motion.div
               whileHover={{ scale: 1.12, y: -3 }}
               whileTap={{ scale: 0.88 }}
               transition={{ type: 'spring', stiffness: 450, damping: 20 }}
               className="w-full cursor-pointer flex flex-col items-center gap-1"
-              onClick={() => handleOptionPress('Priest')}
+              onClick={() => handleOptionPress('Rituals')}
             >
               <View style={styles.serviceIconBox}>
                 <Flame className="w-5 h-5 text-[#581420]" />
               </View>
-              <Text style={styles.serviceLabel}>Priest</Text>
+              <Text style={styles.serviceLabel}>Rituals</Text>
             </motion.div>
           </div>
         </View>
