@@ -283,6 +283,12 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     famousPlace: 'Srivilliputhur Andal Temple Tower',
     image: 'https://images.unsplash.com/photo-1620067925093-801122ac1408?auto=format&fit=crop&w=800&q=80',
   },
+  {
+    name: 'kayalpatinam, Tamil Nadu',
+    district: 'kayalpatinam',
+    famousPlace: 'kayalpatinam beach & Kaveri River',
+    image: '/src/assets/images/kayalpatinam_beach_1786470329010.jpg',
+  },
 ];
 
 const TAMIL_NADU_DISTRICTS: DistrictItem[] = [...TAMIL_NADU_DISTRICTS_RAW].sort((a, b) =>

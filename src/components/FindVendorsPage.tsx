@@ -69,9 +69,9 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     },
   ];
 
-  const pastorCategory = {
-    id: 'Pastor',
-    name: 'Priests',
+  const ritualCategory = {
+    id: 'Rituals',
+    name: 'Rituals',
     vendorsCount: '12 Vendors',
     image: '/src/assets/images/pastor_category.jpg',
   };
@@ -114,23 +114,23 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
           ))}
         </div>
 
-        {/* Wide Pastor/Father Category */}
+        {/* Wide Ritual Category */}
         <View style={styles.wideCategoryWrapper}>
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="flex flex-col items-center cursor-pointer w-full"
-            onClick={() => onSelectCategory(pastorCategory.id)}
+            onClick={() => onSelectCategory(ritualCategory.id)}
           >
             <View style={styles.wideImageContainer}>
               <Image
-                source={{ uri: pastorCategory.image }}
+                source={{ uri: ritualCategory.image }}
                 style={styles.wideCategoryImage}
                 resizeMode="cover"
               />
             </View>
-            <Text style={styles.categoryName}>{pastorCategory.name}</Text>
-            <Text style={styles.vendorsCount}>{pastorCategory.vendorsCount}</Text>
+            <Text style={styles.categoryName}>{ritualCategory.name}</Text>
+            <Text style={styles.vendorsCount}>{ritualCategory.vendorsCount}</Text>
           </motion.div>
         </View>
       </ScrollView>
