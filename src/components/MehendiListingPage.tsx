@@ -115,7 +115,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_arabic_style_1786617685166.jpg',
     description: 'A globally recognized, highly sought-after bridal mehendi specialist who has adorned over 1000+ brides. We create custom intricate figures, flawless symmetry, and personalized motifs (such as couple portraits, wedding vows, and traditional peacocks). Our henna is 100% organic, hand-mixed at home with natural essential oils to guarantee a rich, deep, and long-lasting stain. Each bridal package includes a complimentary consultation and personalized design draft, ensuring your wedding day hands tell your unique love story.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-2',
@@ -130,7 +130,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_artist_applying_1786617553765.jpg',
     description: 'Specializing in breathtaking bridal henna, our studio is dedicated to delivering a deeply personal and artistic mehendi experience. We blend traditional motifs with modern elegance, using only the finest, chemical-free Rajasthani henna for a rich burgundy stain that lasts for weeks.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-3',
@@ -145,7 +145,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_bridal_hands_1786616994272.jpg',
     description: 'With over a decade of expertise, our traditional mehendi artistry captures the pure essence of Indian heritage. We meticulously craft classic Indian, Arabic, and Khafif designs, prioritizing organic henna and ensuring an unforgettable, stress-free experience on your big day.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-4',
@@ -160,7 +160,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_bridal_portrait_1786617928334.jpg',
     description: 'Expert mehendi artist delivering the best Bridal & Party Mehandi experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-5',
@@ -175,7 +175,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_cone_application_1786617733536.jpg',
     description: 'A globally recognized, highly sought-after bridal mehendi specialist who has adorned over 1000+ brides. We create custom intricate figures, flawless symmetry, and personalized motifs (such as couple portraits, wedding vows, and traditional peacocks). Our henna is 100% organic, hand-mixed at home with natural essential oils to guarantee a rich, deep, and long-lasting stain. Each bridal package includes a complimentary consultation and personalized design draft, ensuring your wedding day hands tell your unique love story.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-6',
@@ -190,7 +190,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_floral_design_1786617638464.jpg',
     description: 'Expert mehendi artist delivering the best Luxury Bridal Mehandi experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-7',
@@ -205,7 +205,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_intricate_palms_1786617718285.jpg',
     description: 'Expert mehendi artist delivering the best Organic Henna Specialist experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-8',
@@ -220,7 +220,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_jewelry_bangles_1786617751591.jpg',
     description: 'Expert mehendi artist delivering the best Arabic & Indian Designs experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-9',
@@ -235,7 +235,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_mandala_design_1786617958168.jpg',
     description: 'Expert mehendi artist delivering the best Custom Story Henna experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-10',
@@ -250,7 +250,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_modern_minimalist_1786617671026.jpg',
     description: 'Expert mehendi artist delivering the best Minimalist & Modern experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-11',
@@ -265,7 +265,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_peacock_motif_1786617762239.jpg',
     description: 'Expert mehendi artist delivering the best Traditional Rajasthani experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-12',
@@ -280,7 +280,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_traditional_feet_1786617653822.jpg',
     description: 'Expert mehendi artist delivering the best Intricate Bridal Designs experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-13',
@@ -295,7 +295,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_wedding_celebration_1786617700517.jpg',
     description: 'Expert mehendi artist delivering the best Quick & Neat Designs experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-14',
@@ -310,7 +310,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_arabic_style_1786617685166.jpg',
     description: 'Expert mehendi artist delivering the best Luxury Organic Henna experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'artist-15',
@@ -325,7 +325,7 @@ export const MEHENDI_DATA: MehendiArtist[] = [
     image: '/images/mehendi/mehendi_artist_applying_1786617553765.jpg',
     description: 'Expert mehendi artist delivering the best Bridal Portrait Henna experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
 ];
 
@@ -1537,3 +1537,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+

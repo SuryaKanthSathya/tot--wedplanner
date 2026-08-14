@@ -115,7 +115,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80',
     description: 'Premier luxury bridal makeup studio specializing in HD airbrush makeovers, traditional South Indian Muhurtham styling, Kundan jewelry coordination, and saree draping.',
     experience: '10+ Years',
-    phone: '+91 98765 11001',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Charlotte Tilbury', 'NARS', 'Huda Beauty', 'TEMPTU Airbrush'],
     portfolio: [
       'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80',
@@ -137,7 +137,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
     description: 'Celebrated for natural skin-like HD finishes, long-lasting sweatproof airbrush makeup, and exquisite flower hair braiding for traditional Muhurthams.',
     experience: '8 Years',
-    phone: '+91 98765 11002',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Bobbi Brown', 'Estée Lauder', 'Kryolan'],
     portfolio: [
       'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80',
@@ -159,7 +159,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80',
     description: 'Elite bridal studio equipped with premium luxury brands offering bespoke reception makeovers, traditional maang tikka & nath jewelry fitting, and royal bridal transformations.',
     experience: '12+ Years',
-    phone: '+91 98765 11003',
+    phone: '+91 91501 97966',
     brandsUsed: ['Charlotte Tilbury', 'Dior', 'NARS', 'Tom Ford', 'Chanel'],
     portfolio: [
       'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80',
@@ -181,7 +181,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
     description: 'Master of authentic South Indian Brahmin and Chettinad bridal makeovers, focusing on glowing skin tone matching and flawless jewelry coordination.',
     experience: '14 Years',
-    phone: '+91 98765 11004',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Dior', 'Huda Beauty', 'Anastasia Beverly Hills'],
     portfolio: [
       'https://images.unsplash.com/photo-1588159343745-445ae0b16383?auto=format&fit=crop&w=800&q=80',
@@ -203,7 +203,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80',
     description: 'Budget-friendly luxury bridal makeup with HD camera-ready products, intricate hair extensions, and saree pleating services.',
     experience: '6 Years',
-    phone: '+91 98765 11005',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Kryolan', 'PACS', 'Forever 52'],
     portfolio: [
       'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80',
@@ -225,7 +225,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&w=800&q=80',
     description: 'Renowned celebrity makeup artist Divya creates red-carpet bridal aesthetics with custom airbrush contouring and royal hair crown styling.',
     experience: '15+ Years',
-    phone: '+91 98765 11006',
+    phone: '+91 91501 97966',
     brandsUsed: ['Charlotte Tilbury', 'Dior', 'Huda Beauty', 'Fenty Beauty'],
     portfolio: [
       'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&w=800&q=80',
@@ -247,7 +247,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=800&q=80',
     description: 'Seamlessly blending heritage silk saree aesthetics with subtle glass-skin makeup trends for fashion-forward brides.',
     experience: '9 Years',
-    phone: '+91 98765 11007',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Estée Lauder', 'Anastasia Beverly Hills', 'NARS'],
     portfolio: [
       'https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=800&q=80',
@@ -269,7 +269,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1588159343745-445ae0b16383?auto=format&fit=crop&w=800&q=80',
     description: 'Specialized in TEMPTU airbrush makeup guaranteeing 18-hour sweatproof durability for outdoor mandap and evening receptions.',
     experience: '7 Years',
-    phone: '+91 98765 11008',
+    phone: '+91 91501 97966',
     brandsUsed: ['TEMPTU Airbrush', 'MAC', 'Huda Beauty', 'Kryolan'],
     portfolio: [
       'https://images.unsplash.com/photo-1588159343745-445ae0b16383?auto=format&fit=crop&w=800&q=80',
@@ -291,7 +291,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80',
     description: 'Comprehensive wedding day grooming including bride\'s makeover, traditional flower veni styling, and bridesmaid packages.',
     experience: '8 Years',
-    phone: '+91 98765 11009',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Kryolan', 'L\'Oréal Professional', 'PAC'],
     portfolio: [
       'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80',
@@ -313,7 +313,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80',
     description: 'Destination wedding specialists expert in humidity-resistant bridal makeup, glowing beach reception looks, and editorial hair design.',
     experience: '11 Years',
-    phone: '+91 98765 11010',
+    phone: '+91 91501 97966',
     brandsUsed: ['Charlotte Tilbury', 'Dior', 'Bobbi Brown', 'NARS'],
     portfolio: [
       'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80',
@@ -335,7 +335,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
     description: 'Signature soft glam aesthetic with luminous base work, dramatic eye art, and elegant crown jewelry fitting.',
     experience: '6 Years',
-    phone: '+91 98765 11011',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Huda Beauty', 'Fenty Beauty', 'Too Faced'],
     portfolio: [
       'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80',
@@ -357,7 +357,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80',
     description: 'Gentle skin-first makeup applications using hypoallergenic products, precision saree iron-pleating, and quick hair touchups.',
     experience: '5 Years',
-    phone: '+91 98765 11012',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Kryolan', 'PACS', 'Sugar Cosmetics'],
     portfolio: [
       'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=800&q=80',
@@ -379,7 +379,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
     description: 'Complete couple makeover packages covering high-definition bridal airbrush work and subtle, natural groom beard/skin grooming.',
     experience: '9 Years',
-    phone: '+91 98765 11013',
+    phone: '+91 91501 97966',
     brandsUsed: ['TEMPTU Airbrush', 'MAC', 'NARS', 'Estée Lauder'],
     portfolio: [
       'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=800&q=80',
@@ -401,7 +401,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80',
     description: 'Kanchipuram\'s premier bridal team known for traditional 9-yard saree draping, temple jewelry setting, and radiant morning Muhurtham looks.',
     experience: '16 Years',
-    phone: '+91 98765 11014',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Charlotte Tilbury', 'Kryolan', 'Bobbi Brown'],
     portfolio: [
       'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80',
@@ -423,7 +423,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&w=800&q=80',
     description: 'Luxury boutique studio featuring MAC, Bobbi Brown, and Estée Lauder cosmetics for lavish evening reception transformations.',
     experience: '12 Years',
-    phone: '+91 98765 11015',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Bobbi Brown', 'Estée Lauder', 'Dior'],
     portfolio: [
       'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&w=800&q=80',
@@ -445,7 +445,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=800&q=80',
     description: 'Authentic Tanjore bridal art featuring long poola-jada braided hairstyles, fragrant jasmine floral arrangements, and radiant HD makeup.',
     experience: '7 Years',
-    phone: '+91 98765 11016',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'Kryolan', 'PAC', 'Lakmé Absolute'],
     portfolio: [
       'https://images.unsplash.com/photo-1526045612212-70caf35c14df?auto=format&fit=crop&w=800&q=80',
@@ -467,7 +467,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1588159343745-445ae0b16383?auto=format&fit=crop&w=800&q=80',
     description: 'High-fashion bridal looks tailored for multi-day South Indian celebrations including Sangeet, Mehendi, Muhurtham, and Reception.',
     experience: '10 Years',
-    phone: '+91 98765 11017',
+    phone: '+91 91501 97966',
     brandsUsed: ['MAC', 'NARS', 'TEMPTU Airbrush', 'Anastasia Beverly Hills'],
     portfolio: [
       'https://images.unsplash.com/photo-1588159343745-445ae0b16383?auto=format&fit=crop&w=800&q=80',
@@ -489,7 +489,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80',
     description: 'Preferred studio for grand heritage weddings with 3D hair sculpting, custom trial sessions, and luxury bridal party team services.',
     experience: '13 Years',
-    phone: '+91 98765 11018',
+    phone: '+91 91501 97966',
     brandsUsed: ['Charlotte Tilbury', 'Dior', 'Huda Beauty', 'Tom Ford'],
     portfolio: [
       'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=800&q=80',
@@ -1442,3 +1442,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
+

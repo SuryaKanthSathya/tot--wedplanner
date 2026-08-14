@@ -68,8 +68,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
         description: 'Includes Rigid Box + 3 Multi-color Inserts + Custom Monogram + Dry Fruit Trays.',
       },
     ],
-    phone: '+91 98421 22334',
-    whatsapp: '919842122334',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-2',
@@ -102,8 +102,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98422 33445',
-    whatsapp: '919842233445',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-3',
@@ -136,8 +136,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98423 44556',
-    whatsapp: '919842344556',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-4',
@@ -170,8 +170,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98424 55667',
-    whatsapp: '919842455667',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-5',
@@ -204,8 +204,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98425 66778',
-    whatsapp: '919842566778',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-6',
@@ -238,8 +238,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98426 77889',
-    whatsapp: '919842677889',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-7',
@@ -272,8 +272,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98427 88990',
-    whatsapp: '919842788990',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-8',
@@ -306,8 +306,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98428 99001',
-    whatsapp: '919842899001',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-9',
@@ -340,8 +340,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/6044187/pexels-photo-6044187.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98429 00112',
-    whatsapp: '919842900112',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-10',
@@ -374,8 +374,8 @@ export const INVITATIONS_DATA: InvitationItem[] = [
       'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
       'https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&cs=tinysrgb&w=800',
     ],
-    phone: '+91 98430 11223',
-    whatsapp: '919843011223',
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
 ];
 
@@ -1220,3 +1220,4 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
+

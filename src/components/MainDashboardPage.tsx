@@ -355,6 +355,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         setShowMehendiListing(false);
         setShowCateringListing(false);
         setShowRitualsFlow(false);
+        setShowFindVendorsPage(false);
       }
     };
     const handleSavedReset = () => {
@@ -448,17 +449,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     setShowProfileModal(true);
   };
 
-  if (showFindVendorsPage) {
-    return (
-      <FindVendorsPage
-        onBack={() => setShowFindVendorsPage(false)}
-        onSelectCategory={(category) => {
-          setShowFindVendorsPage(false);
-          handleOptionPress(category);
-        }}
-      />
-    );
-  }
+
 
   if (showPhotographyListing) {
     return (
@@ -674,6 +665,17 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         }}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={toggleSavedRitual}
+      />
+    );
+  }
+
+  if (showFindVendorsPage) {
+    return (
+      <FindVendorsPage
+        onBack={() => setShowFindVendorsPage(false)}
+        onSelectCategory={(category) => {
+          handleOptionPress(category);
+        }}
       />
     );
   }
@@ -1208,6 +1210,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
 
       {/* ================= REGISTER TO EXPLORE MORE POPUP MODAL ================= */}
       <AnimatePresence>

@@ -203,11 +203,11 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
     const msg = encodeURIComponent(
       `Hi ${car.name}, I found your car on the app. I would like to inquire about wedding cars packages in ${car.location}.`
     );
-    window.open(`https://wa.me/919876543210?text=${msg}`, '_blank');
+    window.open(`https://wa.me/919150197966?text=${msg}`, '_blank');
   };
 
   const handleCall = () => {
-    window.open('tel:+919876543210');
+    window.open('tel:+919150197966');
   };
 
   const handleSendQuote = () => {
@@ -1375,3 +1375,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+

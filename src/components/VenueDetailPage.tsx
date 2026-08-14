@@ -188,8 +188,8 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   const [cateringPreference, setCateringPreference] = useState<string>('Pure Veg (In-house)');
   const [additionalNotes, setAdditionalNotes] = useState<string>('');
 
-  const phoneNum = venue.phone || '+91 98765 43210';
-  const whatsappNum = venue.whatsapp || '919876543210';
+  const phoneNum = venue.phone || '+91 91501 97966';
+  const whatsappNum = venue.whatsapp || '919150197966';
 
   const handleCall = () => {
     Linking.openURL(`tel:${phoneNum}`);
@@ -203,7 +203,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   };
 
   const handleInstagram = () => {
-    const handle = venue.instagram || '@taleoftwo_weddings';
+    const handle = venue.instagram || '@_ranjith_r.r_';
     const username = handle.replace('@', '');
     Linking.openURL(`https://instagram.com/${username}`);
   };
@@ -989,3 +989,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+

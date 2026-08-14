@@ -115,7 +115,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Pure Veg & Multi Cuisine experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-2',
@@ -130,7 +130,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best South Indian Specialist experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-3',
@@ -145,7 +145,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Veg & Non Veg experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-4',
@@ -160,7 +160,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Multi Cuisine Catering experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-5',
@@ -175,7 +175,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Traditional South Indian experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-6',
@@ -190,7 +190,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Luxury Catering Service experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-7',
@@ -205,7 +205,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best North Indian & Mughlai experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-8',
@@ -220,7 +220,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Authentic South Indian experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-9',
@@ -235,7 +235,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Chettinad Special experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-10',
@@ -250,7 +250,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Continental & Asian experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-11',
@@ -265,7 +265,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Local Favorites experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-12',
@@ -280,7 +280,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Grand Buffet Sets experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-13',
@@ -295,7 +295,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Pure Vegetarian Only experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-14',
@@ -310,7 +310,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Pan Indian Cuisine experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-15',
@@ -325,7 +325,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Bespoke Menus experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-16',
@@ -340,7 +340,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1633945274405-b6c8069047b0?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Biryani Specialists experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-17',
@@ -355,7 +355,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best High-end Dining experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-18',
@@ -370,7 +370,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Homestyle Cooking experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-19',
@@ -385,7 +385,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best Rich Indian Flavors experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-20',
@@ -400,7 +400,7 @@ export const CATERING_DATA: CateringVendor[] = [
     image: 'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?auto=format&fit=crop&w=600&q=80',
     description: 'Expert catering service delivering the best International Cuisine experience.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43210'
+    phone: '+91 91501 97966'
   },
 ];
 
@@ -1612,3 +1612,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+

@@ -262,16 +262,16 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   };
 
   const handleCallPhone = () => {
-    const phoneNumber = artist.phone ? artist.phone.replace(/[^0-9+]/g, '') : '+919876543210';
+    const phoneNumber = artist.phone ? artist.phone.replace(/[^0-9+]/g, '') : '+919150197966';
     Linking.openURL(`tel:${phoneNumber}`).catch(() => {
-      setToastMessage(`Call ${artist.phone || '+91 98765 43210'}`);
+      setToastMessage(`Call ${artist.phone || '+91 91501 97966'}`);
       setTimeout(() => setToastMessage(null), 3000);
     });
   };
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(`Hi ${artist.name}, I found your bridal mehendi profile on WeddingApp and would like to check availability for my wedding date.`);
-    Linking.openURL(`https://wa.me/919876543210?text=${text}`).catch(() => {
+    Linking.openURL(`https://wa.me/919150197966?text=${text}`).catch(() => {
       setToastMessage('Opening WhatsApp...');
       setTimeout(() => setToastMessage(null), 2000);
     });
@@ -1292,3 +1292,6 @@ const styles = StyleSheet.create({
     height: '80%',
   },
 });
+
+
+

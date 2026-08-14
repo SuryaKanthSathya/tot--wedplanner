@@ -75,7 +75,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/hindu1.jpeg',
     description: 'Experienced Hindu wedding ceremony service provider specializing in Vedic rituals, Saptapadi, and Muhurtham ceremonies with full Pooja arrangements.',
     experience: '15+ Years',
-    phone: '+91 98765 21001',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'English', 'Sanskrit'],
     portfolio: [
       '/images/hindu1.jpeg',
@@ -98,7 +98,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/hindu2.jpeg',
     description: 'Traditional Purohit with deep knowledge of Shastraic procedures, Muhurtham timings, and all South Indian Hindu wedding rituals.',
     experience: '20 Years',
-    phone: '+91 98765 21002',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Telugu', 'Sanskrit'],
     portfolio: [
       '/images/hindu2.jpeg',
@@ -121,7 +121,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/hindu3.jpeg',
     description: 'Complete Homam and wedding Pooja specialists with all ritual materials provided. Expert in Navagraha Shanti, Ganapathi Homam, and Subrahmanya Pooja.',
     experience: '18 Years',
-    phone: '+91 98765 21003',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Sanskrit', 'Hindi'],
     portfolio: [
       '/images/hindu3.jpeg',
@@ -144,7 +144,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/hindu1.jpeg',
     description: 'Specialists in auspicious Muhurtham timing selection and complete ceremony management for Hindu weddings across Tamil Nadu.',
     experience: '12 Years',
-    phone: '+91 98765 21004',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'English'],
     portfolio: [
       '/images/hindu1.jpeg',
@@ -167,7 +167,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/hindu2.jpeg',
     description: 'Traditional Hindu engagement ceremony experts with ring exchange, Nichayathartham rituals, and family blessing ceremonies.',
     experience: '10 Years',
-    phone: '+91 98765 21005',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Telugu'],
     portfolio: [
       '/images/hindu2.jpeg',
@@ -191,7 +191,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/muslim1.png',
     description: 'Trusted Nikah ceremony service providers offering complete wedding ritual management including Mahr negotiation, witness arrangements, and Walima coordination.',
     experience: '14 Years',
-    phone: '+91 98765 22001',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Urdu', 'Arabic', 'English'],
     portfolio: [
       '/images/muslim1.png',
@@ -214,7 +214,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/muslim2.png',
     description: 'Senior Imam with extensive experience in conducting Nikah ceremonies, delivering Nikah Khutbah, and guiding families through Islamic wedding traditions.',
     experience: '22 Years',
-    phone: '+91 98765 22002',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Arabic', 'Urdu', 'English'],
     portfolio: [
       '/images/muslim2.png',
@@ -237,7 +237,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/muslim3.png',
     description: 'Licensed Qazi offering official Nikah registration, marriage certificate processing, and complete Islamic ceremony management.',
     experience: '16 Years',
-    phone: '+91 98765 22003',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Arabic', 'Urdu'],
     portfolio: [
       '/images/muslim3.png',
@@ -260,7 +260,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/muslim1.png',
     description: 'Learned Aalim specializing in Nikah Khutbah recitation, Islamic wedding guidance, and complete marriage ceremony facilitation.',
     experience: '13 Years',
-    phone: '+91 98765 22004',
+    phone: '+91 91501 97966',
     languages: ['Tamil', 'Arabic', 'English'],
     portfolio: [
       '/images/muslim1.png',
@@ -284,7 +284,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/christian1.jpeg',
     description: 'Experienced Catholic priest offering church wedding ceremonies, wedding blessings, and complete Christian marriage sacrament services.',
     experience: '18 Years',
-    phone: '+91 98765 23001',
+    phone: '+91 91501 97966',
     languages: ['English', 'Tamil', 'Malayalam'],
     portfolio: [
       '/images/christian1.jpeg',
@@ -307,7 +307,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/christian2.jpeg',
     description: 'Ordained pastor providing Christian wedding ceremonies, vow renewals, and interfaith blessing services in Tamil Nadu.',
     experience: '15 Years',
-    phone: '+91 98765 23002',
+    phone: '+91 91501 97966',
     languages: ['English', 'Tamil'],
     portfolio: [
       '/images/christian2.jpeg',
@@ -330,7 +330,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/christian3.jpeg',
     description: 'Complete church wedding ceremony services including venue coordination, choir arrangements, and full Christian marriage sacrament.',
     experience: '20 Years',
-    phone: '+91 98765 23003',
+    phone: '+91 91501 97966',
     languages: ['English', 'Tamil', 'Telugu'],
     portfolio: [
       '/images/christian3.jpeg',
@@ -353,7 +353,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     image: '/images/christian1.jpeg',
     description: 'Heartfelt Christian wedding blessing services for couples seeking a meaningful, personalized ceremony that honors their faith.',
     experience: '11 Years',
-    phone: '+91 98765 23004',
+    phone: '+91 91501 97966',
     languages: ['English', 'Tamil'],
     portfolio: [
       '/images/christian1.jpeg',
@@ -810,3 +810,4 @@ const listStyles = StyleSheet.create({
   cardViewBtn: { backgroundColor: '#581420', paddingHorizontal: 16, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
   cardViewBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
 });
+

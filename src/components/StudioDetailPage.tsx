@@ -203,11 +203,11 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
     const msg = encodeURIComponent(
       `Hi ${studio.name}, I found your studio on the app. I would like to inquire about wedding photography packages in ${studio.location}.`
     );
-    window.open(`https://wa.me/919876543210?text=${msg}`, '_blank');
+    window.open(`https://wa.me/919150197966?text=${msg}`, '_blank');
   };
 
   const handleCall = () => {
-    window.open('tel:+919876543210');
+    window.open('tel:+919150197966');
   };
 
   const handleSendQuote = () => {
@@ -1375,3 +1375,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+

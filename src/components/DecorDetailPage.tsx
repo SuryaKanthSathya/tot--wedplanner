@@ -187,12 +187,12 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   };
 
   const handleCall = () => {
-    const phoneNumber = studio.phone || '+919876543210';
+    const phoneNumber = studio.phone || '+919150197966';
     window.open(`tel:${phoneNumber}`, '_self');
   };
 
   const handleWhatsApp = () => {
-    const phoneNumber = studio.phone ? studio.phone.replace(/[^0-9]/g, '') : '919876543210';
+    const phoneNumber = studio.phone ? studio.phone.replace(/[^0-9]/g, '') : '919150197966';
     const text = encodeURIComponent(
       `Hi ${studio.name}, I found your wedding decor profile on Tale of Two app. I would like to check availability and package details!`
     );
@@ -200,7 +200,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   };
 
   const handleInstagram = () => {
-    const handle = studio.instagram || '@taleoftwo_weddings';
+    const handle = studio.instagram || '@_ranjith_r.r_';
     const username = handle.replace('@', '');
     window.open(`https://instagram.com/${username}`, '_blank');
   };
@@ -1153,3 +1153,5 @@ const styles = StyleSheet.create({
     height: '80%',
   },
 });
+
+

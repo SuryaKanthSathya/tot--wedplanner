@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { ChevronLeft, Heart, Calendar, Users } from 'lucide-react';
 import { motion } from 'motion/react';
-import { ChevronLeft } from 'lucide-react';
 
 interface FindVendorsPageProps {
   onBack: () => void;
@@ -12,6 +12,10 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
   onBack,
   onSelectCategory,
 }) => {
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
+  const [brideGroomNames, setBrideGroomNames] = useState('');
+  const [weddingDate, setWeddingDate] = useState('');
+  const [guestCount, setGuestCount] = useState('');
   const categories = [
     {
       id: 'Photography',
@@ -59,13 +63,13 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
       id: 'Invitations',
       name: 'Invitation',
       vendorsCount: '68 Vendors',
-      image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80',
+      image: '/src/assets/images/invitation_category.jpg',
     },
     {
       id: 'Cars',
       name: 'Cars',
       vendorsCount: '45 Vendors',
-      image: 'https://images.unsplash.com/photo-1513346940221-6f673d962e97?auto=format&fit=crop&w=300&q=80',
+      image: '/src/assets/images/cars_category.webp',
     },
   ];
 
@@ -73,7 +77,7 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     id: 'Rituals',
     name: 'Rituals',
     vendorsCount: '12 Vendors',
-    image: '/src/assets/images/pastor_category.jpg',
+    image: '/src/assets/images/rituals_category.webp',
   };
 
   return (
@@ -87,11 +91,90 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
         <View style={{ width: 40 }} /> {/* Placeholder for balance */}
       </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
+      <ScrollView 
+        style={styles.scrollContainer} 
+        contentContainerStyle={isOnboardingComplete ? styles.scrollContent : styles.onboardingContent}
         showsVerticalScrollIndicator={false}
       >
+        {!isOnboardingComplete ? (
+          /* ================= ONBOARDING STEP ================= */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-md mx-auto"
+          >
+            <View style={styles.formContainer}>
+              <View style={styles.formIconWrapper}>
+                <Heart className="w-6 h-6 text-[#581420]" />
+              </View>
+              <Text style={styles.formTitle}>Tell Us About Your Big Day</Text>
+              <Text style={styles.formSubtitle}>Answer these quick details so we can find the perfect vendors for you.</Text>
+              
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Bride & Groom Names</Text>
+                <View style={styles.inputWrapper}>
+                  <Heart className="w-4 h-4 text-stone-400 absolute left-3 top-3.5" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="e.g. Sarah & David"
+                    placeholderTextColor="#A09B98"
+                    value={brideGroomNames}
+                    onChangeText={setBrideGroomNames}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Wedding Date</Text>
+                <View style={styles.inputWrapper}>
+                  <Calendar className="w-4 h-4 text-stone-400 absolute left-3 top-3.5" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="MM/DD/YYYY"
+                    placeholderTextColor="#A09B98"
+                    value={weddingDate}
+                    onChangeText={setWeddingDate}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>Expected Number of Guests</Text>
+                <View style={styles.inputWrapper}>
+                  <Users className="w-4 h-4 text-stone-400 absolute left-3 top-3.5" />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="e.g. 200"
+                    placeholderTextColor="#A09B98"
+                    keyboardType="number-pad"
+                    value={guestCount}
+                    onChangeText={setGuestCount}
+                  />
+                </View>
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.continueBtn,
+                  (!brideGroomNames || !weddingDate || !guestCount) && styles.continueBtnDisabled,
+                ]}
+                disabled={!brideGroomNames || !weddingDate || !guestCount}
+                onPress={() => setIsOnboardingComplete(true)}
+              >
+                <Text style={styles.continueBtnText}>Explore Vendors</Text>
+              </TouchableOpacity>
+            </View>
+          </motion.div>
+        ) : (
+          /* ================= VENDOR GRID STEP ================= */
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="w-full"
+          >
+            <Text style={styles.sectionTitle}>Categories</Text>
+
         <div className="grid grid-cols-3 gap-x-3 gap-y-6 w-full">
           {categories.map((category) => (
             <motion.div
@@ -133,6 +216,8 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
             <Text style={styles.vendorsCount}>{ritualCategory.vendorsCount}</Text>
           </motion.div>
         </View>
+          </motion.div>
+        )}
       </ScrollView>
     </View>
   );
@@ -140,9 +225,11 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: '100%',
     height: '100%',
-    backgroundColor: '#F7F4F0', // Matched background color from screenshot
+    backgroundColor: '#F7F4F0',
+    position: 'relative',
+    flexDirection: 'column',
   },
   headerRow: {
     flexDirection: 'row',
@@ -169,9 +256,109 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontFamily: "'Cormorant Garamond', Georgia, serif",
-    fontSize: 22,
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#2A2425',
+  },
+  formContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 32,
+    borderWidth: 1,
+    borderColor: '#E2DDD5',
+    shadowColor: '#581420',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    alignItems: 'center',
+  },
+  formIconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#F5ECE3',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  formTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 24,
     fontWeight: '700',
     color: '#2A2425',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  formSubtitle: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 14,
+    color: '#635B5C',
+    marginBottom: 32,
+    textAlign: 'center',
+    paddingHorizontal: 10,
+  },
+  inputGroup: {
+    marginBottom: 20,
+    width: '100%',
+  },
+  rowInputs: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  inputLabel: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4A4445',
+    marginBottom: 6,
+  },
+  inputWrapper: {
+    position: 'relative',
+    width: '100%',
+  },
+  input: {
+    width: '100%',
+    height: 44,
+    backgroundColor: '#FAF6EE',
+    borderWidth: 1,
+    borderColor: '#E2DDD5',
+    borderRadius: 10,
+    paddingLeft: 36,
+    paddingRight: 12,
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 14,
+    color: '#2A2425',
+  },
+  continueBtn: {
+    width: '100%',
+    height: 52,
+    backgroundColor: '#581420',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    shadowColor: '#581420',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+  continueBtnDisabled: {
+    backgroundColor: '#A08E90',
+    shadowOpacity: 0,
+  },
+  continueBtnText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  sectionTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#2A2425',
+    marginLeft: 16,
+    marginBottom: 16,
   },
   scrollContainer: {
     flex: 1,

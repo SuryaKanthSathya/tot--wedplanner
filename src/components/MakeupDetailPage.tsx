@@ -306,16 +306,16 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   };
 
   const handleCallPhone = () => {
-    const phoneNumber = studio.phone ? studio.phone.replace(/[^0-9+]/g, '') : '+919876543210';
+    const phoneNumber = studio.phone ? studio.phone.replace(/[^0-9+]/g, '') : '+919150197966';
     Linking.openURL(`tel:${phoneNumber}`).catch(() => {
-      setToastMessage(`Call ${studio.phone || '+91 98765 43210'}`);
+      setToastMessage(`Call ${studio.phone || '+91 91501 97966'}`);
       setTimeout(() => setToastMessage(null), 3000);
     });
   };
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(`Hi ${studio.name}, I found your profile and would like to check availability.`);
-    Linking.openURL(`https://wa.me/919876543210?text=${text}`).catch(() => {
+    Linking.openURL(`https://wa.me/919150197966?text=${text}`).catch(() => {
       setToastMessage('Opening WhatsApp...');
       setTimeout(() => setToastMessage(null), 2000);
     });
@@ -1631,3 +1631,6 @@ const styles = StyleSheet.create({
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
   },
 });
+
+
+

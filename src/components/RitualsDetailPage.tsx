@@ -206,13 +206,13 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
   };
 
   const handleCallPhone = () => {
-    const phoneNumber = vendor.phone ? vendor.phone.replace(/[^0-9+]/g, '') : '+919876543210';
-    Linking.openURL(`tel:${phoneNumber}`).catch(() => { setToastMessage(`Call ${vendor.phone || '+91 98765 43210'}`); setTimeout(() => setToastMessage(null), 3000); });
+    const phoneNumber = vendor.phone ? vendor.phone.replace(/[^0-9+]/g, '') : '+919150197966';
+    Linking.openURL(`tel:${phoneNumber}`).catch(() => { setToastMessage(`Call ${vendor.phone || '+91 91501 97966'}`); setTimeout(() => setToastMessage(null), 3000); });
   };
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent(`Hi ${vendor.name}, I found your profile on Tale of Two and would like to check availability.`);
-    Linking.openURL(`https://wa.me/919876543210?text=${text}`).catch(() => { setToastMessage('Opening WhatsApp...'); setTimeout(() => setToastMessage(null), 2000); });
+    Linking.openURL(`https://wa.me/919150197966?text=${text}`).catch(() => { setToastMessage('Opening WhatsApp...'); setTimeout(() => setToastMessage(null), 2000); });
   };
 
   const serviceOptions = getServicesByReligion(religion);
@@ -582,3 +582,6 @@ const styles = StyleSheet.create({
   successTitle: { fontSize: 18, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', marginBottom: 6 },
   successSub: { fontSize: 13, color: '#6B5A5C', textAlign: 'center' },
 });
+
+
+

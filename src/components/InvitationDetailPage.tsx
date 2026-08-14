@@ -179,8 +179,8 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           invite.image,
         ];
 
-  const phoneNum = invite.phone || '+91 98765 43210';
-  const whatsappNum = invite.whatsapp || '919876543210';
+  const phoneNum = invite.phone || '+91 91501 97966';
+  const whatsappNum = invite.whatsapp || '919150197966';
 
   const handleShare = () => {
     if (navigator.share) {
@@ -1201,3 +1201,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
+

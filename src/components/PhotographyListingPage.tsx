@@ -115,7 +115,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
     description: 'Premier wedding photography studio in Chennai specializing in royal candid moments and traditional heritage ceremonies.',
     experience: '8+ Years Experience',
-    phone: '+91 98765 43210',
+    phone: '+91 91501 97966',
     portfolio: [
       'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
       'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
@@ -134,7 +134,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
     description: 'Capturing unscripted, emotional moments with artistic lighting and timeless color tones.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43211',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-3',
@@ -149,7 +149,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
     description: 'Specialists in classic South Indian temple weddings, muhurtham rituals, and grand reception stage coverage.',
     experience: '10+ Years Experience',
-    phone: '+91 98765 43212',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-4',
@@ -164,7 +164,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80',
     description: 'Award-winning cinematographers bringing movie-quality drone visuals and heartfelt storytelling to your big day.',
     experience: '7+ Years Experience',
-    phone: '+91 98765 43213',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-5',
@@ -179,7 +179,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=600&q=80',
     description: 'Authentic South Indian wedding photography capturing cultural rituals, silk colors, and joyful family celebrations.',
     experience: '9+ Years Experience',
-    phone: '+91 98765 43214',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-6',
@@ -194,7 +194,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80',
     description: 'High-end destination wedding and luxury bridal portrait specialists with magazine-ready editorial styling.',
     experience: '12+ Years Experience',
-    phone: '+91 98765 43215',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-7',
@@ -209,7 +209,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
     description: 'From romantic pre-wedding beach shoots to full multi-day marriage ceremonies with custom photo albums.',
     experience: '8+ Years Experience',
-    phone: '+91 98765 43216',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-8',
@@ -224,7 +224,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=600&q=80',
     description: 'Creative candid team capturing laughter, tears of joy, and vibrant turmeric sangeet moments.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43217',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-9',
@@ -239,7 +239,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=80',
     description: 'Affordable premium photography packages including candid stills, LED screens, and printed coffee table books.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43218',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-10',
@@ -254,7 +254,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80',
     description: 'Bespoke fine art photography studio with global awards for creative lighting and intimate bridal portraits.',
     experience: '11+ Years Experience',
-    phone: '+91 98765 43219',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-11',
@@ -269,7 +269,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1525258946800-98cfd641d0de?auto=format&fit=crop&w=600&q=80',
     description: 'Specializing in hill station outdoor pre-wedding shoots, Ooty/Kodaikanal concepts, and candid ceremony coverage.',
     experience: '7+ Years Experience',
-    phone: '+91 98765 43220',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-12',
@@ -284,7 +284,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
     description: 'Focused on gorgeous bridal makeup details, kanjeevaram silk luster, and cinematic 4K video teasers.',
     experience: '9+ Years Experience',
-    phone: '+91 98765 43221',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-13',
@@ -299,7 +299,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
     description: 'Traditional marriage coverage team ensuring every ritual, nadaswaram note, and elder blessing is immortalized.',
     experience: '12+ Years Experience',
-    phone: '+91 98765 43222',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-14',
@@ -314,7 +314,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
     description: 'Elite cinematic wedding team providing live streaming, aerial drone photography, and signature teaser trailers.',
     experience: '10+ Years Experience',
-    phone: '+91 98765 43223',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-15',
@@ -329,7 +329,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
     description: 'Warm, personable team providing complete end-to-end coverage from mehendi night to reception farewell.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43224',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-16',
@@ -344,7 +344,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=600&q=80',
     description: 'Affordable traditional photography capturing Golden Temple and fort wedding ceremonies.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43225',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-17',
@@ -359,7 +359,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
     description: 'Highlighting Kanjeevaram silk weave colors, traditional gold jewellery details, and muhurtham moments.',
     experience: '7+ Years Experience',
-    phone: '+91 98765 43226',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-18',
@@ -374,7 +374,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80',
     description: 'Expert traditional photography around Big Temple venues with high quality album printing.',
     experience: '8+ Years Experience',
-    phone: '+91 98765 43227',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-19',
@@ -389,7 +389,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1509924603848-aca5e5f276d7?auto=format&fit=crop&w=600&q=80',
     description: 'Scenic tea plantation outdoor sessions, pine forest pre-wedding shoots, and misty romantic captures.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43228',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-20',
@@ -404,7 +404,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
     description: 'Reliable event coverage for marriage halls, engagement ceremonies, and family gatherings.',
     experience: '4+ Years Experience',
-    phone: '+91 98765 43229',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-21',
@@ -419,7 +419,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=600&q=80',
     description: 'Vibrant wedding packages with customized designer album frames and high resolution digital copies.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43230',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-22',
@@ -434,7 +434,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
     description: 'Capturing oceanfront sunset couples shoots and traditional Southern Kanyakumari wedding rites.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43231',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-23',
@@ -449,7 +449,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80',
     description: 'Serving Hosur and Bangalore border couples with sleek outdoor pre-wedding concepts.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43232',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-24',
@@ -464,7 +464,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=80',
     description: 'Friendly photography crew specializing in village and mandapam traditional wedding rituals.',
     experience: '4+ Years Experience',
-    phone: '+91 98765 43233',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-25',
@@ -479,7 +479,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=600&q=80',
     description: 'Pocket-friendly wedding photography focusing on authentic Chettinad and coastal traditions.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43234',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-26',
@@ -494,7 +494,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
     description: 'Warm lighting and detailed coverage of garland exchanges, thaali tying, and reception stage.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43235',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-27',
@@ -509,7 +509,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=600&q=80',
     description: 'Capturing palace architectures and cultural legacy weddings in Chettinad belt.',
     experience: '7+ Years Experience',
-    phone: '+91 98765 43236',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-28',
@@ -524,7 +524,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
     description: 'Prompt service, candid portraits, and flush-mount wedding albums at competitive prices.',
     experience: '4+ Years Experience',
-    phone: '+91 98765 43237',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-29',
@@ -539,7 +539,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80',
     description: 'ECR resort shoots, beachside sunrise portraits, and candid engagement party coverage.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43238',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-30',
@@ -554,7 +554,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=600&q=80',
     description: 'Fresh youthful photography studio specializing in sangeet dance teasers and drone highlight reels.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43239',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-31',
@@ -569,7 +569,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
     description: 'Traditional temple city photography experts with grand lighting rigs for big halls.',
     experience: '9+ Years Experience',
-    phone: '+91 98765 43240',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-32',
@@ -584,7 +584,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=600&q=80',
     description: 'Capturing joyful haldi laughs and energetic reception dances across Central Tamil Nadu.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43241',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-33',
@@ -599,7 +599,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=600&q=80',
     description: 'Complete marriage package including 2 traditional cameras, 1 candid camera, and 2 printed albums.',
     experience: '5+ Years Experience',
-    phone: '+91 98765 43242',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-34',
@@ -614,7 +614,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=600&q=80',
     description: 'Heartfelt family portraits and ritual coverage in Southern Tamil Nadu.',
     experience: '6+ Years Experience',
-    phone: '+91 98765 43243',
+    phone: '+91 91501 97966',
   },
   {
     id: 'studio-35',
@@ -629,7 +629,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80',
     description: 'Clear crisp photography and traditional videography with LED display setup.',
     experience: '4+ Years Experience',
-    phone: '+91 98765 43244',
+    phone: '+91 91501 97966',
   },
 ];
 
@@ -1841,3 +1841,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
 });
+
