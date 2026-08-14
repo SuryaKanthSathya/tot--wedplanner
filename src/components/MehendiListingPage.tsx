@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { ArtistDetailPage } from './ArtistDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { VendorCompareModal } from './VendorCompareModal';
 import {
   ChevronLeft,
   Search,
@@ -34,6 +35,8 @@ import {
   Flower2,
   User,
   ChevronDown,
+  Scale,
+  ChevronRight,
 } from 'lucide-react';
 
 export interface MehendiArtist {
@@ -368,12 +371,12 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
   // Local fallback state if parent doesn't manage saved IDs
   const [localBookmarkedIds, setLocalBookmarkedIds] = useState<Record<string, boolean>>(() => {
     try {
-      const saved = localStorage.getItem('saved_mehendi_artists');
+      const saved = localStorage.getItem('saved_mehendi') || localStorage.getItem('saved_mehendi_artists');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed['artist-1']) {
           delete parsed['artist-1'];
-          localStorage.setItem('saved_mehendi_artists', JSON.stringify(parsed));
+          localStorage.setItem('saved_mehendi', JSON.stringify(parsed));
         }
         return parsed;
       }
@@ -384,6 +387,8 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
   });
 
   const bookmarkedIds = savedMehendiIds || localBookmarkedIds;
+  const savedArtistsList = MEHENDI_DATA.filter((a) => Boolean(bookmarkedIds[a.id]));
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   const toggleBookmark = (id: string) => {
     if (onToggleSavedMehendi) {
@@ -392,6 +397,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
       setLocalBookmarkedIds((prev) => {
         const updated = { ...prev, [id]: !prev[id] };
         try {
+          localStorage.setItem('saved_mehendi', JSON.stringify(updated));
           localStorage.setItem('saved_mehendi_artists', JSON.stringify(updated));
         } catch (e) {
           console.error(e);
@@ -902,6 +908,53 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
         vendorName={quoteArtist?.name || ''}
         vendorLocation={quoteArtist?.location || ''}
         onClose={() => setQuoteArtist(null)}
+      />
+
+      {/* FLOATING COMPARE BAR WHEN 2+ ARTISTS ARE SELECTED/SAVED */}
+      <AnimatePresence>
+        {savedArtistsList.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            style={{
+              position: 'fixed' as any,
+              bottom: 24,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 999,
+              pointerEvents: 'none' as any,
+            }}
+          >
+            <TouchableOpacity
+              style={styles.floatingCompareBtn}
+              onPress={() => setShowCompareModal(true)}
+              activeOpacity={0.9}
+            >
+              <View style={styles.floatingCompareBadge}>
+                <Text style={styles.floatingCompareBadgeText}>{savedArtistsList.length}</Text>
+              </View>
+              <Scale className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.floatingCompareBtnText}>Compare ({savedArtistsList.length})</Text>
+              <ChevronRight className="w-4 h-4 text-white ml-1" />
+            </TouchableOpacity>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VENDOR COMPARE MODAL */}
+      <VendorCompareModal
+        visible={showCompareModal}
+        categoryTitle="Mehendi Artists"
+        vendors={savedArtistsList}
+        onClose={() => setShowCompareModal(false)}
+        onSelectVendor={(v) => {
+          const match = MEHENDI_DATA.find((a) => a.id === v.id);
+          if (match) setSelectedArtist(match);
+        }}
       />
     </View>
   );
@@ -1535,5 +1588,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 6,
     lineHeight: 18,
+  },
+  floatingCompareBtn: {
+    pointerEvents: 'auto' as any,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#581420',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: '#F3ECE4',
+  },
+  floatingCompareBadge: {
+    backgroundColor: '#C28E38',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  floatingCompareBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  floatingCompareBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });

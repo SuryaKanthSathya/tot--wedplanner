@@ -724,6 +724,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onExploreInvitations={() => setShowInvitationListing(true)}
+          savedMehendiIds={savedMehendiIds}
+          onToggleSavedMehendi={toggleSavedMehendi}
+          onExploreMehendi={() => setShowMehendiListing(true)}
+          savedCateringIds={savedCateringIds}
+          onToggleSavedCatering={toggleSavedCatering}
+          onExploreCatering={() => setShowCateringListing(true)}
+          onHideTabBar={setHideTabBar}
           onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'quotes' ? (
@@ -1275,6 +1282,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     flexDirection: 'column',
     justifyContent: 'space-between',
+    overflow: 'hidden',
   },
   scrollContainer: {
     flex: 1,

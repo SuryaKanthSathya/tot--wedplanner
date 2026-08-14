@@ -28,9 +28,11 @@ import {
   Bookmark,
   Check,
   X,
+  Scale,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { VenueItem, VenueDetailPage } from './VenueDetailPage';
+import { VendorCompareModal } from './VendorCompareModal';
 export type { VenueItem };
 
 export const VENUES_DATA: VenueItem[] = [
@@ -735,6 +737,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const savedVenuesList = VENUES_DATA.filter((v) => Boolean(savedVenueIds[v.id]));
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   const filteredVenues = VENUES_DATA.filter((venue) => {
     const matchesCity =
@@ -1147,6 +1151,53 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* FLOATING COMPARE BAR WHEN 2+ VENUES ARE SELECTED/SAVED */}
+      <AnimatePresence>
+        {savedVenuesList.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            style={{
+              position: 'fixed' as any,
+              bottom: 24,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 999,
+              pointerEvents: 'none' as any,
+            }}
+          >
+            <TouchableOpacity
+              style={styles.floatingCompareBtn}
+              onPress={() => setShowCompareModal(true)}
+              activeOpacity={0.9}
+            >
+              <View style={styles.floatingCompareBadge}>
+                <Text style={styles.floatingCompareBadgeText}>{savedVenuesList.length}</Text>
+              </View>
+              <Scale className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.floatingCompareBtnText}>Compare ({savedVenuesList.length})</Text>
+              <ChevronRight className="w-4 h-4 text-white ml-1" />
+            </TouchableOpacity>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VENDOR COMPARE MODAL */}
+      <VendorCompareModal
+        visible={showCompareModal}
+        categoryTitle="Venues"
+        vendors={savedVenuesList}
+        onClose={() => setShowCompareModal(false)}
+        onSelectVendor={(v) => {
+          const match = VENUES_DATA.find((item) => item.id === v.id);
+          if (match) setSelectedVenue(match);
+        }}
+      />
     </View>
   );
 };
@@ -1342,6 +1393,47 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#581420',
+  },
+  venueItemTierText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#92400E',
+  },
+  floatingCompareBtn: {
+    pointerEvents: 'auto' as any,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#581420',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: '#F3ECE4',
+  },
+  floatingCompareBadge: {
+    backgroundColor: '#C28E38',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  floatingCompareBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  floatingCompareBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   bookmarkBtn: {
     width: 32,
