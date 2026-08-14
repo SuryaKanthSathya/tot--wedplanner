@@ -79,6 +79,24 @@ const TIER_OPTIONS = ['All Tiers', 'Signature', 'Premium', 'Essential'];
 
 export const DECOR_STUDIOS_DATA: DecorStudio[] = [
   {
+    id: 'pkg_decor_1',
+    name: 'Dream Designs',
+    category: 'Thematic Floral & Stage Decor',
+    city: 'All Cities',
+    location: 'Destination Weddings',
+    rating: 4.9,
+    reviewsCount: 245,
+    startingPrice: '₹2,00,000 onwards',
+    priceValue: 200000,
+    coreSpecialty: 'Floral & Mandap Decor',
+    image: '/src/assets/images/royal_mandap_decor.jpg',
+    description: 'Bespoke floral arrangements and thematic styling for your big day.',
+    experience: '10+ Years',
+    teamSize: '20+ Decorators',
+    designProcess: '3D Mockups, Concept Sketches',
+    services: ['Mandap Decor', 'Floral Art', 'Lighting', 'Stage Setup'],
+  },
+  {
     id: 'decor-1',
     name: 'Aura Royal Wedding Decorators',
     rating: 4.9,

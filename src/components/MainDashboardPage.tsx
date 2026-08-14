@@ -410,6 +410,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowDestinationWeddingFlow(true);
       return;
     }
+    if (featureName === 'Plan My Entire Wedding') {
+      window.scrollTo(0, 0);
+      setShowDestinationWeddingFlow(true);
+    }
     if (featureName === 'Mehendi') {
       setShowMehendiListing(true);
       return;

@@ -106,6 +106,24 @@ const TIER_OPTIONS = [
 
 export const STUDIOS_DATA: PhotographyStudio[] = [
   {
+    id: 'pkg_photo_1',
+    name: 'Moments Studio',
+    category: 'Cinematic & Candid Photography',
+    city: 'All Cities',
+    location: 'Destination Weddings',
+    rating: 4.9,
+    reviewsCount: 312,
+    startingPrice: '₹1,50,000 onwards',
+    priceValue: 150000,
+    deliveryTime: '3-4 Weeks',
+    image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
+    description: 'Award-winning team specializing in candid moments and cinematic wedding films.',
+    experience: '8+ Years',
+    teamSize: '5-8 Professionals',
+    equipment: 'Sony A7S III, RED Cinema Cameras',
+    services: ['Candid Photography', 'Traditional', 'Cinematic Video', 'Pre-Wedding'],
+  },
+  {
     id: 'studio-1',
     name: 'ABC Photography',
     rating: 4.8,

@@ -28,6 +28,24 @@ export interface EntertainmentItem {
 }
 export const ENTERTAINMENT_DATA: EntertainmentItem[] = [
   {
+    id: 'pkg_ent_1',
+    name: 'Rhythm Entertainment',
+    category: 'DJ & Live Bands',
+    city: 'All Cities',
+    location: 'Destination Weddings',
+    rating: 4.8,
+    reviewsCount: 156,
+    startingPrice: '₹50,000 onwards',
+    priceValue: 50000,
+    performanceTime: '3-4 Hours',
+    image: '/src/assets/images/sangeet_stage_decor.jpg',
+    description: 'Top-tier DJs and live bands to keep your guests dancing all night.',
+    experience: '5+ Years',
+    teamSize: '3-5 Performers',
+    equipment: 'Professional Audio & Lighting',
+    services: ['DJ', 'Live Band', 'MC/Host', 'Sound Setup'],
+  },
+  {
     id: 'ent-1',
     name: 'DJ Shadow & Electro Pulse Percussion',
     category: 'Celebrity DJ & Live Percussionist',
