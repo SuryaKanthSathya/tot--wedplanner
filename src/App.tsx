@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, useWindowDimensions } from 'react-native';
 import { MobileLandingPage } from './components/MobileLandingPage';
 import { OnboardingWizardModal } from './components/OnboardingWizardModal';
 import { LoginModal } from './components/LoginModal';
@@ -12,6 +12,9 @@ import { ColorTheme, ViewMode } from './types';
 import { THEMES } from './constants/themes';
 
 export default function App() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const [viewMode] = useState<ViewMode>('responsive-canvas');
   const [currentTheme] = useState<ColorTheme>('burgundy');
   const [isGetStartedOpen, setIsGetStartedOpen] = useState<boolean>(false);
@@ -21,9 +24,9 @@ export default function App() {
   const theme = THEMES[currentTheme];
 
   return (
-    <SafeAreaView style={styles.appContainer}>
+    <SafeAreaView style={[styles.appContainer, isMobile ? styles.appContainerMobile : styles.appContainerDesktop]}>
       {/* Main Mobile Card Container */}
-      <View style={styles.mainCanvas}>
+      <View style={[styles.mainCanvas, isMobile ? styles.mainCanvasMobile : styles.mainCanvasDesktop]}>
         <MobileLandingPage
           viewMode={viewMode}
           currentTheme={currentTheme}
@@ -58,18 +61,31 @@ export default function App() {
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
+  },
+  appContainerDesktop: {
     minHeight: '100vh' as any,
     backgroundColor: '#1f1e1c',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
   },
+  appContainerMobile: {
+    width: '100%',
+    minHeight: '100vh' as any,
+    backgroundColor: '#FAF6EE',
+    padding: 0,
+  },
   mainCanvas: {
     flex: 1,
+    width: '100%',
+  },
+  mainCanvasDesktop: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
     maxHeight: '100vh' as any,
+  },
+  mainCanvasMobile: {
+    height: '100%',
   },
 });
 

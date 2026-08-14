@@ -10,6 +10,9 @@ import {
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { PhotographyListingPage } from './PhotographyListingPage';
+import { MehendiListingPage } from './MehendiListingPage';
+import { CateringListingPage } from './CateringListingPage';
+import { CarsListingPage } from './CarsListingPage';
 import { MakeupListingPage } from './MakeupListingPage';
 import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
@@ -36,6 +39,7 @@ import {
   Grid,
   Trash2,
   Flower2,
+  Palette,
 } from 'lucide-react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
@@ -146,7 +150,7 @@ function calculateDaysLeft(dateString?: string): number {
   if (!dateString) return 126;
   try {
     let targetDate: Date | null = null;
-    
+
     // Try native Date parsing first
     const nativeParsed = new Date(dateString);
     if (!isNaN(nativeParsed.getTime())) {
@@ -444,6 +448,9 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showServicesModal, setShowServicesModal] = useState(false);
   const [showServicesView, setShowServicesView] = useState(false);
   const [showPhotographyListing, setShowPhotographyListing] = useState(false);
+  const [showMehendiListing, setShowMehendiListing] = useState(false);
+  const [showCateringListing, setShowCateringListing] = useState(false);
+  const [showCarsListing, setShowCarsListing] = useState(false);
   const [showMakeupListing, setShowMakeupListing] = useState(false);
   const [showDecorListing, setShowDecorListing] = useState(false);
   const [showVenueListing, setShowVenueListing] = useState(false);
@@ -451,6 +458,32 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showInvitationListing, setShowInvitationListing] = useState(false);
   const [showCarsListing, setShowCarsListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
+
+
+  if (showMehendiListing) {
+    return (
+      <MehendiListingPage
+        onBack={() => setShowMehendiListing(false)}
+        savedArtistIds={[]} // Add default empty array to avoid undefined errors if props change
+      />
+    );
+  }
+
+  if (showCateringListing) {
+    return (
+      <CateringListingPage
+        onBack={() => setShowCateringListing(false)}
+      />
+    );
+  }
+
+  if (showCarsListing) {
+    return (
+      <CarsListingPage
+        onBack={() => setShowCarsListing(false)}
+      />
+    );
+  }
 
   if (showPhotographyListing) {
     return (
@@ -641,6 +674,17 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                     setShowInvitationListing(true);
                     return;
                   }
+<<<<<<< HEAD
+=======
+                  if (sid === 'mehendi' || sname.includes('mehendi')) {
+                    setShowMehendiListing(true);
+                    return;
+                  }
+                  if (sid === 'catering' || sname.includes('cater')) {
+                    setShowCateringListing(true);
+                    return;
+                  }
+>>>>>>> master
                   if (sid === 'cars' || sname.includes('car')) {
                     setShowCarsListing(true);
                     return;
@@ -764,7 +808,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
           <View style={styles.countdownCard}>
             <View style={styles.countdownLeft}>
               <Text style={styles.countdownCardTitle}>Wedding Countdown</Text>
-              
+
               <View style={styles.numberWrapper}>
                 <Text style={styles.countdownNumber}>{daysLeft}</Text>
                 <Text style={styles.daysLabel}>DAYS</Text>
@@ -986,7 +1030,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 {[
                   { name: 'Photography', icon: Camera },
                   { name: 'Makeup Artist', icon: Sparkles },
-                  { name: 'Decor & Flowers', icon: Flower2 },
+                  { name: 'Decor & Flowers', icon: Palette },
                   { name: 'Catering & Food', icon: Utensils },
                   { name: 'DJ & Music', icon: Music },
                   { name: 'Travel & Stay', icon: Plane },
@@ -1491,5 +1535,97 @@ const styles: any = StyleSheet.create({
     color: '#8A817C',
     marginTop: 1,
     textAlign: 'center',
+  },
+  myQuotesCard: {
+    width: '100%',
+    backgroundColor: '#FAF7F2',
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 16,
+  },
+  myQuotesHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  myQuotesCardTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  quoteBadgeCount: {
+    backgroundColor: '#F5EBE6',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  quoteBadgeCountText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#8B1E2F',
+  },
+  quoteItemBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+  },
+  quoteVendorTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  quoteCategorySubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 2,
+  },
+  quotePriceTag: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#8B1E2F',
+  },
+  quoteStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    marginBottom: 12,
+  },
+  quoteConfirmedTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  quoteConfirmedText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#15803D',
+  },
+  quotePaymentPendingText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#D97706',
+  },
+  quoteViewBtn: {
+    backgroundColor: '#581420',
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quoteViewBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });

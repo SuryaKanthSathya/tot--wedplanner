@@ -81,7 +81,7 @@ export const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({
     }, 800);
   };
 
-  const displayMobile = mobileNumber.trim() ? mobileNumber : '+91 98765 43210';
+  const displayMobile = mobileNumber.trim();
   const formattedTimer = `00:${timer < 10 ? `0${timer}` : timer}`;
 
   return (

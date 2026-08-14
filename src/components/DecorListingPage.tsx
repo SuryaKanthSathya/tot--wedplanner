@@ -31,6 +31,7 @@ import {
   Calendar,
   ChevronDown,
   Flower2,
+  Palette,
 } from 'lucide-react';
 
 export interface DecorListingPageProps {
@@ -88,6 +89,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Specialising in grand traditional South Indian wedding mandaps with fresh jasmine, marigolds, carved temple pillars, and regal stage backdrop design for high-profile weddings across Tamil Nadu.',
     experience: '14+ Years',
     phone: '+91 98401 22334',
+    instagram: '@auraroyal_decor',
     themesProvided: [
       'Jasmine & Tuberose Temple Mandap',
       'Royal Velvet & Brass Lamp Stage',
@@ -113,9 +115,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     tier: 'Signature',
     image: '/src/assets/images/pastel_reception_stage.jpg',
     description:
-      'Pioneers of luxury reception stages featuring mint green sheer drapes, lush tropical greenery leaf arches, white floral hanging chandeliers, and vintage cream velvet chaise lounge seating.',
+      'Pioneers of luxury reception stages featuring mint green drapes, lush tropical greenery leaf arches, white floral hanging chandeliers, and vintage cream velvet chaise lounge seating.',
     experience: '11+ Years',
     phone: '+91 97890 11223',
+    instagram: '@floraluxe_stage',
     themesProvided: [
       'Mint Green & Emerald Tropical Greenery Arch',
       'White Floral Crown Chandeliers',
@@ -144,6 +147,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Vibrant event setup specialists creating joyful Haldi setups with yellow drapes and marigolds, colorful Mehendi swings, and energetic Sangeet concert lighting in Madurai and Southern districts.',
     experience: '9+ Years',
     phone: '+91 94431 55667',
+    instagram: '@utsav_themes',
     themesProvided: [
       'Marigold Yellow Haldi Setup',
       'Boho Swing & Cushion Seating',
@@ -172,6 +176,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Exquisite outdoor destination mandap specialists famous for vibrant pink and orange silk draped oceanfront mandaps, rose and marigold top canopy roofs, and winding rose petal grass aisle pathways.',
     experience: '12+ Years',
     phone: '+91 96001 88990',
+    instagram: '@starlight_ocean',
     themesProvided: [
       'Oceanfront Pink & Orange Silk Draped Mandap',
       'Winding Rose Petal Lawn Aisle Pathway',
@@ -200,6 +205,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Traditional heritage floral artists specializing in authentic South Indian banana pith, lotus, tuberose, and jasmine pillars with carved wooden mandap structures.',
     experience: '10+ Years',
     phone: '+91 98424 33445',
+    instagram: '@kaveri_temple_decor',
     themesProvided: [
       'Lotus & Jasmine Pillar Mandap',
       'Carved Wooden Temple Entrance',
@@ -228,6 +234,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'High-end grand stage designers for large palace weddings and convention centers. Famous for intricate 3D architectural backdrops, crystal chandeliers, and concert-grade intelligent moving lights.',
     experience: '13+ Years',
     phone: '+91 97910 44556',
+    instagram: '@grandeur_palace_decor',
     themesProvided: [
       'Royal Mughal Palace Stage',
       'Aisle Flower Arches & Red Carpet',
@@ -256,6 +263,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Specialising in rich velvet drapes, antique brass lamp pillars, custom floral mandap roofs, and elegant dining table centerpieces across Tiruppur and Erode regions.',
     experience: '8+ Years',
     phone: '+91 98940 77889',
+    instagram: '@mayura_velvet_brass',
     themesProvided: [
       'Velvet & Brass Lamp Mandap',
       'Fresh Orchid Ceiling Strands',
@@ -284,6 +292,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Crafting mesmerizing lotus floating pond mandaps, banana tree entrance gateways, and hand-strung tuberose garlands for authentic Vedic South Indian ceremonies.',
     experience: '16+ Years',
     phone: '+91 98402 88776',
+    instagram: '@vedic_lotus_mandap',
     themesProvided: [
       'Floating Lotus Pool Mandap',
       'Carved Teak Pillar Entrance',
@@ -312,6 +321,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Specializing in contemporary blush pink, lavender, and champagne gold floral installations, fairy-light ceiling tunnels, and mirror pathway stages for grand receptions.',
     experience: '10+ Years',
     phone: '+91 98941 22334',
+    instagram: '@rosewood_pastel_events',
     themesProvided: [
       'Blush Peony & Gold Arch',
       'Mirror Reflection Aisle',
@@ -340,6 +350,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Creating temple architecture inspired mandaps with golden gopuram motifs, silk tapestry backdrops, and fragrant marigold-jasmine floral carpets.',
     experience: '15+ Years',
     phone: '+91 94421 99887',
+    instagram: '@chola_heritage_decor',
     themesProvided: [
       'Golden Temple Gopuram Mandap',
       'Silk Tapestry Stage',
@@ -368,6 +379,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Vibrant and joyful budget-friendly setups for pre-wedding ceremonies including Haldi, Mehendi, Poolside Sangeet, and intimate home engagement decor.',
     experience: '6+ Years',
     phone: '+91 98409 11223',
+    instagram: '@saffron_sunshine_haldi',
     themesProvided: [
       'Marigold Sunshine Canopy',
       'Colorful Kite Backdrop',
@@ -396,6 +408,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Romantic oceanfront resort wedding styling with driftwood arches, white tropical orchids, bamboo torch pathways, and warm festoon lighting.',
     experience: '11+ Years',
     phone: '+91 96002 44556',
+    instagram: '@serenade_beach_decor',
     themesProvided: [
       'Oceanfront Driftwood Mandap',
       'White Orchid & Palm Arch',
@@ -424,6 +437,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Regal ballroom wedding designers famous for grand velvet drapes, cascading crystal drops, mirrored dance floors, and golden throne stage arrangements.',
     experience: '12+ Years',
     phone: '+91 98425 66778',
+    instagram: '@imperial_crystal_decor',
     themesProvided: [
       'Crimson Velvet & Gold Stage',
       'Cascading Crystal Chandelier',
@@ -452,6 +466,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Sustainable and eco-conscious event decor using natural bamboo pillars, fresh eucalyptus leaves, seasonal local blooms, and reusable cloth drapes.',
     experience: '7+ Years',
     phone: '+91 97911 33445',
+    instagram: '@botanica_eco_setups',
     themesProvided: [
       'Greenery & White Rose Arch',
       'Natural Bamboo Gazebo',
@@ -480,6 +495,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Ultra-luxurious Chettinad palace wedding transformations featuring antique brass urlis, handcrafted lotus installations, 10,000+ fresh flower strands, and regal stage backdrops.',
     experience: '18+ Years',
     phone: '+91 98400 55667',
+    instagram: '@subhamangalam_heritage',
     themesProvided: [
       'Chettinad Palace Courtroom Stage',
       'Fresh Jasmine & Rose Ceiling Canopy',
@@ -508,6 +524,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Lighting design and floral stage masters known for warm golden ambient washes, LED screen backdrop integrations, and fragrant floral entrance tunnels.',
     experience: '9+ Years',
     phone: '+91 98942 66778',
+    instagram: '@goldenrays_lighting',
     themesProvided: [
       'Warm Amber LED Backdrop Stage',
       'Tunnel Of Lights Entrance',
@@ -864,7 +881,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
 
         {filteredStudios.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Flower2 className="w-12 h-12 text-[#C5A880] mb-2" />
+            <Palette className="w-12 h-12 text-[#C5A880] mb-2" />
             <Text style={styles.emptyTitle}>No Decorators Found</Text>
             <Text style={styles.emptySub}>
               Try clearing your active filters or changing your location search.
