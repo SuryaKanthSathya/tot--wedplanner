@@ -717,6 +717,7 @@ interface VenueListingPageProps {
   savedVenueIds?: Record<string, boolean>;
   onToggleSavedVenue?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
@@ -724,6 +725,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   savedVenueIds = {},
   onToggleSavedVenue = (_id?: string) => {},
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [selectedBudget, setSelectedBudget] = useState<string>('All');
@@ -777,6 +779,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         onBack={() => setSelectedVenue(null)}
         isBookmarked={Boolean(savedVenueIds[selectedVenue.id])}
         onToggleBookmark={onToggleSavedVenue}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -817,8 +820,9 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         )}
       </View>
 
-      {/* FILTER CHIPS ROW */}
+      {/* Filter Chips Bar */}
       <View style={styles.filterRowContainer}>
+        {/* City Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('city')}
@@ -829,6 +833,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
           </Text>
         </TouchableOpacity>
 
+        {/* Budget Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('budget')}
@@ -839,6 +844,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
           </Text>
         </TouchableOpacity>
 
+        {/* Rating Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('rating')}
@@ -849,6 +855,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
           </Text>
         </TouchableOpacity>
 
+        {/* Tier Filter */}
         <TouchableOpacity
           style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
           onPress={() => setActiveFilterModal('tier')}
@@ -858,20 +865,14 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
             {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.filterChip, selectedCategory !== 'All Types' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('type')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedCategory !== 'All Types' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedCategory === 'All Types' ? 'Venue Type ▼' : `${selectedCategory} ▼`}
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {/* LIST OF VENUE CARDS */}
-      <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
+      <ScrollView
+        style={{ flex: 1, overflowY: 'auto' } as any}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+      >
         {filteredVenues.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Building2 className="w-12 h-12 text-stone-300 mb-2" />
@@ -1003,7 +1004,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ maxHeight: 380, overflowY: 'auto' } as any} showsVerticalScrollIndicator={false}>
                 {activeFilterModal === 'city' && (
                   <View style={styles.optionsList}>
                     {TAMIL_NADU_DISTRICTS.map((district) => {
@@ -1228,48 +1229,60 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 14,
-    marginTop: 10,
+    marginHorizontal: 16,
+    marginTop: 4,
+    marginBottom: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E8DFD5',
+    borderColor: '#EFE7DE',
   },
   searchInput: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: '#1C1917',
-    outlineStyle: 'none',
+    padding: 0,
+    outlineStyle: 'none' as any,
   },
   filterRowContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
     gap: 6,
-    overflowX: 'auto' as any,
+    marginBottom: 8,
+    alignItems: 'center',
+    width: '100%',
+    boxSizing: 'border-box' as any,
   },
   filterChip: {
+    flex: 1,
+    minWidth: 0,
+    height: 32,
+    paddingHorizontal: 4,
+    borderRadius: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E8DFD5',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    borderColor: '#DDD6CE',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
-    backgroundColor: '#F3ECE4',
+    backgroundColor: '#FFFFFF',
     borderColor: '#581420',
+    borderWidth: 1.5,
   },
   filterChipText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#4A3B3C',
+    fontWeight: '500',
+    color: '#332B2C',
+    textAlign: 'center',
+    whiteSpace: 'nowrap' as any,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis' as any,
   },
   filterChipTextActive: {
     color: '#581420',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   modalBackdrop: {
     position: 'fixed' as any,

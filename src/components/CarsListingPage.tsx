@@ -91,6 +91,7 @@ export interface CarsListingPageProps {
   savedCarIds?: Record<string, boolean>;
   onToggleSavedCar?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const CarsListingPage: React.FC<CarsListingPageProps> = ({
@@ -98,6 +99,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
   savedCarIds,
   onToggleSavedCar,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -216,6 +218,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
         onBack={() => setSelectedCar(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedCar.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -488,7 +491,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ maxHeight: 380, overflowY: 'auto' } as any} showsVerticalScrollIndicator={false}>
                 {/* 1. CITY FILTER OPTIONS */}
                 {activeFilterModal === 'city' && (
                   <View style={styles.optionsList}>

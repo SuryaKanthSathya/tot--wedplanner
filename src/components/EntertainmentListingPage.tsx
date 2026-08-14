@@ -91,6 +91,7 @@ export interface EntertainmentListingPageProps {
   savedEntIds?: Record<string, boolean>;
   onToggleSavedEnt?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> = ({
@@ -98,6 +99,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
   savedEntIds,
   onToggleSavedEnt,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -216,6 +218,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
         onBack={() => setSelectedArtist(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedArtist.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -486,7 +489,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ maxHeight: 380, overflowY: 'auto' } as any} showsVerticalScrollIndicator={false}>
                 {/* 1. CITY FILTER OPTIONS */}
                 {activeFilterModal === 'city' && (
                   <View style={styles.optionsList}>

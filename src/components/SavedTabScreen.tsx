@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -23,11 +23,15 @@ import { InvitationItem, INVITATIONS_DATA } from './InvitationListingPage';
 import { InvitationDetailPage } from './InvitationDetailPage';
 import { CarItem, CARS_DATA } from '../constants/CarsData';
 import { CarsDetailPage } from './CarsDetailPage';
+import { MehendiArtist, MEHENDI_DATA } from './MehendiListingPage';
+import { ArtistDetailPage } from './ArtistDetailPage';
+import { CateringVendor, CATERING_DATA } from './CateringListingPage';
+import { CatererDetailPage } from './CatererDetailPage';
 
 interface SavedTabScreenProps {
-  savedStudioIds: Record<string, boolean>;
-  onToggleSavedStudio: (id: string) => void;
-  onExplorePhotography: () => void;
+  savedStudioIds?: Record<string, boolean>;
+  onToggleSavedStudio?: (id: string) => void;
+  onExplorePhotography?: () => void;
   savedMakeupIds?: Record<string, boolean>;
   onToggleSavedMakeup?: (id: string) => void;
   onExploreMakeup?: () => void;
@@ -46,10 +50,17 @@ interface SavedTabScreenProps {
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onExploreInvitations?: () => void;
+  savedMehendiIds?: Record<string, boolean>;
+  onToggleSavedMehendi?: (id: string) => void;
+  onExploreMehendi?: () => void;
+  savedCateringIds?: Record<string, boolean>;
+  onToggleSavedCatering?: (id: string) => void;
+  onExploreCatering?: () => void;
+  onHideTabBar?: (hide: boolean) => void;
 }
 
 export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
-  savedStudioIds,
+  savedStudioIds = {},
   onToggleSavedStudio,
   onExplorePhotography,
   savedMakeupIds = {},
@@ -70,8 +81,17 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   savedInviteIds = {},
   onToggleSavedInvite,
   onExploreInvitations,
+  savedMehendiIds = {},
+  onToggleSavedMehendi,
+  onExploreMehendi,
+  savedCateringIds = {},
+  onToggleSavedCatering,
+  onExploreCatering,
+  onHideTabBar,
 }) => {
-  const [activeCategory, setActiveCategory] = useState<'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Cars' | 'Invitations'>('All');
+  const [activeCategory, setActiveCategory] = useState<
+    'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Cars' | 'Invitations' | 'Mehendi' | 'Catering'
+  >('All');
   const [selectedStudio, setSelectedStudio] = useState<PhotographyStudio | null>(null);
   const [selectedMakeup, setSelectedMakeup] = useState<MakeupStudio | null>(null);
   const [selectedDecor, setSelectedDecor] = useState<DecorStudio | null>(null);
@@ -79,6 +99,31 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   const [selectedEnt, setSelectedEnt] = useState<EntertainmentItem | null>(null);
   const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(null);
   const [selectedCar, setSelectedCar] = useState<CarItem | null>(null);
+  const [selectedMehendi, setSelectedMehendi] = useState<MehendiArtist | null>(null);
+  const [selectedCatering, setSelectedCatering] = useState<CateringVendor | null>(null);
+
+  const isAnyDetailOpen = Boolean(
+    selectedStudio ||
+    selectedMakeup ||
+    selectedDecor ||
+    selectedVenue ||
+    selectedEnt ||
+    selectedCar ||
+    selectedInvite ||
+    selectedMehendi ||
+    selectedCatering
+  );
+
+  useEffect(() => {
+    if (onHideTabBar) {
+      onHideTabBar(isAnyDetailOpen);
+    }
+    return () => {
+      if (onHideTabBar) {
+        onHideTabBar(false);
+      }
+    };
+  }, [isAnyDetailOpen, onHideTabBar]);
 
   const savedStudios = STUDIOS_DATA.filter((s) => Boolean(savedStudioIds[s.id]));
   const savedMakeups = MAKEUP_STUDIOS_DATA.filter((m) => Boolean(savedMakeupIds[m.id]));
@@ -87,6 +132,8 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   const savedEnts = ENTERTAINMENT_DATA.filter((e) => Boolean(savedEntIds[e.id]));
   const savedInvites = INVITATIONS_DATA.filter((i) => Boolean(savedInviteIds[i.id]));
   const savedCars = CARS_DATA.filter((c) => Boolean(savedCarIds[c.id]));
+  const savedMehendis = MEHENDI_DATA.filter((m) => Boolean(savedMehendiIds[m.id]));
+  const savedCaterings = CATERING_DATA.filter((c) => Boolean(savedCateringIds[c.id]));
 
   if (selectedStudio) {
     return (
@@ -94,7 +141,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
         studio={selectedStudio}
         onBack={() => setSelectedStudio(null)}
         isBookmarked={Boolean(savedStudioIds[selectedStudio.id])}
-        onToggleBookmark={onToggleSavedStudio}
+        onToggleBookmark={(id) => onToggleSavedStudio && onToggleSavedStudio(id)}
       />
     );
   }
@@ -143,7 +190,6 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     );
   }
 
-
   if (selectedCar) {
     return (
       <CarsDetailPage
@@ -166,6 +212,28 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     );
   }
 
+  if (selectedMehendi) {
+    return (
+      <ArtistDetailPage
+        artist={selectedMehendi}
+        onBack={() => setSelectedMehendi(null)}
+        isBookmarked={Boolean(savedMehendiIds[selectedMehendi.id])}
+        onToggleBookmark={(id) => onToggleSavedMehendi && onToggleSavedMehendi(id)}
+      />
+    );
+  }
+
+  if (selectedCatering) {
+    return (
+      <CatererDetailPage
+        caterer={selectedCatering}
+        onBack={() => setSelectedCatering(null)}
+        isBookmarked={Boolean(savedCateringIds[selectedCatering.id])}
+        onToggleBookmark={(id) => onToggleSavedCatering && onToggleSavedCatering(id)}
+      />
+    );
+  }
+
   const savedCount =
     savedStudios.length +
     savedMakeups.length +
@@ -173,7 +241,9 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     savedVenues.length +
     savedEnts.length +
     savedCars.length +
-    savedInvites.length;
+    savedInvites.length +
+    savedMehendis.length +
+    savedCaterings.length;
 
   return (
     <View style={styles.container}>
@@ -246,7 +316,6 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
             </Text>
           </TouchableOpacity>
 
-
           <TouchableOpacity
             style={[styles.filterChip, activeCategory === 'Cars' && styles.filterChipActive]}
             onPress={() => setActiveCategory('Cars')}
@@ -264,6 +333,24 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               Invitations ({savedInvites.length})
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.filterChip, activeCategory === 'Mehendi' && styles.filterChipActive]}
+            onPress={() => setActiveCategory('Mehendi')}
+          >
+            <Text style={[styles.filterChipText, activeCategory === 'Mehendi' && styles.filterChipTextActive]}>
+              Mehendi ({savedMehendis.length})
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.filterChip, activeCategory === 'Catering' && styles.filterChipActive]}
+            onPress={() => setActiveCategory('Catering')}
+          >
+            <Text style={[styles.filterChipText, activeCategory === 'Catering' && styles.filterChipTextActive]}>
+              Catering ({savedCaterings.length})
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </View>
 
@@ -276,19 +363,23 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
             </View>
             <Text style={styles.emptyTitle}>No Saved Items Yet</Text>
             <Text style={styles.emptySub}>
-              Tap the bookmark icon on any venue, artist, decorator or studio to save it here.
+              Tap the bookmark or heart icon on any venue, artist, decorator or studio to save it here.
             </Text>
 
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14, justifyContent: 'center' }}>
-              <TouchableOpacity style={styles.exploreBtn} onPress={onExplorePhotography} activeOpacity={0.8}>
-                <Camera className="w-4 h-4 text-white mr-1.5" />
-                <Text style={styles.exploreBtnText}>Photography</Text>
-              </TouchableOpacity>
+              {onExplorePhotography && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExplorePhotography} activeOpacity={0.8}>
+                  <Camera className="w-4 h-4 text-white mr-1.5" />
+                  <Text style={styles.exploreBtnText}>Photography</Text>
+                </TouchableOpacity>
+              )}
 
-              <TouchableOpacity style={styles.exploreBtn} onPress={onExploreMakeup} activeOpacity={0.8}>
-                <Sparkles className="w-4 h-4 text-white mr-1.5" />
-                <Text style={styles.exploreBtnText}>Makeup</Text>
-              </TouchableOpacity>
+              {onExploreMakeup && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreMakeup} activeOpacity={0.8}>
+                  <Sparkles className="w-4 h-4 text-white mr-1.5" />
+                  <Text style={styles.exploreBtnText}>Makeup</Text>
+                </TouchableOpacity>
+              )}
 
               {onExploreDecor && (
                 <TouchableOpacity style={styles.exploreBtn} onPress={onExploreDecor} activeOpacity={0.8}>
@@ -311,7 +402,6 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                 </TouchableOpacity>
               )}
 
-
               {onExploreCars && (
                 <TouchableOpacity style={styles.exploreBtn} onPress={onExploreCars} activeOpacity={0.8}>
                   <Text style={styles.exploreBtnText}>Cars</Text>
@@ -324,6 +414,20 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                   <Text style={styles.exploreBtnText}>Invitations</Text>
                 </TouchableOpacity>
               )}
+
+              {onExploreMehendi && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreMehendi} activeOpacity={0.8}>
+                  <Scissors className="w-4 h-4 text-white mr-1.5" />
+                  <Text style={styles.exploreBtnText}>Mehendi</Text>
+                </TouchableOpacity>
+              )}
+
+              {onExploreCatering && (
+                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreCatering} activeOpacity={0.8}>
+                  <Utensils className="w-4 h-4 text-white mr-1.5" />
+                  <Text style={styles.exploreBtnText}>Catering</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         ) : (
@@ -333,9 +437,11 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               <View style={{ marginBottom: 20 }}>
                 <View style={styles.sectionHeaderRow}>
                   <Text style={styles.sectionTitle}>Photography ({savedStudios.length})</Text>
-                  <TouchableOpacity onPress={onExplorePhotography}>
-                    <Text style={styles.browseMoreText}>+ Explore More</Text>
-                  </TouchableOpacity>
+                  {onExplorePhotography && (
+                    <TouchableOpacity onPress={onExplorePhotography}>
+                      <Text style={styles.browseMoreText}>+ Explore More</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {savedStudios.map((studio) => (
@@ -345,7 +451,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                       <View style={styles.cardRightCol}>
                         <View style={styles.cardHeaderRow}>
                           <Text style={styles.studioName} numberOfLines={1}>{studio.name}</Text>
-                          <TouchableOpacity onPress={() => onToggleSavedStudio(studio.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                          <TouchableOpacity onPress={() => onToggleSavedStudio && onToggleSavedStudio(studio.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                             <Bookmark className="w-4 h-4 text-[#8B1E2F] fill-[#8B1E2F]" />
                           </TouchableOpacity>
                         </View>
@@ -375,9 +481,11 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               <View style={{ marginBottom: 20 }}>
                 <View style={styles.sectionHeaderRow}>
                   <Text style={styles.sectionTitle}>Makeup Artists ({savedMakeups.length})</Text>
-                  <TouchableOpacity onPress={onExploreMakeup}>
-                    <Text style={styles.browseMoreText}>+ Explore More</Text>
-                  </TouchableOpacity>
+                  {onExploreMakeup && (
+                    <TouchableOpacity onPress={onExploreMakeup}>
+                      <Text style={styles.browseMoreText}>+ Explore More</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 {savedMakeups.map((m) => (
@@ -544,7 +652,6 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               </View>
             )}
 
-
             {/* CARS SECTION */}
             {(activeCategory === 'All' || activeCategory === 'Cars') && savedCars.length > 0 && (
               <View style={{ marginBottom: 20 }}>
@@ -594,14 +701,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
               <View style={{ marginBottom: 20 }}>
                 <View style={styles.sectionHeaderRow}>
                   <Text style={styles.sectionTitle}>Invitations ({savedInvites.length})</Text>
-    
-              {onExploreCars && (
-                <TouchableOpacity style={styles.exploreBtn} onPress={onExploreCars} activeOpacity={0.8}>
-                  <Text style={styles.exploreBtnText}>Cars</Text>
-                </TouchableOpacity>
-              )}
-
-              {onExploreInvitations && (
+                  {onExploreInvitations && (
                     <TouchableOpacity onPress={onExploreInvitations}>
                       <Text style={styles.browseMoreText}>+ Explore More</Text>
                     </TouchableOpacity>
@@ -630,6 +730,94 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                         <View style={styles.cardBottomRow}>
                           <Text style={styles.priceText}>{inv.startingPrice}</Text>
                           <TouchableOpacity style={styles.viewDetailsBtn} onPress={() => setSelectedInvite(inv)} activeOpacity={0.8}>
+                            <Text style={styles.viewDetailsBtnText}>View Details</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </motion.div>
+                ))}
+              </View>
+            )}
+
+            {/* MEHENDI SECTION */}
+            {(activeCategory === 'All' || activeCategory === 'Mehendi') && savedMehendis.length > 0 && (
+              <View style={{ marginBottom: 20 }}>
+                <View style={styles.sectionHeaderRow}>
+                  <Text style={styles.sectionTitle}>Mehendi Artists ({savedMehendis.length})</Text>
+                  {onExploreMehendi && (
+                    <TouchableOpacity onPress={onExploreMehendi}>
+                      <Text style={styles.browseMoreText}>+ Explore More</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {savedMehendis.map((m) => (
+                  <motion.div key={m.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full mb-3.5">
+                    <View style={styles.studioCard}>
+                      <Image source={{ uri: m.image }} style={styles.studioImage} resizeMode="cover" />
+                      <View style={styles.cardRightCol}>
+                        <View style={styles.cardHeaderRow}>
+                          <Text style={styles.studioName} numberOfLines={1}>{m.name}</Text>
+                          <TouchableOpacity onPress={() => onToggleSavedMehendi && onToggleSavedMehendi(m.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Bookmark className="w-4 h-4 text-[#8B1E2F] fill-[#8B1E2F]" />
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.ratingRow}>
+                          <Star className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-1" />
+                          <Text style={styles.ratingText}>{m.rating} <Text style={styles.reviewsText}>({m.reviewsCount})</Text></Text>
+                        </View>
+                        <View style={styles.locationRow}>
+                          <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
+                          <Text style={styles.locationText}>{m.location}</Text>
+                        </View>
+                        <View style={styles.cardBottomRow}>
+                          <Text style={styles.priceText}>{m.startingPrice}</Text>
+                          <TouchableOpacity style={styles.viewDetailsBtn} onPress={() => setSelectedMehendi(m)} activeOpacity={0.8}>
+                            <Text style={styles.viewDetailsBtnText}>View Details</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    </View>
+                  </motion.div>
+                ))}
+              </View>
+            )}
+
+            {/* CATERING SECTION */}
+            {(activeCategory === 'All' || activeCategory === 'Catering') && savedCaterings.length > 0 && (
+              <View style={{ marginBottom: 20 }}>
+                <View style={styles.sectionHeaderRow}>
+                  <Text style={styles.sectionTitle}>Catering Services ({savedCaterings.length})</Text>
+                  {onExploreCatering && (
+                    <TouchableOpacity onPress={onExploreCatering}>
+                      <Text style={styles.browseMoreText}>+ Explore More</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {savedCaterings.map((c) => (
+                  <motion.div key={c.id} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }} className="w-full mb-3.5">
+                    <View style={styles.studioCard}>
+                      <Image source={{ uri: c.image }} style={styles.studioImage} resizeMode="cover" />
+                      <View style={styles.cardRightCol}>
+                        <View style={styles.cardHeaderRow}>
+                          <Text style={styles.studioName} numberOfLines={1}>{c.name}</Text>
+                          <TouchableOpacity onPress={() => onToggleSavedCatering && onToggleSavedCatering(c.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                            <Bookmark className="w-4 h-4 text-[#8B1E2F] fill-[#8B1E2F]" />
+                          </TouchableOpacity>
+                        </View>
+                        <View style={styles.ratingRow}>
+                          <Star className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-1" />
+                          <Text style={styles.ratingText}>{c.rating} <Text style={styles.reviewsText}>({c.reviewsCount})</Text></Text>
+                        </View>
+                        <View style={styles.locationRow}>
+                          <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
+                          <Text style={styles.locationText}>{c.location}</Text>
+                        </View>
+                        <View style={styles.cardBottomRow}>
+                          <Text style={styles.priceText}>{c.startingPrice}</Text>
+                          <TouchableOpacity style={styles.viewDetailsBtn} onPress={() => setSelectedCatering(c)} activeOpacity={0.8}>
                             <Text style={styles.viewDetailsBtnText}>View Details</Text>
                           </TouchableOpacity>
                         </View>
@@ -675,63 +863,62 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F3ECE4',
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
   countBadgeText: {
-    fontSize: 12,
-    fontWeight: '800',
+    fontSize: 13,
+    fontWeight: '700',
     color: '#581420',
   },
   filterBar: {
-    backgroundColor: '#FFFFFF',
-    paddingVertical: 10,
+    backgroundColor: '#FAF7F2',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
+    borderBottomColor: '#EFEAE3',
+    paddingVertical: 10,
   },
   filterScroll: {
     paddingHorizontal: 16,
     gap: 8,
   },
   filterChip: {
-    backgroundColor: '#FAF7F2',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
   },
   filterChipActive: {
-    backgroundColor: '#8B1E2F',
-    borderColor: '#8B1E2F',
+    backgroundColor: '#581420',
+    borderColor: '#581420',
   },
   filterChipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#524646',
+    color: '#6E5D5F',
   },
   filterChipTextActive: {
     color: '#FFFFFF',
   },
   scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 80,
+    padding: 16,
+    paddingBottom: 40,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 50,
     paddingHorizontal: 20,
   },
   emptyIconCircle: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     backgroundColor: '#F3ECE4',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   emptyTitle: {
     fontSize: 18,
@@ -743,25 +930,24 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#8C7A7C',
     textAlign: 'center',
-    lineHeight: 18,
     maxWidth: 280,
-    marginBottom: 16,
+    lineHeight: 18,
   },
   exploreBtn: {
-    backgroundColor: '#581420',
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#581420',
     paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingVertical: 8,
     borderRadius: 20,
   },
   exploreBtnText: {
     color: '#FFFFFF',
+    fontSize: 12,
     fontWeight: '700',
-    fontSize: 12.5,
   },
   savedList: {
-    width: '100%',
+    gap: 8,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -772,39 +958,42 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#581420',
+    color: '#3B2F2F',
   },
   browseMoreText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#8B1E2F',
+    color: '#581420',
   },
   studioCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
     borderRadius: 14,
-    overflow: 'hidden',
+    padding: 12,
+    gap: 12,
     borderWidth: 1,
-    borderColor: '#E8DFD5',
+    borderColor: '#EFEAE3',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
   },
   studioImage: {
-    width: 110,
-    height: 110,
+    width: 90,
+    height: 90,
+    borderRadius: 10,
+    backgroundColor: '#EAE4DC',
   },
   cardRightCol: {
     flex: 1,
-    padding: 10,
     justifyContent: 'space-between',
   },
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   studioName: {
     fontSize: 14,
-    fontWeight: '800',
-    color: '#3B2F2F',
+    fontWeight: '700',
+    color: '#2A2425',
     flex: 1,
     marginRight: 6,
   },
@@ -814,12 +1003,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   ratingText: {
-    fontSize: 11.5,
+    fontSize: 12,
     fontWeight: '700',
-    color: '#3B2F2F',
+    color: '#2A2425',
   },
   reviewsText: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#8C7A7C',
     fontWeight: '400',
   },
@@ -839,19 +1028,19 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   priceText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '800',
     color: '#581420',
   },
   viewDetailsBtn: {
-    backgroundColor: '#581420',
+    backgroundColor: '#F3ECE4',
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingVertical: 4,
     borderRadius: 12,
   },
   viewDetailsBtnText: {
-    color: '#FFFFFF',
+    fontSize: 11,
     fontWeight: '700',
-    fontSize: 10.5,
+    color: '#581420',
   },
 });

@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Modal,
   Linking,
+  TextInput,
 } from 'react-native-web';
 import {
   ChevronLeft,
@@ -26,16 +27,21 @@ import {
   X,
   Briefcase,
   Globe,
+  Clock,
+  Send,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MakeupStudio } from './MakeupListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { QuotationScreen } from './QuotationScreen';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 
 interface MakeupDetailPageProps {
   studio: MakeupStudio;
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
@@ -43,6 +49,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   onBack,
   isBookmarked,
   onToggleBookmark,
+  onNavigateToQuotesTab,
 }) => {
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
@@ -50,45 +57,161 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
-    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid'
-  >('initial');
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[studio.id]) {
+          return statuses[studio.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[studio.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentOption, setSelectedPaymentOption] = useState<'advance' | 'full'>('advance');
 
-  const mockQuoteDetails = {
-    artistName: studio.name || 'Glow Bridal Studio',
-    packageName: 'Premium Bridal Makeup',
-    includedServices: [
-      'Bridal Makeup',
-      'Hair Styling',
-      'Saree Draping',
-      'Makeup for Reception',
-      'Makeup Trial',
-    ],
-    weddingDate: '24 Oct 2026',
-    location: studio.location || 'Chennai, TN',
-    totalAmount: 35000,
-    advanceAmount: 10500,
-    remainingAmount: 24500,
-  };
+  const [showNegotiateView, setShowNegotiateView] = useState(false);
+  const [negotiatePrice, setNegotiatePrice] = useState('');
+  const [negotiateMessage, setNegotiateMessage] = useState('');
+
+  const [mockQuoteDetails, setMockQuoteDetails] = useState(() => {
+    const basePrice = parseInt(studio.startingPrice.replace(/[^0-9]/g, ''), 10) || 35000;
+    const defaultDetails = {
+      artistName: studio.name || 'Glow Bridal Studio',
+      packageName: 'Premium Bridal Makeup',
+      includedServices: [
+        'Bridal Makeup',
+        'Hair Styling',
+        'Saree Draping',
+        'Makeup for Reception',
+        'Makeup Trial',
+      ],
+      weddingDate: '24 Oct 2026',
+      location: studio.location || 'Chennai, TN',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+    };
+
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
+        if (match) {
+          return {
+            ...defaultDetails,
+            totalAmount: match.totalAmount,
+            advanceAmount: match.advanceAmount,
+            remainingAmount: match.remainingAmount,
+            weddingDate: match.weddingDate,
+            location: match.location,
+            includedServices: match.includedServices,
+          };
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return defaultDetails;
+  });
 
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
-    setQuoteStatus('requested');
-    setToastMessage('Quote Request Sent!');
+    updateQuoteStatus('requested');
+    saveOrUpdateQuote({
+      id: `quote-${studio.id}`,
+      vendorId: studio.id,
+      vendorName: studio.name,
+      category: 'Makeup',
+      packageName: mockQuoteDetails.packageName,
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: mockQuoteDetails.totalAmount,
+      advanceAmount: mockQuoteDetails.advanceAmount,
+      remainingAmount: mockQuoteDetails.remainingAmount,
+      weddingDate: mockQuoteDetails.weddingDate,
+      location: studio.location || 'Chennai, TN',
+      includedServices: mockQuoteDetails.includedServices,
+      image: studio.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
     setTimeout(() => setToastMessage(null), 3000);
 
     // Simulate vendor response after 3 seconds
     setTimeout(() => {
-      setQuoteStatus('response_ready');
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${studio.id}`,
+        status: 'response_ready',
+      });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 4000);
     }, 3000);
   };
 
   const handleConfirmQuote = () => {
-    setQuoteStatus('confirmed');
+    updateQuoteStatus('confirmed');
+    
+    // Save to global tot_confirmed_quotes in localStorage
+    const newQuote = {
+      id: `quote-${studio.id}`,
+      vendorName: studio.name,
+      category: 'Makeup',
+      packageName: mockQuoteDetails.packageName,
+      status: 'confirmed',
+      paymentStatus: 'pending',
+      totalAmount: mockQuoteDetails.totalAmount,
+      advanceAmount: mockQuoteDetails.advanceAmount,
+      remainingAmount: mockQuoteDetails.remainingAmount,
+      weddingDate: mockQuoteDetails.weddingDate,
+      location: mockQuoteDetails.location,
+      includedServices: mockQuoteDetails.includedServices,
+      image: studio.image,
+      invoiceNo: `TOT-INV-2026-00${Math.floor(Math.random() * 900) + 100}`,
+      invoiceDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+    };
+
+    try {
+      const existingQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      let existingQuotes = existingQuotesJson ? JSON.parse(existingQuotesJson) : [];
+      // Remove existing duplicate
+      existingQuotes = existingQuotes.filter((q: any) => q.id !== newQuote.id);
+      existingQuotes.push(newQuote);
+      localStorage.setItem('tot_confirmed_quotes', JSON.stringify(existingQuotes));
+    } catch (e) {
+      console.warn('Error saving confirmed quote:', e);
+    }
+
     setShowQuotationScreen(false);
     setToastMessage('Quote Confirmed! Added to My Quotes');
     setTimeout(() => setToastMessage(null), 3500);
@@ -96,15 +219,68 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
   const handleProcessPayment = () => {
     if (selectedPaymentOption === 'advance') {
-      setQuoteStatus('partially_paid');
+      updateQuoteStatus('partially_paid');
       setToastMessage('Advance Paid (Partially Paid)!');
     } else {
-      setQuoteStatus('fully_paid');
+      updateQuoteStatus('fully_paid');
       setToastMessage('Payment Successful (Fully Paid)!');
     }
     setShowPaymentModal(false);
     setShowQuotationScreen(false);
     setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const handleRejectQuote = () => {
+    updateQuoteStatus('rejected');
+    setShowQuotationScreen(false);
+    setToastMessage('Quotation Rejected.');
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleSendNegotiate = () => {
+    if (!negotiatePrice.trim()) {
+      setToastMessage('Please enter proposed price.');
+      setTimeout(() => setToastMessage(null), 2500);
+      return;
+    }
+
+    const parsedPrice = parseInt(negotiatePrice.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(parsedPrice) || parsedPrice <= 0) {
+      setToastMessage('Please enter a valid price.');
+      setTimeout(() => setToastMessage(null), 2500);
+      return;
+    }
+
+    setShowNegotiateView(false);
+    setShowQuotationScreen(false);
+    updateQuoteStatus('negotiating');
+    setToastMessage('Counter-offer sent successfully!');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate vendor response after 3.5 seconds
+    setTimeout(() => {
+      let finalPrice = parsedPrice;
+      const basePrice = parseInt(studio.startingPrice.replace(/[^0-9]/g, ''), 10) || 35000;
+      const floorLimit = Math.round(basePrice * 0.85);
+
+      if (parsedPrice < floorLimit) {
+        finalPrice = floorLimit;
+      }
+
+      const newAdvance = Math.round(finalPrice * 0.3);
+      const newRemaining = finalPrice - newAdvance;
+
+      setMockQuoteDetails((prev) => ({
+        ...prev,
+        totalAmount: finalPrice,
+        advanceAmount: newAdvance,
+        remainingAmount: newRemaining,
+      }));
+
+      updateQuoteStatus('response_ready');
+      setToastMessage(`Vendor replied with counter quote: ₹${finalPrice.toLocaleString('en-IN')}!`);
+      setTimeout(() => setToastMessage(null), 4500);
+    }, 3500);
   };
 
   const portfolioImages = studio.portfolio && studio.portfolio.length >= 4
@@ -153,7 +329,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
+            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 w-max max-w-[90%] text-center"
           >
             <Sparkles className="w-4 h-4 text-[#C28E38]" />
             {toastMessage}
@@ -383,13 +559,25 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
         
         {quoteStatus === 'initial' && (
           <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
-            <Text style={styles.btnQuoteText}>Send Quote</Text>
+            <Text style={styles.btnQuoteText}>Req Quote</Text>
           </TouchableOpacity>
         )}
 
         {quoteStatus === 'requested' && (
           <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
             <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Pending Response</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'negotiating' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Negotiating Price...</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'rejected' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Quote Rejected (Reset)</Text>
           </TouchableOpacity>
         )}
 
@@ -436,201 +624,288 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
       {/* QUOTATION DETAILS SCREEN / SUMMARY & PAYMENT MODALS */}
       {showQuotationScreen && (
-        <Modal visible={true} animationType="slide" transparent={false}>
-          <View style={styles.modalFullContainer}>
-            {/* Header */}
-            <View style={styles.modalHeaderNav}>
-              <TouchableOpacity onPress={() => setShowQuotationScreen(false)} style={styles.modalCloseBtn}>
-                <X size={20} color="#2A2425" />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitle}>
-                {quoteStatus === 'response_ready' ? 'Quotation Details' : 'Confirmed Quotation'}
-              </Text>
-              <View style={{ width: 32 }} />
+        <View style={styles.modalFullContainer}>
+          {/* Header */}
+          <View style={styles.modalHeaderNav}>
+            <TouchableOpacity onPress={() => setShowQuotationScreen(false)} style={styles.modalCloseBtn}>
+              <X size={20} color="#2A2425" />
+            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitle}>
+              {quoteStatus === 'response_ready' ? 'Quotation Details' : 'Confirmed Quotation'}
+            </Text>
+            <View style={{ width: 32 }} />
+          </View>
+
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+            {/* Vendor & Status Header */}
+            <View style={styles.quoteCardHeader}>
+              <Image source={{ uri: studio.image }} style={styles.quoteVendorThumb} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.quoteVendorName}>{studio.name}</Text>
+                <Text style={styles.quotePackageName}>{mockQuoteDetails.packageName}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 4 }}>
+                  <MapPin size={12} color="#7D6E70" />
+                  <Text style={{ fontSize: 12, color: '#7D6E70' }}>{mockQuoteDetails.location}</Text>
+                </View>
+              </View>
             </View>
 
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-              {/* Vendor & Status Header */}
-              <View style={styles.quoteCardHeader}>
-                <Image source={{ uri: studio.image }} style={styles.quoteVendorThumb} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.quoteVendorName}>{studio.name}</Text>
-                  <Text style={styles.quotePackageName}>{mockQuoteDetails.packageName}</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 4 }}>
-                    <MapPin size={12} color="#7D6E70" />
-                    <Text style={{ fontSize: 12, color: '#7D6E70' }}>{mockQuoteDetails.location}</Text>
+            {/* Status Badge */}
+            <View style={styles.quoteBadgeContainer}>
+              <Sparkles size={14} color="#8B1E2F" />
+              <Text style={styles.quoteBadgeText}>
+                {quoteStatus === 'response_ready'
+                  ? 'Vendor Quotation Received'
+                  : quoteStatus === 'confirmed'
+                  ? '✓ Quote Confirmed'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Advance Done)'
+                  : '✓ Fully Paid'}
+              </Text>
+            </View>
+
+            {/* Event & Date Details */}
+            <View style={styles.quoteSectionBox}>
+              <Text style={styles.quoteSectionTitle}>Booking Details</Text>
+              <View style={styles.quoteRowItem}>
+                <Calendar size={15} color="#581420" />
+                <Text style={styles.quoteRowLabel}>Wedding Date:</Text>
+                <Text style={styles.quoteRowValue}>{mockQuoteDetails.weddingDate}</Text>
+              </View>
+              <View style={styles.quoteRowItem}>
+                <MapPin size={15} color="#581420" />
+                <Text style={styles.quoteRowLabel}>Location:</Text>
+                <Text style={styles.quoteRowValue}>{mockQuoteDetails.location}</Text>
+              </View>
+            </View>
+
+            {/* Included Services */}
+            <View style={styles.quoteSectionBox}>
+              <Text style={styles.quoteSectionTitle}>Included Services</Text>
+              {mockQuoteDetails.includedServices.map((service, index) => (
+                <View key={index} style={styles.serviceCheckRow}>
+                  <ShieldCheck size={16} color="#10B981" />
+                  <Text style={styles.serviceCheckText}>{service}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Financial Breakdown */}
+            <View style={styles.quoteSectionBox}>
+              <Text style={styles.quoteSectionTitle}>Payment Breakdown</Text>
+              <View style={styles.priceRow}>
+                <Text style={styles.priceLabel}>Total Quotation Amount:</Text>
+                <Text style={styles.priceValue}>₹{mockQuoteDetails.totalAmount.toLocaleString('en-IN')}</Text>
+              </View>
+
+              {quoteStatus !== 'response_ready' && (
+                <>
+                  <View style={styles.priceRow}>
+                    <Text style={styles.priceLabel}>Advance Paid / Required:</Text>
+                    <Text style={[styles.priceValue, { color: '#D97706' }]}>
+                      ₹{mockQuoteDetails.advanceAmount.toLocaleString('en-IN')}
+                    </Text>
                   </View>
-                </View>
-              </View>
-
-              {/* Status Badge */}
-              <View style={styles.quoteBadgeContainer}>
-                <Sparkles size={14} color="#8B1E2F" />
-                <Text style={styles.quoteBadgeText}>
-                  {quoteStatus === 'response_ready'
-                    ? 'Vendor Quotation Received'
-                    : quoteStatus === 'confirmed'
-                    ? '✓ Quote Confirmed'
-                    : quoteStatus === 'partially_paid'
-                    ? 'Partially Paid (Advance Done)'
-                    : '✓ Fully Paid'}
-                </Text>
-              </View>
-
-              {/* Event & Date Details */}
-              <View style={styles.quoteSectionBox}>
-                <Text style={styles.quoteSectionTitle}>Booking Details</Text>
-                <View style={styles.quoteRowItem}>
-                  <Calendar size={15} color="#581420" />
-                  <Text style={styles.quoteRowLabel}>Wedding Date:</Text>
-                  <Text style={styles.quoteRowValue}>{mockQuoteDetails.weddingDate}</Text>
-                </View>
-                <View style={styles.quoteRowItem}>
-                  <MapPin size={15} color="#581420" />
-                  <Text style={styles.quoteRowLabel}>Location:</Text>
-                  <Text style={styles.quoteRowValue}>{mockQuoteDetails.location}</Text>
-                </View>
-              </View>
-
-              {/* Included Services */}
-              <View style={styles.quoteSectionBox}>
-                <Text style={styles.quoteSectionTitle}>Included Services</Text>
-                {mockQuoteDetails.includedServices.map((service, index) => (
-                  <View key={index} style={styles.serviceCheckRow}>
-                    <ShieldCheck size={16} color="#10B981" />
-                    <Text style={styles.serviceCheckText}>{service}</Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Financial Breakdown */}
-              <View style={styles.quoteSectionBox}>
-                <Text style={styles.quoteSectionTitle}>Payment Breakdown</Text>
-                <View style={styles.priceRow}>
-                  <Text style={styles.priceLabel}>Total Quotation Amount:</Text>
-                  <Text style={styles.priceValue}>₹{mockQuoteDetails.totalAmount.toLocaleString('en-IN')}</Text>
-                </View>
-
-                {quoteStatus !== 'response_ready' && (
-                  <>
-                    <View style={styles.priceRow}>
-                      <Text style={styles.priceLabel}>Advance Paid / Required:</Text>
-                      <Text style={[styles.priceValue, { color: '#D97706' }]}>
-                        ₹{mockQuoteDetails.advanceAmount.toLocaleString('en-IN')}
-                      </Text>
-                    </View>
-                    <View style={styles.priceRow}>
-                      <Text style={styles.priceLabel}>Remaining Balance:</Text>
-                      <Text style={[styles.priceValue, { color: '#DC2626' }]}>
-                        ₹{(
-                          mockQuoteDetails.totalAmount -
-                          (quoteStatus === 'fully_paid'
-                            ? mockQuoteDetails.totalAmount
-                            : quoteStatus === 'partially_paid'
-                            ? mockQuoteDetails.advanceAmount
-                            : 0)
-                        ).toLocaleString('en-IN')}
-                      </Text>
-                    </View>
-                    <View style={[styles.priceRow, { borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 8, marginTop: 4 }]}>
-                      <Text style={{ fontWeight: '700', color: '#2A2425' }}>Payment Status:</Text>
-                      <Text
-                        style={{
-                          fontWeight: '700',
-                          color: quoteStatus === 'fully_paid' ? '#15803D' : quoteStatus === 'partially_paid' ? '#D97706' : '#DC2626',
-                        }}
-                      >
-                        {quoteStatus === 'fully_paid'
-                          ? 'Fully Paid'
+                  <View style={styles.priceRow}>
+                    <Text style={styles.priceLabel}>Remaining Balance:</Text>
+                    <Text style={[styles.priceValue, { color: '#DC2626' }]}>
+                      ₹{(
+                        mockQuoteDetails.totalAmount -
+                        (quoteStatus === 'fully_paid'
+                          ? mockQuoteDetails.totalAmount
                           : quoteStatus === 'partially_paid'
-                          ? 'Partially Paid'
-                          : 'Payment Pending'}
-                      </Text>
-                    </View>
-                  </>
-                )}
-              </View>
-            </ScrollView>
-
-            {/* Action Bottom Bar */}
-            <View style={styles.quoteModalBottomBar}>
-              {quoteStatus === 'response_ready' ? (
-                <TouchableOpacity style={styles.confirmQuoteBtn} onPress={handleConfirmQuote} activeOpacity={0.85}>
-                  <Text style={styles.confirmQuoteBtnText}>Confirm Quote</Text>
-                </TouchableOpacity>
-              ) : quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' ? (
-                <TouchableOpacity style={styles.confirmQuoteBtn} onPress={() => setShowPaymentModal(true)} activeOpacity={0.85}>
-                  <Text style={styles.confirmQuoteBtnText}>Proceed to Payment</Text>
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity style={[styles.confirmQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(false)} activeOpacity={0.85}>
-                  <Text style={styles.confirmQuoteBtnText}>Completed</Text>
-                </TouchableOpacity>
+                          ? mockQuoteDetails.advanceAmount
+                          : 0)
+                      ).toLocaleString('en-IN')}
+                    </Text>
+                  </View>
+                  <View style={[styles.priceRow, { borderTopWidth: 1, borderTopColor: '#E5E7EB', paddingTop: 8, marginTop: 4 }]}>
+                    <Text style={{ fontWeight: '700', color: '#2A2425' }}>Payment Status:</Text>
+                    <Text
+                      style={{
+                        fontWeight: '700',
+                        color: quoteStatus === 'fully_paid' ? '#15803D' : quoteStatus === 'partially_paid' ? '#D97706' : '#DC2626',
+                      }}
+                    >
+                      {quoteStatus === 'fully_paid'
+                        ? 'Fully Paid'
+                        : quoteStatus === 'partially_paid'
+                        ? 'Partially Paid'
+                        : 'Payment Pending'}
+                    </Text>
+                  </View>
+                </>
               )}
             </View>
+          </ScrollView>
+
+          {/* Action Bottom Bar */}
+          <View style={styles.quoteModalBottomBar}>
+            {quoteStatus === 'response_ready' ? (
+              <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+                <TouchableOpacity
+                  style={[styles.confirmQuoteBtn, styles.rejectQuoteBtn, { flex: 1 }]}
+                  onPress={handleRejectQuote}
+                  activeOpacity={0.85}
+                >
+                  <Text style={[styles.confirmQuoteBtnText, styles.rejectQuoteBtnText]}>Reject</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.confirmQuoteBtn, styles.negotiateQuoteBtn, { flex: 1.2 }]}
+                  onPress={() => {
+                    setNegotiatePrice(mockQuoteDetails.totalAmount.toString());
+                    setShowNegotiateView(true);
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Text style={[styles.confirmQuoteBtnText, styles.negotiateQuoteBtnText]}>Negotiate</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.confirmQuoteBtn, { flex: 1.8 }]}
+                  onPress={handleConfirmQuote}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.confirmQuoteBtnText}>Confirm Quote</Text>
+                </TouchableOpacity>
+              </View>
+            ) : quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' ? (
+              <TouchableOpacity
+                style={styles.confirmQuoteBtn}
+                onPress={() => {
+                  setShowQuotationScreen(false);
+                  if (onBack) onBack();
+                  if (onNavigateToQuotesTab) {
+                    onNavigateToQuotesTab();
+                  }
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.confirmQuoteBtnText}>Go to My Quotes to Pay</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={[styles.confirmQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(false)} activeOpacity={0.85}>
+                <Text style={styles.confirmQuoteBtnText}>Completed</Text>
+              </TouchableOpacity>
+            )}
           </View>
-        </Modal>
+
+          {/* NEGOTIATION OVERLAY PANEL */}
+          {showNegotiateView && (
+            <View style={styles.negotiateOverlay}>
+              <View style={styles.negotiateCard}>
+                <View style={styles.negotiateCardHeader}>
+                  <Text style={styles.negotiateCardTitle}>Negotiate Pricing</Text>
+                  <TouchableOpacity
+                    style={styles.negotiateCloseBtn}
+                    onPress={() => setShowNegotiateView(false)}
+                    activeOpacity={0.7}
+                  >
+                    <X size={18} color="#2A2425" />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingTop: 4, paddingBottom: 16 }}>
+                  <Text style={styles.negotiateNotice}>
+                    Propose a custom price offer or package adjustment request. The vendor will review it and reply with a revised quotation.
+                  </Text>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Proposed Amount (₹)</Text>
+                    <TextInput
+                      style={styles.negotiateTextInput}
+                      keyboardType="numeric"
+                      placeholder="e.g. 30,000"
+                      placeholderTextColor="#A39B9C"
+                      value={negotiatePrice}
+                      onChangeText={setNegotiatePrice}
+                    />
+                  </View>
+
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Message to Vendor</Text>
+                    <TextInput
+                      style={[styles.negotiateTextInput, { height: 80, textAlignVertical: 'top', paddingTop: 10 }]}
+                      multiline
+                      placeholder="e.g. Requesting a discount if we remove Saree Draping or package standard HD..."
+                      placeholderTextColor="#A39B9C"
+                      value={negotiateMessage}
+                      onChangeText={setNegotiateMessage}
+                    />
+                  </View>
+                </ScrollView>
+
+                <TouchableOpacity
+                  style={styles.sendNegotiationBtn}
+                  onPress={handleSendNegotiate}
+                  activeOpacity={0.88}
+                >
+                  <Text style={styles.sendNegotiationBtnText}>Submit Counter-Offer</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </View>
       )}
 
       {/* PAYMENT MODAL SCREEN */}
       {showPaymentModal && (
-        <Modal visible={true} animationType="slide" transparent={false}>
-          <View style={styles.modalFullContainer}>
-            <View style={styles.modalHeaderNav}>
-              <TouchableOpacity onPress={() => setShowPaymentModal(false)} style={styles.modalCloseBtn}>
-                <X size={20} color="#2A2425" />
-              </TouchableOpacity>
-              <Text style={styles.modalHeaderTitle}>Payment Screen</Text>
-              <View style={{ width: 32 }} />
-            </View>
-
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: '700', color: '#2A2425', marginBottom: 4 }}>Select Payment Method</Text>
-              <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Mock Payment System • Tale of Two</Text>
-
-              {/* Option 1: Pay Advance */}
-              <TouchableOpacity
-                style={[styles.paymentOptionCard, selectedPaymentOption === 'advance' && styles.paymentOptionCardSelected]}
-                onPress={() => setSelectedPaymentOption('advance')}
-                activeOpacity={0.85}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={styles.paymentOptionTitle}>Pay Advance</Text>
-                  <Text style={styles.paymentOptionAmount}>₹{mockQuoteDetails.advanceAmount.toLocaleString('en-IN')}</Text>
-                </View>
-                <Text style={styles.paymentOptionDesc}>Secure your booking date. Pay remaining ₹{mockQuoteDetails.remainingAmount.toLocaleString('en-IN')} later.</Text>
-              </TouchableOpacity>
-
-              {/* Option 2: Pay Full Amount */}
-              <TouchableOpacity
-                style={[styles.paymentOptionCard, selectedPaymentOption === 'full' && styles.paymentOptionCardSelected]}
-                onPress={() => setSelectedPaymentOption('full')}
-                activeOpacity={0.85}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={styles.paymentOptionTitle}>Pay Full Amount</Text>
-                  <Text style={styles.paymentOptionAmount}>₹{mockQuoteDetails.totalAmount.toLocaleString('en-IN')}</Text>
-                </View>
-                <Text style={styles.paymentOptionDesc}>Clear complete payment in one step.</Text>
-              </TouchableOpacity>
-
-              <View style={styles.mockPayNotice}>
-                <ShieldCheck size={18} color="#15803D" />
-                <Text style={{ fontSize: 12, color: '#15803D', flex: 1, marginLeft: 8 }}>
-                  Mock Payment Mode Active: No real money will be charged.
-                </Text>
-              </View>
-            </ScrollView>
-
-            <View style={styles.quoteModalBottomBar}>
-              <TouchableOpacity style={styles.confirmQuoteBtn} onPress={handleProcessPayment} activeOpacity={0.85}>
-                <Text style={styles.confirmQuoteBtnText}>
-                  Pay {selectedPaymentOption === 'advance' ? `Advance (₹${mockQuoteDetails.advanceAmount.toLocaleString('en-IN')})` : `Full (₹${mockQuoteDetails.totalAmount.toLocaleString('en-IN')})`}
-                </Text>
-              </TouchableOpacity>
-            </View>
+        <View style={styles.modalFullContainer}>
+          <View style={styles.modalHeaderNav}>
+            <TouchableOpacity onPress={() => setShowPaymentModal(false)} style={styles.modalCloseBtn}>
+              <X size={20} color="#2A2425" />
+            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitle}>Payment Screen</Text>
+            <View style={{ width: 32 }} />
           </View>
-        </Modal>
+
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', color: '#2A2425', marginBottom: 4 }}>Select Payment Method</Text>
+            <Text style={{ fontSize: 13, color: '#6B7280', marginBottom: 20 }}>Mock Payment System • Tale of Two</Text>
+
+            {/* Option 1: Pay Advance */}
+            <TouchableOpacity
+              style={[styles.paymentOptionCard, selectedPaymentOption === 'advance' && styles.paymentOptionCardSelected]}
+              onPress={() => setSelectedPaymentOption('advance')}
+              activeOpacity={0.85}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={styles.paymentOptionTitle}>Pay Advance</Text>
+                <Text style={styles.paymentOptionAmount}>₹{mockQuoteDetails.advanceAmount.toLocaleString('en-IN')}</Text>
+              </View>
+              <Text style={styles.paymentOptionDesc}>Secure your booking date. Pay remaining ₹{mockQuoteDetails.remainingAmount.toLocaleString('en-IN')} later.</Text>
+            </TouchableOpacity>
+
+            {/* Option 2: Pay Full Amount */}
+            <TouchableOpacity
+              style={[styles.paymentOptionCard, selectedPaymentOption === 'full' && styles.paymentOptionCardSelected]}
+              onPress={() => setSelectedPaymentOption('full')}
+              activeOpacity={0.85}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={styles.paymentOptionTitle}>Pay Full Amount</Text>
+                <Text style={styles.paymentOptionAmount}>₹{mockQuoteDetails.totalAmount.toLocaleString('en-IN')}</Text>
+              </View>
+              <Text style={styles.paymentOptionDesc}>Clear complete payment in one step.</Text>
+            </TouchableOpacity>
+
+            <View style={styles.mockPayNotice}>
+              <ShieldCheck size={18} color="#15803D" />
+              <Text style={{ fontSize: 12, color: '#15803D', flex: 1, marginLeft: 8 }}>
+                Mock Payment Mode Active: No real money will be charged.
+              </Text>
+            </View>
+          </ScrollView>
+
+          <View style={styles.quoteModalBottomBar}>
+            <TouchableOpacity style={styles.confirmQuoteBtn} onPress={handleProcessPayment} activeOpacity={0.85}>
+              <Text style={styles.confirmQuoteBtnText}>
+                Pay {selectedPaymentOption === 'advance' ? `Advance (₹${mockQuoteDetails.advanceAmount.toLocaleString('en-IN')})` : `Full (₹${mockQuoteDetails.totalAmount.toLocaleString('en-IN')})`}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
     </View>
   );
@@ -644,6 +919,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#FAF7F2',
     overflow: 'hidden',
+    position: 'relative',
   },
   navHeader: {
     position: 'absolute',
@@ -1070,8 +1346,13 @@ const styles = StyleSheet.create({
     height: '80%',
   },
   modalFullContainer: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: '#FAF7F2',
+    zIndex: 100,
   },
   modalHeaderNav: {
     height: 56,
@@ -1252,5 +1533,100 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     marginTop: 16,
+  },
+  rejectQuoteBtn: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1.5,
+    borderColor: '#EF4444',
+  },
+  rejectQuoteBtnText: {
+    color: '#EF4444',
+  },
+  negotiateQuoteBtn: {
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1.5,
+    borderColor: '#D97706',
+  },
+  negotiateQuoteBtnText: {
+    color: '#D97706',
+  },
+  negotiateOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+    zIndex: 200,
+  },
+  negotiateCard: {
+    backgroundColor: '#FAF7F2',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '80%',
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+  },
+  negotiateCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  negotiateCardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#581420',
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+  },
+  negotiateCloseBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#EAE4DC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  negotiateNotice: {
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 16,
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  },
+  inputGroup: {
+    gap: 6,
+  },
+  inputLabel: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: '#2A2425',
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  },
+  negotiateTextInput: {
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 42,
+    fontSize: 13,
+    color: '#2A2425',
+    backgroundColor: '#FFFFFF',
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+  },
+  sendNegotiationBtn: {
+    backgroundColor: '#581420',
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+  },
+  sendNegotiationBtnText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
   },
 });

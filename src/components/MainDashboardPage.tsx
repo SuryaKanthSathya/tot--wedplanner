@@ -86,6 +86,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'saved' | 'quotes' | 'profile'>(
     initialTab === 'my-wedding' && !isPlannerCreated ? 'home' : initialTab
   );
+  const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [showExploreModal, setShowExploreModal] = useState<boolean>(false);
   const [showPhotographyListing, setShowPhotographyListing] = useState<boolean>(false);
@@ -313,6 +314,41 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
   }, [initialTab, isPlannerCreated]);
 
+  useEffect(() => {
+    const handleSwitchTab = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && customEvent.detail.tab) {
+        setActiveTab(customEvent.detail.tab);
+        setShowPhotographyListing(false);
+        setShowMakeupListing(false);
+        setShowDecorListing(false);
+        setShowVenueListing(false);
+        setShowEntertainmentListing(false);
+        setShowCarsListing(false);
+        setShowInvitationListing(false);
+        setShowMehendiListing(false);
+        setShowCateringListing(false);
+      }
+    };
+    const handleSavedReset = () => {
+      setSavedStudioIds({});
+      setSavedMakeupIds({});
+      setSavedDecorIds({});
+      setSavedVenueIds({});
+      setSavedEntIds({});
+      setSavedCarIds({});
+      setSavedInviteIds({});
+      setSavedMehendiIds({});
+      setSavedCateringIds({});
+    };
+    window.addEventListener('tot_switch_tab', handleSwitchTab);
+    window.addEventListener('tot_saved_updated', handleSavedReset);
+    return () => {
+      window.removeEventListener('tot_switch_tab', handleSwitchTab);
+      window.removeEventListener('tot_saved_updated', handleSavedReset);
+    };
+  }, []);
+
   const handleOptionPress = (featureName: string) => {
     if (featureName === 'Photography') {
       setShowPhotographyListing(true);
@@ -387,6 +423,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowPhotographyListing(false);
           setActiveTab('saved');
         }}
+        onNavigateToQuotesTab={() => {
+          setShowPhotographyListing(false);
+          setActiveTab('quotes');
+        }}
       />
     );
   }
@@ -400,6 +440,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onOpenSavedTab={() => {
           setShowMakeupListing(false);
           setActiveTab('saved');
+        }}
+        onNavigateToQuotesTab={() => {
+          setShowMakeupListing(false);
+          setActiveTab('quotes');
         }}
       />
     );
@@ -415,6 +459,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowDecorListing(false);
           setActiveTab('saved');
         }}
+        onNavigateToQuotesTab={() => {
+          setShowDecorListing(false);
+          setActiveTab('quotes');
+        }}
       />
     );
   }
@@ -428,6 +476,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onOpenSavedTab={() => {
           setShowVenueListing(false);
           setActiveTab('saved');
+        }}
+        onNavigateToQuotesTab={() => {
+          setShowVenueListing(false);
+          setActiveTab('quotes');
         }}
       />
     );
@@ -443,6 +495,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowEntertainmentListing(false);
           setActiveTab('saved');
         }}
+        onNavigateToQuotesTab={() => {
+          setShowEntertainmentListing(false);
+          setActiveTab('quotes');
+        }}
       />
     );
   }
@@ -457,6 +513,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowCarsListing(false);
           setActiveTab('saved');
         }}
+        onNavigateToQuotesTab={() => {
+          setShowCarsListing(false);
+          setActiveTab('quotes');
+        }}
       />
     );
   }
@@ -470,6 +530,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onOpenSavedTab={() => {
           setShowInvitationListing(false);
           setActiveTab('saved');
+        }}
+        onNavigateToQuotesTab={() => {
+          setShowInvitationListing(false);
+          setActiveTab('quotes');
         }}
       />
     );
@@ -497,6 +561,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowMehendiListing(false);
           setActiveTab('saved');
         }}
+        onNavigateToQuotesTab={() => {
+          setShowMehendiListing(false);
+          setActiveTab('quotes');
+        }}
       />
     );
   }
@@ -510,6 +578,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onOpenSavedTab={() => {
           setShowCateringListing(false);
           setActiveTab('saved');
+        }}
+        onNavigateToQuotesTab={() => {
+          setShowCateringListing(false);
+          setActiveTab('quotes');
         }}
       />
     );
@@ -536,9 +608,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onOpenSavedTab={() => setActiveTab('saved')}
+          onOpenQuotesTab={() => setActiveTab('quotes')}
+          onHideTabBar={setHideTabBar}
         />
       ) : activeTab === 'quotes' ? (
-        <MyQuotesTabScreen />
+        <MyQuotesTabScreen
+          onHideTabBar={setHideTabBar}
+          onExploreVendors={() => setActiveTab('dashboard')}
+        />
       ) : activeTab === 'saved' ? (
         <SavedTabScreen
           savedStudioIds={savedStudioIds}
@@ -562,6 +639,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
           onExploreInvitations={() => setShowInvitationListing(true)}
+          savedMehendiIds={savedMehendiIds}
+          onToggleSavedMehendi={toggleSavedMehendi}
+          onExploreMehendi={() => setShowMehendiListing(true)}
+          savedCateringIds={savedCateringIds}
+          onToggleSavedCatering={toggleSavedCatering}
+          onExploreCatering={() => setShowCateringListing(true)}
+          onHideTabBar={setHideTabBar}
         />
       ) : (
         /* Scrollable Main Content */
@@ -838,112 +922,114 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       )}
 
       {/* ================= BOTTOM TAB BAR ================= */}
-      <View style={styles.bottomTabBar}>
-        <TouchableOpacity
-          style={styles.tabItem}
-          onPress={() => setActiveTab('home')}
-        >
-          <Home
-            className={`w-5 h-5 ${
-              activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'
-            }`}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'home' && styles.activeTabLabel,
-            ]}
+      {!hideTabBar && (
+        <View style={styles.bottomTabBar}>
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setActiveTab('home')}
           >
-            Home
-          </Text>
-        </TouchableOpacity>
+            <Home
+              className={`w-5 h-5 ${
+                activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'
+              }`}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'home' && styles.activeTabLabel,
+              ]}
+            >
+              Home
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabItem}
-          onPress={() => {
-            if (!isPlannerCreated) {
-              setSelectedFeatureName('My Wedding');
-              setShowExploreModal(true);
-            } else {
-              setActiveTab('my-wedding');
-            }
-          }}
-        >
-          <Sparkles
-            className={`w-5 h-5 ${
-              activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'
-            }`}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'my-wedding' && styles.activeTabLabel,
-            ]}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => {
+              if (!isPlannerCreated) {
+                setSelectedFeatureName('My Wedding');
+                setShowExploreModal(true);
+              } else {
+                setActiveTab('my-wedding');
+              }
+            }}
           >
-            My Wedding
-          </Text>
-        </TouchableOpacity>
+            <Sparkles
+              className={`w-5 h-5 ${
+                activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'
+              }`}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'my-wedding' && styles.activeTabLabel,
+              ]}
+            >
+              My Wedding
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabItem}
-          onPress={() => setActiveTab('saved')}
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              activeTab === 'saved' ? 'text-[#581420]' : 'text-stone-400'
-            }`}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'saved' && styles.activeTabLabel,
-            ]}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setActiveTab('saved')}
           >
-            Saved
-          </Text>
-        </TouchableOpacity>
+            <Heart
+              className={`w-5 h-5 ${
+                activeTab === 'saved' ? 'text-[#581420]' : 'text-stone-400'
+              }`}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'saved' && styles.activeTabLabel,
+              ]}
+            >
+              Saved
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabItem}
-          onPress={() => setActiveTab('quotes')}
-        >
-          <FileText
-            className={`w-5 h-5 ${
-              activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
-            }`}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'quotes' && styles.activeTabLabel,
-            ]}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => setActiveTab('quotes')}
           >
-            My Quotes
-          </Text>
-        </TouchableOpacity>
+            <FileText
+              className={`w-5 h-5 ${
+                activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
+              }`}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'quotes' && styles.activeTabLabel,
+              ]}
+            >
+              My Quotes
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.tabItem}
-          onPress={() => {
-            setActiveTab('profile');
-            setShowProfileModal(true);
-          }}
-        >
-          <User
-            className={`w-5 h-5 ${
-              activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'
-            }`}
-          />
-          <Text
-            style={[
-              styles.tabLabel,
-              activeTab === 'profile' && styles.activeTabLabel,
-            ]}
+          <TouchableOpacity
+            style={styles.tabItem}
+            onPress={() => {
+              setActiveTab('profile');
+              setShowProfileModal(true);
+            }}
           >
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <User
+              className={`w-5 h-5 ${
+                activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'
+              }`}
+            />
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === 'profile' && styles.activeTabLabel,
+              ]}
+            >
+              Profile
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* ================= PROFILE DETAILS MODAL ================= */}
       <AnimatePresence>

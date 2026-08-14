@@ -10,7 +10,9 @@ import {
   Linking,
 } from 'react-native-web';
 import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   ChevronLeft,
   Share2,
@@ -32,6 +34,7 @@ import {
   Palette,
   Image as ImageIcon,
   Instagram,
+  Send,
 } from 'lucide-react';
 
 export interface DecorStudio {
@@ -55,6 +58,7 @@ export interface DecorStudio {
 }
 
 interface DecorDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   studio: DecorStudio;
   onBack: () => void;
   isBookmarked?: boolean;
@@ -62,6 +66,7 @@ interface DecorDetailPageProps {
 }
 
 export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
+  onNavigateToQuotesTab,
   studio,
   onBack,
   isBookmarked = false,
@@ -71,6 +76,95 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[studio.id]) {
+          return statuses[studio.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[studio.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((studio.startingPrice || '₹1,50,000').replace(/[^0-9]/g, ''), 10) || 150000;
+    saveOrUpdateQuote({
+      id: `quote-${studio.id}`,
+      vendorId: studio.id,
+      vendorName: studio.name,
+      category: 'Decor',
+      packageName: 'Exquisite Mandap & Entrance Stage Decor',
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: '24 Oct 2026',
+      location: studio.location,
+      includedServices: [
+        'Grand Mandap Stage Floral Backdrop',
+        'Bespoke Wooden Mandap Structure Setup',
+        'Royal Entrance Arch Floral Decor',
+        'Groom & Bride Pathway Flowers',
+        'Ambient Mood Lighting & LED Accents',
+      ],
+      image: studio.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${studio.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -463,13 +557,48 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={styles.primaryQuoteBtn}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
-          </TouchableOpacity>
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.primaryQuoteBtn}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.primaryQuoteBtnText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.primaryQuoteBtnText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>
+                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -493,6 +622,25 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
         startingPrice={studio.startingPrice}
         category="decor"
         onClose={() => setShowQuoteModal(false)}
+        onQuoteSent={handleQuoteRequestSent}
+      />
+
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={studio.id}
+        vendorName={studio.name}
+        vendorImage={studio.image}
+        vendorLocation={studio.location}
+        startingPrice={studio.startingPrice}
+        category="Decor"
+        packageName="Exquisite Mandap & Entrance Stage Decor"
+        includedServices={[ 'Grand Mandap Stage Floral Backdrop', 'Bespoke Wooden Mandap Structure Setup', 'Royal Entrance Arch Floral Decor', 'Groom & Bride Pathway Flowers', 'Ambient Mood Lighting & LED Accents' ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
       />
     </View>
   );

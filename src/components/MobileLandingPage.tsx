@@ -17,6 +17,7 @@ import { MainDashboardPage } from './MainDashboardPage';
 import { TellUsAboutCouplePage } from './TellUsAboutCouplePage';
 import { ColorTheme, ViewMode } from '../types';
 import { THEMES } from '../constants/themes';
+import { clearAllQuotesAndSavedData } from '../utils/quotesManager';
 
 interface MobileLandingPageProps {
   viewMode: ViewMode;
@@ -148,12 +149,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     setUserEmail('');
     setUserId('');
     setWeddingProfile(null);
-    try {
-      localStorage.removeItem('wedding_app_data');
-      localStorage.removeItem('wedding_app_user_data');
-    } catch (e) {
-      console.error(e);
-    }
+    clearAllQuotesAndSavedData();
     setActiveScreen('landing');
   };
 

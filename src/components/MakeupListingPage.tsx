@@ -505,6 +505,7 @@ interface MakeupListingPageProps {
   savedMakeupIds?: Record<string, boolean>;
   onToggleSavedMakeup?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
@@ -512,6 +513,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
   savedMakeupIds,
   onToggleSavedMakeup,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -616,6 +618,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         onBack={() => setSelectedStudio(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedStudio.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }

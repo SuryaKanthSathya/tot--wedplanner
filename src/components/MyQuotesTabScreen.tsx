@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   ScrollView,
   StyleSheet,
   Image,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
@@ -21,63 +20,58 @@ import {
   Smartphone,
   Building,
   AlertTriangle,
+  Sparkles,
+  Clock,
 } from 'lucide-react';
+import { getAllQuotes, saveOrUpdateQuote, QuoteItem } from '../utils/quotesManager';
+import { QuotationScreen } from './QuotationScreen';
 
-export interface QuoteItem {
-  id: string;
-  vendorName: string;
-  category: string;
-  packageName: string;
-  status: 'pending' | 'received' | 'confirmed';
-  paymentStatus: 'pending' | 'partially_paid' | 'fully_paid';
-  totalAmount: number;
-  advanceAmount: number;
-  remainingAmount: number;
-  weddingDate: string;
-  location: string;
-  includedServices: string[];
-  image: string;
-  invoiceNo?: string;
-  invoiceDate?: string;
-}
-
-const INITIAL_QUOTES: QuoteItem[] = [
-  {
-    id: 'quote-1',
-    vendorName: 'Glow Bridal Studio',
-    category: 'Makeup',
-    packageName: 'Premium Bridal Makeup',
-    status: 'confirmed',
-    paymentStatus: 'pending',
-    totalAmount: 35000,
-    advanceAmount: 10500,
-    remainingAmount: 24500,
-    weddingDate: '24 Oct 2026',
-    location: 'Chennai',
-    includedServices: [
-      'Bridal Makeup',
-      'Hair Styling',
-      'Saree Draping',
-      'Reception Makeup',
-      'Makeup Trial',
-    ],
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
-    invoiceNo: 'TOT-INV-2026-001',
-    invoiceDate: '13 Aug 2026',
-  },
-];
+export type { QuoteItem };
 
 type Screen = 'list' | 'invoice' | 'payment' | 'success';
 type PaymentOption = 'advance' | 'full';
 type PaymentMethod = 'upi' | 'card' | 'netbanking';
 
-export const MyQuotesTabScreen: React.FC = () => {
-  const [activeFilterTab, setActiveFilterTab] = useState<'All' | 'Advance Paid' | 'Fully Paid'>('All');
-  const [quotesList, setQuotesList] = useState<QuoteItem[]>(INITIAL_QUOTES);
+interface MyQuotesTabScreenProps {
+  onHideTabBar?: (hide: boolean) => void;
+  onExploreVendors?: () => void;
+}
+
+export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
+  onHideTabBar,
+  onExploreVendors,
+}) => {
+  const [activeFilterTab, setActiveFilterTab] = useState<'All' | 'Requested' | 'Advance Paid' | 'Fully Paid'>('All');
+  const [quotesList, setQuotesList] = useState<QuoteItem[]>(() => getAllQuotes());
+
+  // Listen to realtime updates across components
+  useEffect(() => {
+    const handleSync = () => {
+      setQuotesList(getAllQuotes());
+    };
+    window.addEventListener('tot_quotes_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('tot_quotes_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
 
   // Navigation state
   const [screen, setScreen] = useState<Screen>('list');
   const [activeQuote, setActiveQuote] = useState<QuoteItem | null>(null);
+  const [reviewingQuote, setReviewingQuote] = useState<QuoteItem | null>(null);
+
+  useEffect(() => {
+    if (onHideTabBar) {
+      onHideTabBar(screen !== 'list');
+    }
+    return () => {
+      if (onHideTabBar) {
+        onHideTabBar(false);
+      }
+    };
+  }, [screen, onHideTabBar]);
 
   // Cancel dialog state (on Invoice page)
   const [showCancelDialog, setShowCancelDialog] = useState(false);
@@ -91,10 +85,28 @@ export const MyQuotesTabScreen: React.FC = () => {
   const [paidAmount, setPaidAmount] = useState(0);
   const [successStatus, setSuccessStatus] = useState<'partially_paid' | 'fully_paid'>('partially_paid');
 
-  // Derived — My Quotes shows ONLY confirmed quotes
-  const confirmedQuotes = quotesList.filter((q) => q.status === 'confirmed');
-  const filteredQuotes = confirmedQuotes.filter((q) => {
+  // Check if any other vendor in the same category is already booked/paid
+  const getPaidVendorForCategory = (category: string, currentQuoteId: string) => {
+    const paidMatch = quotesList.find(
+      (q) =>
+        q.category.toLowerCase() === category.toLowerCase() &&
+        q.id !== currentQuoteId &&
+        (q.paymentStatus === 'partially_paid' || q.paymentStatus === 'fully_paid')
+    );
+    return paidMatch ? paidMatch.vendorName : null;
+  };
+
+  // Filtered quotes logic
+  const filteredQuotes = quotesList.filter((q) => {
     if (activeFilterTab === 'All') return true;
+    if (activeFilterTab === 'Requested') {
+      return (
+        q.status === 'requested' ||
+        q.status === 'response_ready' ||
+        q.status === 'negotiating' ||
+        (q.status === 'confirmed' && q.paymentStatus === 'pending')
+      );
+    }
     if (activeFilterTab === 'Advance Paid') return q.paymentStatus === 'partially_paid';
     if (activeFilterTab === 'Fully Paid') return q.paymentStatus === 'fully_paid';
     return true;
@@ -138,13 +150,14 @@ export const MyQuotesTabScreen: React.FC = () => {
       setPaidAmount(amount);
       setSuccessStatus(newStatus);
 
-      // Update quote list
-      setQuotesList((prev) =>
-        prev.map((q) =>
-          q.id === activeQuote.id ? { ...q, paymentStatus: newStatus } : q
-        )
-      );
-      setActiveQuote((prev) => (prev ? { ...prev, paymentStatus: newStatus } : null));
+      // Update global quote state
+      const updated = saveOrUpdateQuote({
+        id: activeQuote.id,
+        paymentStatus: newStatus,
+        status: 'confirmed',
+      });
+      setQuotesList(updated);
+      setActiveQuote((prev) => (prev ? { ...prev, paymentStatus: newStatus, status: 'confirmed' } : null));
 
       setScreen('success');
     }, 2000);
@@ -165,13 +178,6 @@ export const MyQuotesTabScreen: React.FC = () => {
         ? activeQuote.remainingAmount
         : activeQuote.totalAmount;
 
-    const amountPaidSoFar =
-      activeQuote.paymentStatus === 'fully_paid'
-        ? activeQuote.totalAmount
-        : activeQuote.paymentStatus === 'partially_paid'
-        ? activeQuote.advanceAmount
-        : 0;
-
     return (
       <View style={styles.container}>
         {/* Header */}
@@ -184,6 +190,14 @@ export const MyQuotesTabScreen: React.FC = () => {
         </View>
 
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+          {getPaidVendorForCategory(activeQuote.category, activeQuote.id) && (
+            <View style={styles.alternativePaidWarning}>
+              <AlertTriangle size={16} color="#9A3412" style={{ marginTop: 2 }} />
+              <Text style={styles.alternativePaidWarningText}>
+                You have already booked and paid <Text style={{ fontWeight: '700' }}>{getPaidVendorForCategory(activeQuote.category, activeQuote.id)}</Text> for this category. You can only hire one vendor per category.
+              </Text>
+            </View>
+          )}
 
           {/* Brand Header */}
           <View style={styles.invoiceBrand}>
@@ -199,7 +213,7 @@ export const MyQuotesTabScreen: React.FC = () => {
             </View>
             <View style={[styles.invoiceMetaRow, { marginBottom: 0 }]}>
               <Text style={styles.invoiceMetaLabel}>Date:</Text>
-              <Text style={styles.invoiceMetaValue}>{activeQuote.invoiceDate || '13 Aug 2026'}</Text>
+              <Text style={styles.invoiceMetaValue}>{activeQuote.invoiceDate || '14 Aug 2026'}</Text>
             </View>
           </View>
 
@@ -228,22 +242,22 @@ export const MyQuotesTabScreen: React.FC = () => {
             </View>
           </View>
 
+          {/* Included Services */}
+          {activeQuote.includedServices && activeQuote.includedServices.length > 0 && (
+            <View style={styles.invoiceSection}>
+              <Text style={styles.invoiceSectionHeading}>INCLUDED SERVICES</Text>
+              {activeQuote.includedServices.map((svc, i) => (
+                <View key={i} style={styles.invoiceServiceRow}>
+                  <Text style={styles.invoiceServiceDot}>•</Text>
+                  <Text style={styles.invoiceServiceText}>{svc}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
           <View style={styles.invoiceDivider} />
 
-          {/* Service Details */}
-          <View style={styles.invoiceSection}>
-            <Text style={styles.invoiceSectionHeading}>SERVICE DETAILS</Text>
-            {activeQuote.includedServices.map((service, idx) => (
-              <View key={idx} style={styles.invoiceServiceRow}>
-                <Text style={styles.invoiceServiceDot}>•</Text>
-                <Text style={styles.invoiceServiceText}>{service}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.invoiceDivider} />
-
-          {/* Price */}
+          {/* Price Breakdown */}
           <View style={styles.invoiceSection}>
             <Text style={styles.invoiceSectionHeading}>PRICE</Text>
             <View style={styles.invoiceDetailRow}>
@@ -270,18 +284,18 @@ export const MyQuotesTabScreen: React.FC = () => {
               styles.invoicePayStatusPill,
               {
                 backgroundColor:
-                  activeQuote.paymentStatus === 'fully_paid' ? '#DCFCE7'
-                  : activeQuote.paymentStatus === 'partially_paid' ? '#FEF3C7'
-                  : '#FEE2E2',
+                  activeQuote.paymentStatus === 'fully_paid' || activeQuote.paymentStatus === 'partially_paid'
+                    ? '#DCFCE7'
+                    : '#FEE2E2',
               },
             ]}>
               <Text style={[
                 styles.invoicePayStatusText,
                 {
                   color:
-                    activeQuote.paymentStatus === 'fully_paid' ? '#15803D'
-                    : activeQuote.paymentStatus === 'partially_paid' ? '#D97706'
-                    : '#DC2626',
+                    activeQuote.paymentStatus === 'fully_paid' || activeQuote.paymentStatus === 'partially_paid'
+                      ? '#15803D'
+                      : '#DC2626',
                 },
               ]}>
                 {activeQuote.paymentStatus === 'fully_paid'
@@ -348,11 +362,15 @@ export const MyQuotesTabScreen: React.FC = () => {
 
           {activeQuote.paymentStatus !== 'fully_paid' ? (
             <TouchableOpacity
-              style={styles.invoicePaymentBtn}
+              style={[
+                styles.invoicePaymentBtn,
+                getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { backgroundColor: '#E5E7EB', opacity: 0.6 }
+              ]}
               onPress={handleGoToPayment}
-              activeOpacity={0.85}
+              disabled={Boolean(getPaidVendorForCategory(activeQuote.category, activeQuote.id))}
+              activeOpacity={getPaidVendorForCategory(activeQuote.category, activeQuote.id) ? 1 : 0.85}
             >
-              <Text style={styles.invoicePaymentBtnText}>Payment</Text>
+              <Text style={[styles.invoicePaymentBtnText, getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { color: '#9CA3AF' }]}>Payment</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -387,7 +405,7 @@ export const MyQuotesTabScreen: React.FC = () => {
                   </View>
                   <Text style={styles.dialogTitle}>Cancel Payment?</Text>
                   <Text style={styles.dialogMessage}>
-                    Are you sure you want to leave the payment process? Your booking remains confirmed.
+                    Are you sure you want to leave the payment process? Your quote remains available in My Quotes.
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -402,7 +420,7 @@ export const MyQuotesTabScreen: React.FC = () => {
                   onPress={handleCancelConfirm}
                   activeOpacity={0.85}
                 >
-                  <Text style={styles.dialogCancelBtnText}>Cancel</Text>
+                  <Text style={styles.dialogCancelBtnText}>Leave</Text>
                 </TouchableOpacity>
               </motion.div>
             </motion.div>
@@ -434,7 +452,7 @@ export const MyQuotesTabScreen: React.FC = () => {
             <Image source={{ uri: activeQuote.image }} style={styles.payVendorImage} />
             <View style={{ flex: 1 }}>
               <Text style={styles.payVendorName}>{activeQuote.vendorName}</Text>
-              <Text style={styles.payVendorCategory}>{activeQuote.category}</Text>
+              <Text style={styles.payVendorCategory}>{activeQuote.category} • {activeQuote.packageName}</Text>
             </View>
           </View>
 
@@ -501,23 +519,24 @@ export const MyQuotesTabScreen: React.FC = () => {
 
           {(
             [
-              { key: 'upi', label: 'UPI', icon: <Smartphone size={18} color="#581420" /> },
+              { key: 'upi', label: 'UPI (GPay / PhonePe / Paytm)', icon: <Smartphone size={18} color="#581420" /> },
               { key: 'card', label: 'Credit / Debit Card', icon: <CreditCard size={18} color="#581420" /> },
               { key: 'netbanking', label: 'Net Banking', icon: <Building size={18} color="#581420" /> },
             ] as { key: PaymentMethod; label: string; icon: React.ReactNode }[]
           ).map((method) => (
-            <TouchableOpacity
-              key={method.key}
-              style={[styles.methodRow, paymentMethod === method.key && styles.methodRowSelected]}
-              onPress={() => setPaymentMethod(method.key)}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.radioOuter, paymentMethod === method.key && styles.radioOuterSelected]}>
-                {paymentMethod === method.key && <View style={styles.radioInner} />}
-              </View>
-              <View style={styles.methodIconBox}>{method.icon}</View>
-              <Text style={styles.methodLabel}>{method.label}</Text>
-            </TouchableOpacity>
+            <React.Fragment key={method.key}>
+              <TouchableOpacity
+                style={[styles.methodRow, paymentMethod === method.key && styles.methodRowSelected]}
+                onPress={() => setPaymentMethod(method.key)}
+                activeOpacity={0.85}
+              >
+                <View style={[styles.radioOuter, paymentMethod === method.key && styles.radioOuterSelected]}>
+                  {paymentMethod === method.key && <View style={styles.radioInner} />}
+                </View>
+                <View style={styles.methodIconBox}>{method.icon}</View>
+                <Text style={styles.methodLabel}>{method.label}</Text>
+              </TouchableOpacity>
+            </React.Fragment>
           ))}
 
           {/* Mock notice */}
@@ -576,8 +595,8 @@ export const MyQuotesTabScreen: React.FC = () => {
             </View>
             <View style={styles.successRow}>
               <Text style={styles.successLabel}>Payment Status:</Text>
-              <Text style={[styles.successValue, { color: isFullyPaid ? '#15803D' : '#D97706' }]}>
-                {isFullyPaid ? 'Fully Paid' : 'Partially Paid'}
+              <Text style={[styles.successValue, { color: isFullyPaid ? '#15803D' : '#15803D' }]}>
+                {isFullyPaid ? 'Fully Paid' : 'Advance Paid'}
               </Text>
             </View>
             <View style={[styles.successRow, { marginBottom: 0 }]}>
@@ -589,7 +608,7 @@ export const MyQuotesTabScreen: React.FC = () => {
           </View>
 
           <Text style={styles.successVendor}>{activeQuote.vendorName}</Text>
-          <Text style={styles.successSub}>Your booking is confirmed. We'll notify the vendor.</Text>
+          <Text style={styles.successSub}>Your booking is confirmed. We will notify the vendor.</Text>
 
           <TouchableOpacity style={styles.successDoneBtn} onPress={handleSuccessDone} activeOpacity={0.85}>
             <Text style={styles.successDoneBtnText}>Return to My Quotes</Text>
@@ -605,60 +624,61 @@ export const MyQuotesTabScreen: React.FC = () => {
       {/* HEADER */}
       <View style={styles.topHeader}>
         <Text style={styles.headerTitle}>My Quotes</Text>
-        <Text style={styles.headerSubtitle}>Confirmed vendor bookings & payment tracking</Text>
+        <Text style={styles.headerSubtitle}>Vendor quote requests & advance payment tracking</Text>
       </View>
 
       {/* FILTER TABS */}
-      <View style={styles.filterTabsContainer}>
-        {(['All', 'Advance Paid', 'Fully Paid'] as const).map((tab) => {
-          const isActive = activeFilterTab === tab;
-          return (
-            <TouchableOpacity
-              key={tab}
-              style={[styles.filterTabPill, isActive && styles.filterTabPillActive]}
-              onPress={() => setActiveFilterTab(tab)}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.filterTabText, isActive && styles.filterTabTextActive]}>
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
+      <View style={styles.filterTabsScrollWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterTabsContainer}
+        >
+          {(['All', 'Requested', 'Advance Paid', 'Fully Paid'] as const).map((tab) => {
+            const isActive = activeFilterTab === tab;
+            return (
+              <React.Fragment key={tab}>
+                <TouchableOpacity
+                  style={[styles.filterTabPill, isActive && styles.filterTabPillActive]}
+                  onPress={() => setActiveFilterTab(tab)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.filterTabText, isActive && styles.filterTabTextActive]}>
+                    {tab}
+                  </Text>
+                </TouchableOpacity>
+              </React.Fragment>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* QUOTES LIST */}
       <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {filteredQuotes.length === 0 ? (
           <View style={styles.emptyStateContainer}>
-            <FileText size={42} color="#A1999A" />
+            <FileText size={44} color="#A1999A" />
             <Text style={styles.emptyTitle}>
-              {confirmedQuotes.length === 0 ? 'No Confirmed Quotes' : 'No Matching Quotes'}
+              {quotesList.length === 0 ? 'No Quotes Yet' : 'No Matching Quotes'}
             </Text>
             <Text style={styles.emptyDesc}>
-              {confirmedQuotes.length === 0
-                ? 'Confirm a vendor quote to see it here.'
-                : `No quotes with payment status: ${activeFilterTab.toLowerCase()}.`}
+              {quotesList.length === 0
+                ? "Explore services and tap 'Request Quote' on any vendor to receive and track custom quotations here."
+                : `No quotes found under "${activeFilterTab}".`}
             </Text>
+            {quotesList.length === 0 && onExploreVendors && (
+              <TouchableOpacity
+                style={styles.emptyExploreBtn}
+                onPress={onExploreVendors}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.emptyExploreBtnText}>Explore Services</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           filteredQuotes.map((quote) => {
-            const paymentLabel =
-              quote.paymentStatus === 'fully_paid'
-                ? '✓ Fully Paid'
-                : quote.paymentStatus === 'partially_paid'
-                ? 'Advance Paid'
-                : 'Payment Pending';
-            const paymentColor =
-              quote.paymentStatus === 'fully_paid'
-                ? '#15803D'
-                : quote.paymentStatus === 'partially_paid'
-                ? '#D97706'
-                : '#DC2626';
-            const paymentBg =
-              quote.paymentStatus === 'fully_paid'
-                ? '#DCFCE7'
-                : '#FEF3C7';
+            const isLocked = Boolean(getPaidVendorForCategory(quote.category, quote.id));
 
             return (
               <motion.div
@@ -678,15 +698,58 @@ export const MyQuotesTabScreen: React.FC = () => {
                     <Text style={styles.totalPrice}>₹{quote.totalAmount.toLocaleString('en-IN')}</Text>
                   </View>
 
-                  {/* Badges */}
-                  <View style={[styles.badgeRow, { gap: 8 }]}>
-                    <View style={styles.statusConfirmedBadge}>
-                      <CheckCircle2 size={12} color="#15803D" />
-                      <Text style={styles.statusConfirmedText}>✓ Quote Confirmed</Text>
-                    </View>
-                    <View style={[styles.statusPayBadge, { backgroundColor: paymentBg }]}>
-                      <Text style={[styles.statusPayText, { color: paymentColor }]}>{paymentLabel}</Text>
-                    </View>
+                  {/* Status Badges */}
+                  <View style={[styles.badgeRow, { gap: 8, flexWrap: 'wrap' }]}>
+                    {quote.paymentStatus === 'fully_paid' ? (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#DCFCE7' }]}>
+                        <CheckCircle2 size={12} color="#15803D" />
+                        <Text style={[styles.statusPayText, { color: '#15803D' }]}>✓ Fully Paid</Text>
+                      </View>
+                    ) : quote.paymentStatus === 'partially_paid' ? (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#DCFCE7' }]}>
+                        <CheckCircle2 size={12} color="#15803D" />
+                        <Text style={[styles.statusPayText, { color: '#15803D' }]}>Advance Paid</Text>
+                      </View>
+                    ) : quote.status === 'confirmed' ? (
+                      <>
+                        <View style={[styles.statusPayBadge, { backgroundColor: '#DCFCE7' }]}>
+                          <CheckCircle2 size={12} color="#15803D" />
+                          <Text style={[styles.statusPayText, { color: '#15803D' }]}>✓ Quote Confirmed</Text>
+                        </View>
+                        <View style={[styles.statusPayBadge, { backgroundColor: '#FEF3C7' }]}>
+                          <Text style={[styles.statusPayText, { color: '#B45309' }]}>Payment Pending</Text>
+                        </View>
+                      </>
+                    ) : quote.status === 'response_ready' ? (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#FEF3C7', borderColor: '#F59E0B', borderWidth: 1 }]}>
+                        <Sparkles size={12} color="#D97706" />
+                        <Text style={[styles.statusPayText, { color: '#B45309', fontWeight: '700' }]}>⚡ Quotation Ready</Text>
+                      </View>
+                    ) : quote.status === 'negotiating' ? (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#FEF3C7' }]}>
+                        <Clock size={12} color="#D97706" />
+                        <Text style={[styles.statusPayText, { color: '#B45309' }]}>💬 Counter-Offer Sent</Text>
+                      </View>
+                    ) : quote.status === 'rejected' ? (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#FEE2E2' }]}>
+                        <Text style={[styles.statusPayText, { color: '#DC2626' }]}>✕ Rejected</Text>
+                      </View>
+                    ) : (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#FEF3C7' }]}>
+                        <Clock size={12} color="#D97706" />
+                        <Text style={[styles.statusPayText, { color: '#B45309' }]}>⏳ Quote Requested</Text>
+                      </View>
+                    )}
+
+                    {/* Category Lock Warning */}
+                    {isLocked && quote.paymentStatus === 'pending' && (
+                      <View style={[styles.statusPayBadge, { backgroundColor: '#FEE2E2', flexDirection: 'row', gap: 4, alignItems: 'center' }]}>
+                        <AlertTriangle size={10} color="#DC2626" />
+                        <Text style={[styles.statusPayText, { color: '#DC2626', fontSize: 10 }]}>
+                          Locked (Hired: {getPaidVendorForCategory(quote.category, quote.id)})
+                        </Text>
+                      </View>
+                    )}
                   </View>
 
                   {/* Payment breakdown if partially/fully paid */}
@@ -716,21 +779,74 @@ export const MyQuotesTabScreen: React.FC = () => {
                     </View>
                   </View>
 
-                  {/* Single Invoice Button */}
-                  <TouchableOpacity
-                    style={styles.invoiceBtn}
-                    onPress={() => openInvoice(quote)}
-                    activeOpacity={0.85}
-                  >
-                    <FileText size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
-                    <Text style={styles.invoiceBtnText}>Invoice</Text>
-                  </TouchableOpacity>
+                  {/* Action Buttons Based on Status */}
+                  <View style={styles.quoteCardActions}>
+                    {quote.status === 'response_ready' || quote.status === 'negotiating' || quote.status === 'rejected' ? (
+                      <TouchableOpacity
+                        style={styles.reviewQuoteBtn}
+                        onPress={() => setReviewingQuote(quote)}
+                        activeOpacity={0.85}
+                      >
+                        <Sparkles size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+                        <Text style={styles.reviewQuoteBtnText}>
+                          {quote.status === 'response_ready' ? 'Review & Accept Quote' : 'View Quotation Details'}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : quote.status === 'requested' ? (
+                      <View style={styles.pendingQuoteBadge}>
+                        <ActivityIndicator size="small" color="#D97706" style={{ marginRight: 8 }} />
+                        <Text style={styles.pendingQuoteBadgeText}>Vendor Preparing Quote...</Text>
+                      </View>
+                    ) : (
+                      // Confirmed or Paid Quote
+                      <TouchableOpacity
+                        style={[
+                          styles.invoiceBtn,
+                          isLocked && quote.paymentStatus === 'pending' && { backgroundColor: '#9CA3AF' },
+                        ]}
+                        onPress={() => openInvoice(quote)}
+                        activeOpacity={0.85}
+                      >
+                        <FileText size={14} color="#FFFFFF" style={{ marginRight: 6 }} />
+                        <Text style={styles.invoiceBtnText}>
+                          {isLocked && quote.paymentStatus === 'pending' ? 'Invoice (Locked)' : 'Invoice'}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </View>
               </motion.div>
             );
           })
         )}
       </ScrollView>
+
+      {/* MODAL REVIEW QUOTATION SCREEN */}
+      {reviewingQuote && (
+        <QuotationScreen
+          visible={Boolean(reviewingQuote)}
+          onClose={() => setReviewingQuote(null)}
+          quoteStatus={reviewingQuote.status}
+          setQuoteStatus={(newStatus) => {
+            const updated = saveOrUpdateQuote({
+              id: reviewingQuote.id,
+              status: newStatus,
+            });
+            setQuotesList(updated);
+            setReviewingQuote((prev) => (prev ? { ...prev, status: newStatus } : null));
+          }}
+          vendorId={reviewingQuote.vendorId || reviewingQuote.id.replace('quote-', '')}
+          vendorName={reviewingQuote.vendorName}
+          vendorImage={reviewingQuote.image}
+          vendorLocation={reviewingQuote.location}
+          startingPrice={`₹${reviewingQuote.totalAmount.toLocaleString('en-IN')}`}
+          category={reviewingQuote.category}
+          packageName={reviewingQuote.packageName}
+          includedServices={reviewingQuote.includedServices}
+          onNavigateToQuotesTab={() => setReviewingQuote(null)}
+          onBack={() => setReviewingQuote(null)}
+        />
+      )}
     </View>
   );
 };
@@ -787,11 +903,14 @@ const styles = StyleSheet.create({
   },
 
   // ── FILTER TABS ──
+  filterTabsScrollWrapper: {
+    marginBottom: 16,
+  },
   filterTabsContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 20,
     gap: 8,
-    marginBottom: 16,
   },
   filterTabPill: {
     paddingHorizontal: 14,
@@ -800,6 +919,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E8E2D9',
+    flexShrink: 0,
   },
   filterTabPillActive: {
     backgroundColor: '#581420',
@@ -809,6 +929,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#4B5563',
+    whiteSpace: 'nowrap' as any,
   },
   filterTabTextActive: {
     color: '#FFFFFF',
@@ -817,25 +938,40 @@ const styles = StyleSheet.create({
   // ── SCROLL ──
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 30,
+    paddingBottom: 40,
     gap: 14,
   },
   emptyStateContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
+    paddingHorizontal: 20,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '700',
     color: '#2A2425',
     marginTop: 12,
   },
   emptyDesc: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#7D7571',
-    marginTop: 4,
+    marginTop: 6,
     textAlign: 'center',
+    lineHeight: 18,
+    maxWidth: 280,
+  },
+  emptyExploreBtn: {
+    marginTop: 20,
+    backgroundColor: '#581420',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  emptyExploreBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
 
   // ── QUOTE CARD ──
@@ -853,8 +989,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   vendorImage: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     borderRadius: 12,
     backgroundColor: '#EAE4DC',
   },
@@ -878,23 +1014,12 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     flexWrap: 'wrap',
   },
-  statusConfirmedBadge: {
+  statusPayBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#DCFCE7',
     paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  statusConfirmedText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#15803D',
-  },
-  statusPayBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderRadius: 8,
   },
   statusPayText: {
@@ -936,11 +1061,42 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  // ── INVOICE BUTTON (single card action) ──
-  invoiceBtn: {
-    backgroundColor: '#581420',
+  // ── ACTION BUTTONS ──
+  quoteCardActions: {
+    marginTop: 2,
+  },
+  reviewQuoteBtn: {
+    backgroundColor: '#10B981',
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  reviewQuoteBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  pendingQuoteBadge: {
+    backgroundColor: '#FEF3C7',
     height: 40,
     borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  pendingQuoteBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#B45309',
+  },
+  invoiceBtn: {
+    backgroundColor: '#581420',
+    height: 42,
+    borderRadius: 21,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
@@ -949,6 +1105,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  secondaryQuoteBtn: {
+    backgroundColor: '#F3EBE1',
+    height: 42,
+    paddingHorizontal: 16,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#D6C9BB',
+  },
+  secondaryQuoteBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#581420',
   },
 
   // ── INVOICE PAGE ──
@@ -1454,5 +1625,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: '#FFFFFF',
+  },
+  alternativePaidWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEDD5',
+    borderColor: '#F97316',
+    borderWidth: 1,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  alternativePaidWarningText: {
+    fontSize: 12,
+    color: '#9A3412',
+    flex: 1,
+    lineHeight: 16,
   },
 });

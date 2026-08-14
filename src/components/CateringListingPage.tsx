@@ -409,6 +409,7 @@ export interface CateringListingPageProps {
   savedCateringIds?: Record<string, boolean>;
   onToggleSavedCatering?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const CateringListingPage: React.FC<CateringListingPageProps> = ({
@@ -416,6 +417,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
   savedCateringIds,
   onToggleSavedCatering,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -534,6 +536,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
         onBack={() => setSelectedCaterer(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedCaterer.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -806,7 +809,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ maxHeight: 380, overflowY: 'auto' } as any} showsVerticalScrollIndicator={false}>
                 {/* 1. CITY FILTER OPTIONS */}
                 {activeFilterModal === 'city' && (
                   <View style={styles.optionsList}>

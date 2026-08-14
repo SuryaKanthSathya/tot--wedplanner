@@ -16,7 +16,13 @@ import {
   CheckCircle2,
   Camera,
   Sparkles,
-  Flower2, Palette, Utensils
+  Flower2,
+  Palette,
+  Utensils,
+  Building2,
+  Mail,
+  Car,
+  Music,
 } from 'lucide-react';
 
 export interface RequestQuoteModalProps {
@@ -142,18 +148,53 @@ const ENTERTAINMENT_BUDGET_RANGES = [
 ];
 
 const CARS_SERVICES = [
-  'Vintage Car',
-  'Luxury Sedan',
-  'Tempo Traveller',
-  'AC Bus/Van',
-  'Bridal Car Decoration',
+  'Vintage Luxury Car Rental',
+  'Mercedes / BMW Chauffeur Sedan',
+  'Tempo Traveller (14 - 20 Seater)',
+  'Luxury AC Coach / Mini Bus',
+  'Bridal Floral Car Decoration',
+  'Airport & Railway Guest Transfers',
 ];
 
 const CARS_BUDGET_RANGES = [
-  'Under ₹10,000',
-  '₹10,000 - ₹25,000',
-  '₹25,000 - ₹50,000',
-  '₹50,000+',
+  'Under ₹15,000',
+  '₹15,000 - ₹30,000',
+  '₹30,000 - ₹60,000',
+  '₹60,000+',
+];
+
+const VENUE_SERVICES = [
+  'Central AC Main Mandapam (12 Hours)',
+  'Dining Hall Setup (800+ seats)',
+  'Deluxe AC Bridal & Groom Changing Suites',
+  'Guest Deluxe AC Rooms (10+ Rooms)',
+  'Valet Parking & Professional Staff',
+  '100% Uninterrupted Power Generator Backup',
+  'Outdoor Seafront / Lawn Area',
+  'In-House Stage Lighting & Sound AV Rig',
+];
+
+const VENUE_BUDGET_RANGES = [
+  'Under ₹1,50,000',
+  '₹1,50,000 - ₹3,00,000',
+  '₹3,00,000 - ₹6,00,000',
+  '₹6,00,000+',
+];
+
+const INVITATION_SERVICES = [
+  'Luxury Hardbound Box Invitations',
+  'Traditional Gold Foil & Embossed Cards',
+  'Animated Video Invitations & Save the Date',
+  'Custom Wedding Bags & Favor Stationery',
+  'Eco-Friendly Seed Paper Cards',
+  'Custom Calligraphy & Return Address Printing',
+];
+
+const INVITATION_BUDGET_RANGES = [
+  'Under ₹15,000',
+  '₹15,000 - ₹35,000',
+  '₹35,000 - ₹75,000',
+  '₹75,000+',
 ];
 
 export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
@@ -170,6 +211,8 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
   const finalVendorName = vendorName || studioName || 'Vendor';
   const finalLocation = vendorLocation || location || '';
   const catLower = category?.toLowerCase() || '';
+  const isVenue = catLower === 'venue' || catLower === 'venues';
+  const isInvitations = catLower === 'invitations' || catLower === 'invitation';
   const isMakeup = catLower === 'makeup';
   const isMehendi = catLower === 'mehendi';
   const isCatering = catLower === 'catering';
@@ -177,8 +220,41 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
   const isEntertainment = catLower === 'entertainment';
   const isCars = catLower === 'cars';
 
-  const servicesList = isCars ? CARS_SERVICES : isEntertainment ? ENTERTAINMENT_SERVICES : isDecor ? DECOR_SERVICES : isMakeup ? MAKEUP_SERVICES : isMehendi ? MEHENDI_SERVICES : isCatering ? CATERING_SERVICES : PHOTOGRAPHY_SERVICES;
-  const budgetList = isCars ? CARS_BUDGET_RANGES : isEntertainment ? ENTERTAINMENT_BUDGET_RANGES : isDecor ? DECOR_BUDGET_RANGES : isMakeup ? MAKEUP_BUDGET_RANGES : isMehendi ? MEHENDI_BUDGET_RANGES : isCatering ? CATERING_BUDGET_RANGES : PHOTOGRAPHY_BUDGET_RANGES;
+  const servicesList = isVenue
+    ? VENUE_SERVICES
+    : isInvitations
+    ? INVITATION_SERVICES
+    : isCars
+    ? CARS_SERVICES
+    : isEntertainment
+    ? ENTERTAINMENT_SERVICES
+    : isDecor
+    ? DECOR_SERVICES
+    : isMakeup
+    ? MAKEUP_SERVICES
+    : isMehendi
+    ? MEHENDI_SERVICES
+    : isCatering
+    ? CATERING_SERVICES
+    : PHOTOGRAPHY_SERVICES;
+
+  const budgetList = isVenue
+    ? VENUE_BUDGET_RANGES
+    : isInvitations
+    ? INVITATION_BUDGET_RANGES
+    : isCars
+    ? CARS_BUDGET_RANGES
+    : isEntertainment
+    ? ENTERTAINMENT_BUDGET_RANGES
+    : isDecor
+    ? DECOR_BUDGET_RANGES
+    : isMakeup
+    ? MAKEUP_BUDGET_RANGES
+    : isMehendi
+    ? MEHENDI_BUDGET_RANGES
+    : isCatering
+    ? CATERING_BUDGET_RANGES
+    : PHOTOGRAPHY_BUDGET_RANGES;
 
   const [weddingDate, setWeddingDate] = useState('');
   const [weddingLocation, setWeddingLocation] = useState(finalLocation);
@@ -305,10 +381,44 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                     <CheckCircle2 className="w-16 h-16 text-[#15803D]" />
                   </View>
                   <Text style={styles.successTitle}>
-                    {isCars ? 'Car Quote Request Sent!' : isEntertainment ? 'Entertainment Quote Request Sent!' : isDecor ? 'Decor Quote Request Sent!' : isMakeup ? 'Makeup Quote Request Sent!' : isMehendi ? 'Mehendi Quote Request Sent!' : isCatering ? 'Catering Quote Request Sent!' : 'Quote Request Sent!'}
+                    {isVenue
+                      ? 'Venue Quote Request Sent!'
+                      : isInvitations
+                      ? 'Invitation Quote Request Sent!'
+                      : isCars
+                      ? 'Car Quote Request Sent!'
+                      : isEntertainment
+                      ? 'Entertainment Quote Request Sent!'
+                      : isDecor
+                      ? 'Decor Quote Request Sent!'
+                      : isMakeup
+                      ? 'Makeup Quote Request Sent!'
+                      : isMehendi
+                      ? 'Mehendi Quote Request Sent!'
+                      : isCatering
+                      ? 'Catering Quote Request Sent!'
+                      : 'Quote Request Sent!'}
                   </Text>
                   <Text style={styles.successSubtitle}>
-                    Your {isCars ? 'transport/car' : isEntertainment ? 'entertainment' : isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : isMehendi ? 'bridal mehendi' : isCatering ? 'catering' : 'photography'} requirements have been sent to{' '}
+                    Your{' '}
+                    {isVenue
+                      ? 'venue booking'
+                      : isInvitations
+                      ? 'wedding invitation'
+                      : isCars
+                      ? 'transport/car'
+                      : isEntertainment
+                      ? 'entertainment'
+                      : isDecor
+                      ? 'wedding decor'
+                      : isMakeup
+                      ? 'bridal makeup'
+                      : isMehendi
+                      ? 'bridal mehendi'
+                      : isCatering
+                      ? 'catering'
+                      : 'photography'}{' '}
+                    requirements have been sent to{' '}
                     <Text style={{ fontWeight: '700', color: '#581420' }}>{finalVendorName}</Text>. They
                     will reach out to you shortly via WhatsApp / Phone with full pricing and custom
                     package details.
@@ -335,7 +445,11 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                 <View style={styles.formContent}>
                   {/* HEADER */}
                   <View style={styles.headerRow}>
-                    {isDecor ? (
+                    {isVenue ? (
+                      <Building2 className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isInvitations ? (
+                      <Mail className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isDecor ? (
                       <Palette className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : isMakeup ? (
                       <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
@@ -343,18 +457,69 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       <Camera className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     )}
                     <Text style={styles.modalTitle}>
-                      {isCars ? 'Car Rental Quote Request' : isEntertainment ? 'Entertainment Quote Request' : isDecor ? 'Wedding Decor Quote Request' : isMakeup ? 'Bridal Makeup Quote Request' : isMehendi ? 'Bridal Mehendi Quote Request' : isCatering ? 'Catering Quote Request' : 'Photography Quote Request'}
+                      {isVenue
+                        ? 'Wedding Venue Quote Request'
+                        : isInvitations
+                        ? 'Invitation Cards Quote Request'
+                        : isCars
+                        ? 'Car Rental Quote Request'
+                        : isEntertainment
+                        ? 'Entertainment Quote Request'
+                        : isDecor
+                        ? 'Wedding Decor Quote Request'
+                        : isMakeup
+                        ? 'Bridal Makeup Quote Request'
+                        : isMehendi
+                        ? 'Bridal Mehendi Quote Request'
+                        : isCatering
+                        ? 'Catering Quote Request'
+                        : 'Photography Quote Request'}
                     </Text>
                   </View>
                   <Text style={styles.modalSubtitle}>
-                    Share your {isCars ? 'transportation' : isEntertainment ? 'entertainment' : isDecor ? 'wedding decor' : isMakeup ? 'bridal makeup' : isMehendi ? 'mehendi' : isCatering ? 'catering' : 'photography'} details to receive an exact quotation from{' '}
+                    Share your{' '}
+                    {isVenue
+                      ? 'venue requirements'
+                      : isInvitations
+                      ? 'wedding invitation card'
+                      : isCars
+                      ? 'transportation'
+                      : isEntertainment
+                      ? 'entertainment'
+                      : isDecor
+                      ? 'wedding decor'
+                      : isMakeup
+                      ? 'bridal makeup'
+                      : isMehendi
+                      ? 'mehendi'
+                      : isCatering
+                      ? 'catering'
+                      : 'photography'}{' '}
+                    details to receive an exact quotation from{' '}
                     <Text style={{ fontWeight: '700', color: '#581420' }}>{finalVendorName}</Text>.
                   </Text>
 
                   {/* SECTION 1 — Services Required */}
                   <View style={styles.fieldGroup}>
                     <Text style={styles.fieldLabel}>
-                      1. {isCars ? 'Vehicle/Services Needed' : isEntertainment ? 'Entertainment Services Needed' : isDecor ? 'Decor Services Needed' : isMakeup ? 'Makeup Services Needed' : isMehendi ? 'Mehendi Services Needed' : isCatering ? 'Catering Services Needed' : 'Photography Services Needed'}{' '}
+                      1.{' '}
+                      {isVenue
+                        ? 'Venue Amenities & Halls Needed'
+                        : isInvitations
+                        ? 'Invitation Types Needed'
+                        : isCars
+                        ? 'Vehicle/Services Needed'
+                        : isEntertainment
+                        ? 'Entertainment Services Needed'
+                        : isDecor
+                        ? 'Decor Services Needed'
+                        : isMakeup
+                        ? 'Makeup Services Needed'
+                        : isMehendi
+                        ? 'Mehendi Services Needed'
+                        : isCatering
+                        ? 'Catering Services Needed'
+                        : 'Photography Services Needed'}{' '}
                       <Text style={styles.asterisk}>*</Text>
                     </Text>
                     <View style={styles.chipsRow}>

@@ -25,9 +25,12 @@ import {
   Package,
   Clock,
   Printer,
+  Send,
 } from 'lucide-react';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 
 export interface InvitationItem {
   id: string;
@@ -59,6 +62,7 @@ export interface InvitationItem {
 }
 
 interface InvitationDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   invite: InvitationItem;
   onBack: () => void;
   isBookmarked: boolean;
@@ -66,6 +70,7 @@ interface InvitationDetailPageProps {
 }
 
 export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
+  onNavigateToQuotesTab,
   invite,
   onBack,
   isBookmarked,
@@ -74,6 +79,95 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${invite.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[invite.id]) {
+          return statuses[invite.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[invite.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((invite.startingPrice || '₹15,000').replace(/[^0-9]/g, ''), 10) || 15000;
+    saveOrUpdateQuote({
+      id: `quote-${invite.id}`,
+      vendorId: invite.id,
+      vendorName: invite.name,
+      category: 'Invitations',
+      packageName: 'Custom Animated Luxury E-Invite & Printed Cards',
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: '24 Oct 2026',
+      location: invite.location,
+      includedServices: [
+        'Bespoke Animated Video Invitation Design',
+        'Couple Save-the-Date Digital Flyer',
+        '150 Gold Foil Premium Printed Cards',
+        'Custom Couple Wedding Monogram Design',
+        'Digital RSVP Portal & Guest Tracking Link',
+      ],
+      image: invite.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${invite.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
 
   const portfolioImages =
     invite.portfolio && invite.portfolio.length >= 4
@@ -130,7 +224,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
+            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-[#C28E38]" />
             {toastMessage}
@@ -453,13 +547,48 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           <Text style={styles.btnCallText}>Call Now</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.btnQuote}
-          onPress={() => setShowQuoteModal(true)}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.btnQuoteText}>Send Quotes</Text>
-        </TouchableOpacity>
+        {quoteStatus === 'initial' && (
+          <TouchableOpacity
+            style={styles.btnQuote}
+            onPress={() => setShowQuoteModal(true)}
+            activeOpacity={0.85}
+          >
+            <Send className="w-4 h-4 text-white mr-1.5" />
+            <Text style={styles.btnQuoteText}>Req Quote</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'requested' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+            <Text style={styles.btnQuoteText}>Pending Response</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'negotiating' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+            <Text style={styles.btnQuoteText}>Negotiating...</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'rejected' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+            <Text style={styles.btnQuoteText}>Rejected (Reset)</Text>
+          </TouchableOpacity>
+        )}
+
+        {quoteStatus === 'response_ready' && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <Text style={styles.btnQuoteText}>View Quote</Text>
+          </TouchableOpacity>
+        )}
+
+        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <Text style={styles.btnQuoteText}>
+              {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* PHOTO ZOOM MODAL */}
@@ -489,6 +618,25 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
         startingPrice={invite.startingPrice}
         location={invite.location}
         category="invitation"
+        onQuoteSent={handleQuoteRequestSent}
+      />
+
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={invite.id}
+        vendorName={invite.name}
+        vendorImage={invite.image}
+        vendorLocation={invite.location}
+        startingPrice={invite.startingPrice}
+        category="Invitations"
+        packageName="Custom Animated Luxury E-Invite & Printed Cards"
+        includedServices={[ 'Bespoke Animated Video Invitation Design', 'Couple Save-the-Date Digital Flyer', '150 Gold Foil Premium Printed Cards', 'Custom Couple Wedding Monogram Design', 'Digital RSVP Portal & Guest Tracking Link' ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
       />
     </View>
   );

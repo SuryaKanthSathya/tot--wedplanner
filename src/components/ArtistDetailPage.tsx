@@ -35,10 +35,13 @@ import {
   Palette,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
 import { MehendiArtist } from './MehendiListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 
 interface ArtistDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   artist: MehendiArtist;
   onBack: () => void;
   isBookmarked: boolean;
@@ -46,6 +49,7 @@ interface ArtistDetailPageProps {
 }
 
 export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
+  onNavigateToQuotesTab,
   artist,
   onBack,
   isBookmarked,
@@ -55,6 +59,95 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${artist.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[artist.id]) {
+          return statuses[artist.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[artist.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((artist.startingPrice || '₹25,000').replace(/[^0-9]/g, ''), 10) || 25000;
+    saveOrUpdateQuote({
+      id: `quote-${artist.id}`,
+      vendorId: artist.id,
+      vendorName: artist.name,
+      category: 'Mehendi',
+      packageName: 'Traditional South Indian Bridal Mehendi Package',
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: '24 Oct 2026',
+      location: artist.location,
+      includedServices: [
+        'Full Bridal Hands Mehendi',
+        'Bridal Feet Mehendi',
+        'Guest Mehendi (up to 15 guests)',
+        'Organic Natural Henna Cones',
+        'Mehendi Design Consultation',
+      ],
+      image: artist.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${artist.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
 
   const portfolioImages = artist.portfolio && artist.portfolio.length > 0
     ? artist.portfolio
@@ -193,7 +286,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
+            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-[#C28E38]" />
             {toastMessage}
@@ -519,14 +612,48 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
             <MessageCircle className="w-4 h-4 text-emerald-700" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.quoteBtnMain}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.quoteBtnMainText}>Request Quote</Text>
-          </TouchableOpacity>
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.quoteBtnMain}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>
+                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -553,6 +680,25 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
         startingPrice={artist.startingPrice}
         location={artist.location}
         category="mehendi"
+        onQuoteSent={handleQuoteRequestSent}
+      />
+
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={artist.id}
+        vendorName={artist.name}
+        vendorImage={artist.image}
+        vendorLocation={artist.location}
+        startingPrice={artist.startingPrice}
+        category="Mehendi"
+        packageName="Traditional South Indian Bridal Mehendi Package"
+        includedServices={[ 'Full Bridal Hands Mehendi', 'Bridal Feet Mehendi', 'Guest Mehendi (up to 15 guests)', 'Organic Natural Henna Cones', 'Mehendi Design Consultation' ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
       />
     </View>
   );

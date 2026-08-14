@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -45,6 +45,9 @@ import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_178646971954
 import stageEntertainmentImg from '../assets/images/guest_banquet_hall_stage_1786471284070.jpg';
 import mehendiFullForearmsImg from '../assets/images/mehendi_full_forearms.svg';
 import decorMandapImg from '../assets/images/royal_mandap_decor_pure.jpg';
+import christianPastorImg from '../assets/images/christian_pastor.jpg';
+import hinduIyerImg from '../assets/images/hindu_iyer.jpg';
+import muslimImamImg from '../assets/images/muslim_imam.jpg';
 
 const SERVICES_DATA = [
   {
@@ -136,6 +139,8 @@ interface MyWeddingTabScreenProps {
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onOpenQuotesTab?: () => void;
+  onHideTabBar?: (hide: boolean) => void;
 }
 
 interface ChecklistItem {
@@ -386,6 +391,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   savedInviteIds,
   onToggleSavedInvite,
   onOpenSavedTab,
+  onOpenQuotesTab,
+  onHideTabBar,
 }) => {
   // Extract couple names dynamically from registered weddingProfile or userName
   let brideName = '';
@@ -429,6 +436,36 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   // Automatically calculate remaining countdown days from actual wedding date
   const daysLeft = calculateDaysLeft(rawDate);
 
+  const getPoojaServiceData = () => {
+    const rawType = weddingProfile?.marriageType || 'Hindu';
+    if (rawType.includes('Christian')) {
+      return {
+        id: 'pastor',
+        name: 'Pastor/Father',
+        vendors: '12 Vendors',
+        image: christianPastorImg,
+      };
+    }
+    if (rawType.includes('Muslim')) {
+      return {
+        id: 'imam',
+        name: 'Imam',
+        vendors: '8 Vendors',
+        image: muslimImamImg,
+      };
+    }
+    // Default or Hindu: "Iyer"
+    return {
+      id: 'iyer',
+      name: 'Iyer',
+      vendors: '24 Vendors',
+      image: hinduIyerImg,
+    };
+  };
+
+  const poojaService = getPoojaServiceData();
+  const isIntercaste = (weddingProfile?.marriageType || 'Hindu').includes('Intercaste');
+
   // Initial services checklist items
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
     { id: '1', title: 'Wedding Date Fixed', category: 'General', completed: true },
@@ -456,6 +493,30 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
+
+  const isAnyListingOpen = Boolean(
+    showServicesView ||
+    showPhotographyListing ||
+    showMehendiListing ||
+    showCateringListing ||
+    showCarsListing ||
+    showMakeupListing ||
+    showDecorListing ||
+    showVenueListing ||
+    showEntertainmentListing ||
+    showInvitationListing
+  );
+
+  useEffect(() => {
+    if (onHideTabBar) {
+      onHideTabBar(isAnyListingOpen);
+    }
+    return () => {
+      if (onHideTabBar) {
+        onHideTabBar(false);
+      }
+    };
+  }, [isAnyListingOpen, onHideTabBar]);
 
 
   if (showMehendiListing) {
@@ -501,6 +562,12 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={onToggleSavedMakeup}
         onOpenSavedTab={onOpenSavedTab}
+        onNavigateToQuotesTab={() => {
+          setShowMakeupListing(false);
+          if (onOpenQuotesTab) {
+            onOpenQuotesTab();
+          }
+        }}
       />
     );
   }
@@ -710,37 +777,38 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
             ))}
           </View>
 
-          {/* 10th Card: Pooja (Centered at bottom) */}
-          <View style={{ alignItems: 'center', marginTop: 2, marginBottom: 20 }}>
-            <motion.div
-              whileTap={{ scale: 0.95 }}
-              className="cursor-pointer"
-              style={{ width: '64%', alignItems: 'center' }}
-              onClick={() => {
-                const poojaService = SERVICES_DATA[9];
-                if (!checklist.some((c) => c.title.toLowerCase().includes(poojaService.name.toLowerCase()))) {
-                  setChecklist((prev) => [
-                    ...prev,
-                    { id: Date.now().toString(), title: poojaService.name, category: poojaService.name, completed: false },
-                  ]);
-                  setAddedToast(`Added ${poojaService.name} to checklist`);
-                } else {
-                  setAddedToast(`${poojaService.name} is in checklist`);
-                }
-                setTimeout(() => setAddedToast(null), 2000);
-              }}
-            >
-              <View style={styles.poojaItemContainer}>
-                <Image
-                  source={typeof SERVICES_DATA[9].image === 'string' ? { uri: SERVICES_DATA[9].image } : SERVICES_DATA[9].image}
-                  style={styles.poojaGridImage}
-                  resizeMode="cover"
-                />
-                <Text style={styles.serviceGridCardTitle}>{SERVICES_DATA[9].name}</Text>
-                <Text style={styles.serviceGridCardVendors}>{SERVICES_DATA[9].vendors}</Text>
-              </View>
-            </motion.div>
-          </View>
+          {/* 10th Card: Pooja/Iyer/Pastor/Imam (Centered at bottom, hidden for Intercaste) */}
+          {!isIntercaste && (
+            <View style={{ alignItems: 'center', marginTop: 2, marginBottom: 20 }}>
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                className="cursor-pointer"
+                style={{ width: '64%', alignItems: 'center' }}
+                onClick={() => {
+                  if (!checklist.some((c) => c.title.toLowerCase().includes(poojaService.name.toLowerCase()))) {
+                    setChecklist((prev) => [
+                      ...prev,
+                      { id: Date.now().toString(), title: poojaService.name, category: poojaService.name, completed: false },
+                    ]);
+                    setAddedToast(`Added ${poojaService.name} to checklist`);
+                  } else {
+                    setAddedToast(`${poojaService.name} is in checklist`);
+                  }
+                  setTimeout(() => setAddedToast(null), 2000);
+                }}
+              >
+                <View style={styles.poojaItemContainer}>
+                  <Image
+                    source={typeof poojaService.image === 'string' ? { uri: poojaService.image } : poojaService.image}
+                    style={styles.poojaGridImage}
+                    resizeMode="cover"
+                  />
+                  <Text style={styles.serviceGridCardTitle}>{poojaService.name}</Text>
+                  <Text style={styles.serviceGridCardVendors}>{poojaService.vendors}</Text>
+                </View>
+              </motion.div>
+            </View>
+          )}
         </ScrollView>
       </View>
     );
@@ -915,22 +983,20 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
               ) : (
                 checklist.map((item) => (
                   <div key={item.id}>
-                    <View style={styles.checklistItemRow}>
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => toggleChecklist(item.id)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        {item.completed ? (
-                          <CheckCircle2 className="w-5 h-5 text-[#557A46] flex-shrink-0" />
-                        ) : (
-                          <Circle className="w-5 h-5 text-[#B5AAA0] flex-shrink-0" />
-                        )}
-                      </TouchableOpacity>
-
+                    <View style={[
+                      styles.checklistItemRow,
+                      item.completed && { backgroundColor: '#F0F7EC', borderColor: '#D4E5CD' }
+                    ]}>
                       <TouchableOpacity
                         activeOpacity={0.7}
                         onPress={() => {
+                          // Mark as completed/selected since they selected this service
+                          setChecklist((prev) =>
+                            prev.map((c) =>
+                              c.id === item.id ? { ...c, completed: true } : c
+                            )
+                          );
+
                           const t = item.title.toLowerCase();
                           if (t.includes('photo')) {
                             setShowPhotographyListing(true);
@@ -960,9 +1026,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                             setShowCarsListing(true);
                             return;
                           }
-                          toggleChecklist(item.id);
                         }}
-                        style={{ flex: 1, marginLeft: 10 }}
+                        style={{ flex: 1, paddingVertical: 2 }}
                       >
                         <Text
                           style={[
@@ -1454,8 +1519,7 @@ const styles: any = StyleSheet.create({
     flex: 1,
   },
   checklistItemTextCompleted: {
-    color: '#8C8283',
-    textDecorationLine: 'line-through',
+    color: '#557A46',
   },
   deleteBtn: {
     padding: 6,

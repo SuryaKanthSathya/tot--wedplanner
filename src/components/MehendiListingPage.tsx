@@ -334,6 +334,7 @@ export interface MehendiListingPageProps {
   savedMehendiIds?: Record<string, boolean>;
   onToggleSavedMehendi?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
@@ -341,6 +342,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
   savedMehendiIds,
   onToggleSavedMehendi,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -459,6 +461,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
         onBack={() => setSelectedArtist(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedArtist.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -731,7 +734,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ maxHeight: 380, overflowY: 'auto' } as any} showsVerticalScrollIndicator={false}>
                 {/* 1. CITY FILTER OPTIONS */}
                 {activeFilterModal === 'city' && (
                   <View style={styles.optionsList}>

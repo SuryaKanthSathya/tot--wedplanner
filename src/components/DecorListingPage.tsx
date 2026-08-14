@@ -39,6 +39,7 @@ export interface DecorListingPageProps {
   savedDecorIds?: Record<string, boolean>;
   onToggleSavedDecor?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 const TAMIL_NADU_DISTRICTS = [
@@ -545,6 +546,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
   savedDecorIds = {},
   onToggleSavedDecor,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
@@ -625,6 +627,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
         onBack={() => setSelectedStudio(null)}
         isBookmarked={Boolean(savedDecorIds[selectedStudio.id])}
         onToggleBookmark={handleToggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }
@@ -871,7 +874,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
 
       {/* LISTINGS SCROLL */}
       <ScrollView
-        style={{ flex: 1 }}
+        style={{ flex: 1, overflowY: 'auto' } as any}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       >
@@ -1228,25 +1231,20 @@ const styles = StyleSheet.create({
   filterBarContainer: {
     flexDirection: 'row',
     paddingHorizontal: 16,
-    gap: 8,
-    marginBottom: 10,
-    marginTop: 2,
+    gap: 6,
+    marginBottom: 8,
+    alignItems: 'center',
   },
   filterChip: {
     flex: 1,
-    height: 36,
-    borderRadius: 24,
+    height: 32,
+    paddingHorizontal: 6,
+    borderRadius: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#DDD6CE',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
-    elevation: 1,
   },
   filterChipActive: {
     backgroundColor: '#FFFFFF',
@@ -1261,7 +1259,7 @@ const styles = StyleSheet.create({
   },
   filterChipTextActive: {
     color: '#581420',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   dropdownOption: {
     flexDirection: 'row',

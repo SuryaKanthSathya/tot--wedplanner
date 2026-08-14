@@ -509,7 +509,7 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
   const getPageTitle = () => {
     if (currentStep === 1) return 'Marriage Type';
     if (currentStep === 2) return 'Tell us about the couple';
-    if (currentStep === 3) return 'Where are you getting married?';
+    if (currentStep === 3) return 'Where is your event location?';
     if (currentStep === 4) return 'How many guests are you expecting?';
     if (currentStep === 5) return "What's your estimated wedding budget?";
     return 'What type of wedding are you planning?';
@@ -871,7 +871,7 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
           </View>
         )}
 
-        {/* STEP 3: Where are you getting married? (Location) */}
+        {/* STEP 3: Where is your event location? (Location) */}
         {currentStep === 3 && (
           <View style={styles.formSectionBlock}>
             {/* Wedding Location Input Box (Empty Initially!) */}
@@ -1227,8 +1227,8 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
                   desc: 'Beachfront Canopy & Tropical Sunset',
                 },
                 {
-                  id: 'Simple',
-                  label: 'Simple',
+                  id: 'Classic',
+                  label: 'Classic',
                   image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=600&q=80',
                   desc: 'Minimal Intimate Garden & Chic Arch',
                 },

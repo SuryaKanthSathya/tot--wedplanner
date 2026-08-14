@@ -35,10 +35,13 @@ import {
   Palette,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
 import { CateringVendor } from './CateringListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 
 interface CatererDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   caterer: CateringVendor;
   onBack: () => void;
   isBookmarked: boolean;
@@ -46,6 +49,7 @@ interface CatererDetailPageProps {
 }
 
 export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
+  onNavigateToQuotesTab,
   caterer,
   onBack,
   isBookmarked,
@@ -55,6 +59,95 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${caterer.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[caterer.id]) {
+          return statuses[caterer.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[caterer.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((caterer.startingPrice || '₹1,10,000').replace(/[^0-9]/g, ''), 10) || 110000;
+    saveOrUpdateQuote({
+      id: `quote-${caterer.id}`,
+      vendorId: caterer.id,
+      vendorName: caterer.name,
+      category: 'Catering',
+      packageName: 'Grand Royal Buffet Wedding Menu',
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: '24 Oct 2026',
+      location: caterer.location,
+      includedServices: [
+        'Traditional Welcome Drinks & Shorba',
+        'Gourmet Starters & Live Counters (5 Items)',
+        'Traditional Main Course (12 Special Items)',
+        'Artisanal Dessert Station (4 Items)',
+        'Premium Catering Staff & Table Service',
+      ],
+      image: caterer.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${caterer.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
 
   const portfolioImages = caterer.portfolio && caterer.portfolio.length > 0
     ? caterer.portfolio
@@ -193,7 +286,7 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
+            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-[#C28E38]" />
             {toastMessage}
@@ -511,14 +604,48 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
             <MessageCircle className="w-4 h-4 text-emerald-700" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.quoteBtnMain}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.quoteBtnMainText}>Request Quote</Text>
-          </TouchableOpacity>
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.quoteBtnMain}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.quoteBtnMainText}>
+                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -545,6 +672,25 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
         startingPrice={caterer.startingPrice}
         location={caterer.location}
         category="catering"
+        onQuoteSent={handleQuoteRequestSent}
+      />
+
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={caterer.id}
+        vendorName={caterer.name}
+        vendorImage={caterer.image}
+        vendorLocation={caterer.location}
+        startingPrice={caterer.startingPrice}
+        category="Catering"
+        packageName="Grand Royal Buffet Wedding Menu"
+        includedServices={[ 'Traditional Welcome Drinks & Shorba', 'Gourmet Starters & Live Counters (5 Items)', 'Traditional Main Course (12 Special Items)', 'Artisanal Dessert Station (4 Items)', 'Premium Catering Staff & Table Service' ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
       />
     </View>
   );

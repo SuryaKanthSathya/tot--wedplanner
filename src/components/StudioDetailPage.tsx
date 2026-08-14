@@ -39,10 +39,13 @@ import {
   FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 import { PhotographyStudio } from './PhotographyListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 
 interface StudioDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   studio: PhotographyStudio;
   onBack: () => void;
   isBookmarked: boolean;
@@ -50,6 +53,7 @@ interface StudioDetailPageProps {
 }
 
 export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
+  onNavigateToQuotesTab,
   studio,
   onBack,
   isBookmarked,
@@ -61,6 +65,95 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[studio.id]) {
+          return statuses[studio.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[studio.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((studio.startingPrice || '₹75,000').replace(/[^0-9]/g, ''), 10) || 75000;
+    saveOrUpdateQuote({
+      id: `quote-${studio.id}`,
+      vendorId: studio.id,
+      vendorName: studio.name,
+      category: 'Photography',
+      packageName: 'Premium Candid Photography & Wedding Highlight Film',
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: eventDate || '15 Dec 2026',
+      location: studio.location || 'Chennai, Tamil Nadu',
+      includedServices: [
+        '2 Elite Candid Wedding Photographers',
+        '1 Cinematic Traditional Videographer',
+        'Wedding Highlight Film & Teaser Reel',
+        'Pre-Wedding Couple Outdoor Photoshoot',
+        'Luxury Glass-Covered Leather Album',
+      ],
+      image: studio.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${studio.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
 
   // Quote form state
   const [customerName, setCustomerName] = useState('');
@@ -417,10 +510,48 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
           <Text style={styles.callNowBtnText}>Call Now</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.sendQuoteBtn} onPress={() => setShowQuoteModal(true)} activeOpacity={0.8}>
-          <Send className="w-4 h-4 text-white mr-1.5" />
-          <Text style={styles.sendQuoteBtnText}>Send Quote</Text>
-        </TouchableOpacity>
+                  {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.sendQuoteBtn}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.sendQuoteBtnText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.sendQuoteBtnText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.sendQuoteBtnText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.sendQuoteBtnText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.sendQuoteBtnText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.sendQuoteBtnText}>
+                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              </Text>
+            </TouchableOpacity>
+          )}
       </View>
 
       {/* LIGHTBOX PHOTO MODAL */}
@@ -441,8 +572,27 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
         visible={showQuoteModal}
         vendorName={studio.name}
         vendorLocation={studio.location}
-        onQuoteSent={() => showToast('Quote Request Sent Successfully!')}
+        category="photography"
+        onQuoteSent={handleQuoteRequestSent}
         onClose={() => setShowQuoteModal(false)}
+      />
+
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={studio.id}
+        vendorName={studio.name}
+        vendorImage={studio.image}
+        vendorLocation={studio.location}
+        startingPrice={studio.startingPrice}
+        category="Photography"
+        packageName="Premium Candid Photography & Wedding Highlight Film"
+        includedServices={[ '2 Elite Candid Wedding Photographers', '1 Cinematic Traditional Videographer', 'Wedding Highlight Film & Teaser Reel', 'Pre-Wedding Couple Outdoor Photoshoot', 'Luxury Glass-Covered Leather Album' ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
       />
     </View>
   );

@@ -638,6 +638,7 @@ export interface PhotographyListingPageProps {
   savedStudioIds?: Record<string, boolean>;
   onToggleSavedStudio?: (id: string) => void;
   onOpenSavedTab?: () => void;
+  onNavigateToQuotesTab?: () => void;
 }
 
 export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
@@ -645,6 +646,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
   savedStudioIds,
   onToggleSavedStudio,
   onOpenSavedTab,
+  onNavigateToQuotesTab,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -763,6 +765,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
         onBack={() => setSelectedStudio(null)}
         isBookmarked={Boolean(bookmarkedIds[selectedStudio.id])}
         onToggleBookmark={toggleBookmark}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
   }

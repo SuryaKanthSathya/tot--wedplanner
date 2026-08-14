@@ -34,7 +34,9 @@ import {
   ChevronRight,
   Instagram,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { QuotationScreen } from './QuotationScreen';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
+import { RequestQuoteModal } from './RequestQuoteModal';
 
 export interface VenueItem {
   id: string;
@@ -69,6 +71,7 @@ export interface VenueItem {
 }
 
 interface VenueDetailPageProps {
+  onNavigateToQuotesTab?: () => void;
   venue: VenueItem;
   onBack: () => void;
   isBookmarked: boolean;
@@ -76,6 +79,7 @@ interface VenueDetailPageProps {
 }
 
 export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
+  onNavigateToQuotesTab,
   venue,
   onBack,
   isBookmarked,
@@ -83,6 +87,96 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 }) => {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Quote Flow Local States
+  const [quoteStatus, setQuoteStatus] = useState<
+    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
+  >(() => {
+    try {
+      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
+      if (savedQuotesJson) {
+        const quotes = JSON.parse(savedQuotesJson);
+        const match = quotes.find((q: any) => q.id === `quote-${venue.id}`);
+        if (match) {
+          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
+          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
+          if (match.status === 'confirmed') return 'confirmed';
+        }
+      }
+      const statusesJson = localStorage.getItem('tot_quote_statuses');
+      if (statusesJson) {
+        const statuses = JSON.parse(statusesJson);
+        if (statuses[venue.id]) {
+          return statuses[venue.id];
+        }
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+    return 'initial';
+  });
+
+  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+    setQuoteStatus(newStatus);
+    try {
+      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
+      const statuses = JSON.parse(statusesJson);
+      statuses[venue.id] = newStatus;
+      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+
+  const handleShowToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleQuoteRequestSent = () => {
+    setShowQuoteModal(false);
+    updateQuoteStatus('requested');
+    const basePrice = parseInt((venue.startingPrice || '₹2,50,000').replace(/[^0-9]/g, ''), 10) || 250000;
+    saveOrUpdateQuote({
+      id: `quote-${venue.id}`,
+      vendorId: venue.id,
+      vendorName: venue.name,
+      category: 'Venues',
+      packageName: `${venue.name} - Grand AC Mandapam & Convention Package`,
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: basePrice,
+      advanceAmount: Math.round(basePrice * 0.3),
+      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      weddingDate: '24 Oct 2026',
+      location: venue.location || venue.city,
+      includedServices: venue.amenities && venue.amenities.length > 0 ? venue.amenities : [
+        'Centrally AC Banquet Hall Hire (12 Hours)',
+        'Traditional Grand Stage & Buffet Canopy Setup',
+        '2 AC Deluxe Bridal & Groom Changing Rooms',
+        'Valet Parking Service for up to 150 Vehicles',
+        '100% Uninterrupted Power Backup Generator',
+      ],
+      image: venue.image,
+    });
+    setToastMessage('Quote Request Sent! Added to My Quotes');
+    setTimeout(() => setToastMessage(null), 3000);
+
+    // Simulate response after 3 seconds
+    setTimeout(() => {
+      updateQuoteStatus('response_ready');
+      saveOrUpdateQuote({
+        id: `quote-${venue.id}`,
+        status: 'response_ready',
+      });
+      setToastMessage('Venue Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 4000);
+    }, 3000);
+  };
+
   const [quoteSuccess, setQuoteSuccess] = useState<boolean>(false);
 
   // Quote Form State
@@ -114,7 +208,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
     Linking.openURL(`https://instagram.com/${username}`);
   };
 
-  const handleSubmitQuote = (e: React.FormEvent) => {
+    const handleSubmitQuote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!guestName.trim() || !guestPhone.trim() || !eventDate.trim()) {
       alert('Please fill in your name, phone number, and event date.');
@@ -124,12 +218,18 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
     setTimeout(() => {
       setQuoteSuccess(false);
       setShowQuoteModal(false);
-    }, 2200);
+      handleQuoteRequestSent();
+    }, 1500);
   };
 
   return (
     <View style={styles.container}>
-      {/* FIXED TOP HEADER */}
+      {/* TOAST NOTIFICATION */}
+      {toastMessage && (
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] px-5 py-2.5 bg-stone-900/90 rounded-xl shadow-lg">
+          <span className="text-white text-sm font-medium">{toastMessage}</span>
+        </div>
+      )}
       <View style={styles.topHeader}>
         <TouchableOpacity
           style={styles.iconCircleBtn}
@@ -162,8 +262,8 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
       {/* SCROLLABLE MAIN BODY */}
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        style={{ flex: 1, overflowY: 'auto' } as any}
+        contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HERO IMAGE & CAROUSEL PREVIEW */}
@@ -349,189 +449,84 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={styles.primaryQuoteBtn}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
-          </TouchableOpacity>
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.primaryQuoteBtn}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.primaryQuoteBtnText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.primaryQuoteBtnText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.primaryQuoteBtnText}>
+                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
-      {/* REQUEST QUOTE MODAL */}
-      {showQuoteModal && (
-        <Modal
-          visible={showQuoteModal}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowQuoteModal(false)}
-        >
-          <View style={styles.modalBg}>
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="w-[92%] max-w-md bg-white rounded-2xl overflow-hidden shadow-2xl p-5"
-            >
-              <View style={styles.modalHeader}>
-                <View>
-                  <Text style={styles.modalTitle}>Request Venue Quote</Text>
-                  <Text style={styles.modalSub}>{venue.name}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => setShowQuoteModal(false)}
-                  style={styles.modalCloseBtn}
-                >
-                  <X className="w-5 h-5 text-stone-500" />
-                </TouchableOpacity>
-              </View>
+      <RequestQuoteModal
+        visible={showQuoteModal}
+        vendorName={venue.name}
+        startingPrice={venue.startingPrice}
+        location={venue.location || venue.city}
+        category="venue"
+        onClose={() => setShowQuoteModal(false)}
+        onQuoteSent={handleQuoteRequestSent}
+      />
 
-              {quoteSuccess ? (
-                <View style={styles.successContainer}>
-                  <CheckCircle2 className="w-12 h-12 text-emerald-600 mb-2" />
-                  <Text style={styles.successTitle}>Quote Request Sent!</Text>
-                  <Text style={styles.successSub}>
-                    {venue.name} manager will contact you on WhatsApp / phone shortly.
-                  </Text>
-                </View>
-              ) : (
-                <form onSubmit={handleSubmitQuote}>
-                  <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false}>
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Your Name *</Text>
-                      <TextInput
-                        style={styles.formInput}
-                        placeholder="e.g. Ananya & Karthik"
-                        value={guestName}
-                        onChangeText={setGuestName}
-                      />
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Phone Number *</Text>
-                      <TextInput
-                        style={styles.formInput}
-                        placeholder="e.g. +91 98765 43210"
-                        keyboardType="phone-pad"
-                        value={guestPhone}
-                        onChangeText={setGuestPhone}
-                      />
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Wedding Date *</Text>
-                      <TextInput
-                        style={styles.formInput}
-                        placeholder="DD/MM/YYYY"
-                        value={eventDate}
-                        onChangeText={setEventDate}
-                      />
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Expected Guests</Text>
-                      <View style={styles.chipRow}>
-                        {['200 - 500', '500 - 1,000', '1,000 - 2,500', '2,500+'].map((g) => (
-                          <TouchableOpacity
-                            key={g}
-                            style={[
-                              styles.selectChip,
-                              guestCount === g && styles.selectChipActive,
-                            ]}
-                            onPress={() => setGuestCount(g)}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipText,
-                                guestCount === g && styles.selectChipTextActive,
-                              ]}
-                            >
-                              {g}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>AC Guest Rooms Needed</Text>
-                      <View style={styles.chipRow}>
-                        {['None', '5 - 10 Rooms', '10 - 25 Rooms', '25+ Rooms'].map((r) => (
-                          <TouchableOpacity
-                            key={r}
-                            style={[
-                              styles.selectChip,
-                              roomRequirement === r && styles.selectChipActive,
-                            ]}
-                            onPress={() => setRoomRequirement(r)}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipText,
-                                roomRequirement === r && styles.selectChipTextActive,
-                              ]}
-                            >
-                              {r}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Catering Preference</Text>
-                      <View style={styles.chipRow}>
-                        {['Pure Veg (In-house)', 'Non-Veg Allowed', 'External Catering'].map((c) => (
-                          <TouchableOpacity
-                            key={c}
-                            style={[
-                              styles.selectChip,
-                              cateringPreference === c && styles.selectChipActive,
-                            ]}
-                            onPress={() => setCateringPreference(c)}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipText,
-                                cateringPreference === c && styles.selectChipTextActive,
-                              ]}
-                            >
-                              {c}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-
-                    <View style={styles.formGroup}>
-                      <Text style={styles.formLabel}>Notes & Specific Requests</Text>
-                      <TextInput
-                        style={[styles.formInput, { height: 70, paddingTop: 8 }]}
-                        placeholder="e.g. Muhurtham morning timing, Mandapam decorator preferences..."
-                        multiline
-                        numberOfLines={3}
-                        value={additionalNotes}
-                        onChangeText={setAdditionalNotes}
-                      />
-                    </View>
-                  </ScrollView>
-
-                  <TouchableOpacity
-                    style={styles.submitModalBtn}
-                    onPress={handleSubmitQuote as any}
-                    activeOpacity={0.85}
-                  >
-                    <Send className="w-4 h-4 text-white mr-1.5" />
-                    <Text style={styles.submitModalBtnText}>Send Venue Quote Request</Text>
-                  </TouchableOpacity>
-                </form>
-              )}
-            </motion.div>
-          </View>
-        </Modal>
-      )}
+      <QuotationScreen
+        visible={showQuotationScreen}
+        onClose={() => setShowQuotationScreen(false)}
+        quoteStatus={quoteStatus}
+        setQuoteStatus={updateQuoteStatus}
+        vendorId={venue.id}
+        vendorName={venue.name}
+        vendorImage={venue.image}
+        vendorLocation={venue.location || venue.city}
+        startingPrice={venue.startingPrice}
+        category="Venues"
+        packageName={`${venue.name} - Grand AC Mandapam & Convention Package`}
+        includedServices={venue.amenities && venue.amenities.length > 0 ? venue.amenities : [
+          'Centrally AC Banquet Hall Hire (12 Hours)',
+          'Traditional Grand Stage & Buffet Canopy Setup',
+          '2 AC Deluxe Bridal & Groom Changing Rooms',
+          'Valet Parking Service for up to 150 Vehicles',
+          '100% Uninterrupted Power Backup Generator',
+        ]}
+        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        onBack={onBack}
+        onShowToast={handleShowToast}
+      />
     </View>
   );
 };
@@ -539,7 +534,11 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
+    maxHeight: '100%',
+    width: '100%',
     backgroundColor: '#FAF7F2',
+    overflow: 'hidden',
   },
   topHeader: {
     flexDirection: 'row',
