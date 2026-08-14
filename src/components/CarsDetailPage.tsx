@@ -570,6 +570,7 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={car.id}
         vendorName={car.name}
         vendorLocation={car.location}
         category="cars"

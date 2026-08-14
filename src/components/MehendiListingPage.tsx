@@ -898,6 +898,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteArtist)}
+        vendorId={quoteArtist?.id}
         vendorName={quoteArtist?.name || ''}
         vendorLocation={quoteArtist?.location || ''}
         onClose={() => setQuoteArtist(null)}

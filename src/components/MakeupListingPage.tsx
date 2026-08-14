@@ -1050,6 +1050,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteStudio)}
+        vendorId={quoteStudio?.id}
         onClose={() => setQuoteStudio(null)}
         studioName={quoteStudio ? quoteStudio.name : ''}
         startingPrice={quoteStudio ? quoteStudio.startingPrice : ''}

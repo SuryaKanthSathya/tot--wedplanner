@@ -726,6 +726,11 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onExploreInvitations={() => setShowInvitationListing(true)}
           onNavigateToHome={() => setActiveTab('home')}
         />
+      ) : activeTab === 'quotes' ? (
+        <MyQuotesTabScreen
+          onHideTabBar={setHideTabBar}
+          onExploreVendors={() => setActiveTab('home')}
+        />
       ) : (
         /* Scrollable Main Content */
         <ScrollView

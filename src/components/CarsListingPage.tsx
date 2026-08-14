@@ -655,6 +655,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteCar)}
+        vendorId={quoteCar?.id}
         vendorName={quoteCar?.name || ''}
         vendorLocation={quoteCar?.location || ''}
         category="cars"

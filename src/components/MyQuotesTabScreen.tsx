@@ -247,10 +247,12 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
             <View style={styles.invoiceSection}>
               <Text style={styles.invoiceSectionHeading}>INCLUDED SERVICES</Text>
               {activeQuote.includedServices.map((svc, i) => (
-                <View key={i} style={styles.invoiceServiceRow}>
-                  <Text style={styles.invoiceServiceDot}>•</Text>
-                  <Text style={styles.invoiceServiceText}>{svc}</Text>
-                </View>
+                <React.Fragment key={i}>
+                  <View style={styles.invoiceServiceRow}>
+                    <Text style={styles.invoiceServiceDot}>•</Text>
+                    <Text style={styles.invoiceServiceText}>{svc}</Text>
+                  </View>
+                </React.Fragment>
               ))}
             </View>
           )}
@@ -928,8 +930,7 @@ const styles = StyleSheet.create({
   filterTabText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#4B5563',
-    whiteSpace: 'nowrap' as any,
+    color: '#8C7A7C',
   },
   filterTabTextActive: {
     color: '#FFFFFF',

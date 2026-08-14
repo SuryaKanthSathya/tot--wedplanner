@@ -496,6 +496,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={venue.id}
         vendorName={venue.name}
         startingPrice={venue.startingPrice}
         location={venue.location || venue.city}

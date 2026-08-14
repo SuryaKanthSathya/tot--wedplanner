@@ -617,6 +617,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={studio.id}
         vendorName={studio.name}
         location={studio.location}
         startingPrice={studio.startingPrice}

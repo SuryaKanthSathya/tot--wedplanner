@@ -675,6 +675,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={artist.id}
         onClose={() => setShowQuoteModal(false)}
         artistName={artist.name}
         startingPrice={artist.startingPrice}

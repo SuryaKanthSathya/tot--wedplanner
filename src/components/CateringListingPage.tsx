@@ -973,6 +973,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteCaterer)}
+        vendorId={quoteCaterer?.id}
         vendorName={quoteCaterer?.name || ''}
         vendorLocation={quoteCaterer?.location || ''}
         onClose={() => setQuoteCaterer(null)}

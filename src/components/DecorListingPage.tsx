@@ -1031,7 +1031,8 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
       </ScrollView>
 
       {/* FILTER MODAL */}
-      <Modal visible={showFilterModal} transparent animationType="slide">
+      <Modal visible={showFilterModal}
+        vendorId={quoteStudio?.id} transparent animationType="slide">
         <View style={styles.filterModalOverlay}>
           <View style={styles.filterModalContent}>
             <View style={styles.filterModalHeader}>
@@ -1150,6 +1151,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
       {quoteStudio && (
         <RequestQuoteModal
           visible={Boolean(quoteStudio)}
+        vendorId={quoteStudio?.id}
           vendorName={quoteStudio.name}
           location={quoteStudio.location}
           startingPrice={quoteStudio.startingPrice}
@@ -1620,19 +1622,6 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     maxHeight: '80%',
     paddingBottom: 20,
-  },
-  filterModalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
-  },
-  filterModalTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#2A2425',
   },
   filterModalScroll: {
     padding: 16,

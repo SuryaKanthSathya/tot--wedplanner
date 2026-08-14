@@ -613,6 +613,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={invite.id}
         onClose={() => setShowQuoteModal(false)}
         studioName={invite.name}
         startingPrice={invite.startingPrice}

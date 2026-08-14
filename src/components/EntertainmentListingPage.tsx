@@ -653,6 +653,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteArtist)}
+        vendorId={quoteArtist?.id}
         vendorName={quoteArtist?.name || ''}
         vendorLocation={quoteArtist?.location || ''}
         category="entertainment"

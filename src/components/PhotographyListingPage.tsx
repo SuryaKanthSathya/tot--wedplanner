@@ -1202,6 +1202,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
       {/* SEND QUOTE MODAL POPUP */}
       <RequestQuoteModal
         visible={Boolean(quoteStudio)}
+        vendorId={quoteStudio?.id}
         vendorName={quoteStudio?.name || ''}
         vendorLocation={quoteStudio?.location || ''}
         onClose={() => setQuoteStudio(null)}

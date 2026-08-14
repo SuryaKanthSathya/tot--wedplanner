@@ -140,6 +140,8 @@ interface MyWeddingTabScreenProps {
   onToggleSavedInvite?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToHome?: () => void;
+  onHideTabBar?: (hide: boolean) => void;
+  onOpenQuotesTab?: () => void;
 }
 
 interface ChecklistItem {
@@ -391,6 +393,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onToggleSavedInvite,
   onOpenSavedTab,
   onNavigateToHome,
+  onHideTabBar,
+  onOpenQuotesTab,
 }) => {
   const [activeSegment, setActiveSegment] = useState<'overview' | 'checklist' | 'guests' | 'budget'>('overview');
   let brideName = '';

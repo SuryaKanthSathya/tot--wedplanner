@@ -24,9 +24,11 @@ import {
   Car,
   Music,
 } from 'lucide-react';
+import { saveOrUpdateQuote } from '../utils/quotesManager';
 
 export interface RequestQuoteModalProps {
   visible: boolean;
+  vendorId?: string;
   vendorName?: string;
   studioName?: string;
   vendorLocation?: string;
@@ -199,6 +201,7 @@ const INVITATION_BUDGET_RANGES = [
 
 export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
   visible,
+  vendorId,
   vendorName,
   studioName,
   vendorLocation,
@@ -336,6 +339,27 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
     }
 
     setValidationError(null);
+
+    const fallbackId = `quote-${finalVendorName.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
+    const newQuoteId = vendorId ? `quote-${vendorId}` : fallbackId;
+    
+    saveOrUpdateQuote({
+      id: newQuoteId,
+      vendorId: vendorId || newQuoteId.replace('quote-', ''),
+      vendorName: finalVendorName,
+      category: category,
+      packageName: `${category.charAt(0).toUpperCase() + category.slice(1)} Package`,
+      status: 'requested',
+      paymentStatus: 'pending',
+      totalAmount: 0,
+      advanceAmount: 0,
+      remainingAmount: 0,
+      weddingDate,
+      location: weddingLocation,
+      includedServices: selectedServices,
+      image: '',
+    });
+
     setIsSuccess(true);
     if (onQuoteSent) {
       onQuoteSent();

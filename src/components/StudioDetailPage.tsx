@@ -570,6 +570,7 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={studio.id}
         vendorName={studio.name}
         vendorLocation={studio.location}
         category="photography"

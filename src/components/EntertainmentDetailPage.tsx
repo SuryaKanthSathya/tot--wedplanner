@@ -570,6 +570,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={artist.id}
         vendorName={artist.name}
         vendorLocation={artist.location}
         category="entertainment"

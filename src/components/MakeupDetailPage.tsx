@@ -614,6 +614,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={studio.id}
         onClose={() => setShowQuoteModal(false)}
         studioName={studio.name}
         startingPrice={studio.startingPrice}

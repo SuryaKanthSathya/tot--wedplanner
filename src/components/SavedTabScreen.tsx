@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors, ArrowLeft } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -57,6 +57,7 @@ interface SavedTabScreenProps {
   onToggleSavedCatering?: (id: string) => void;
   onExploreCatering?: () => void;
   onHideTabBar?: (hide: boolean) => void;
+  onNavigateToHome?: () => void;
 }
 
 export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
@@ -88,6 +89,7 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   onToggleSavedCatering,
   onExploreCatering,
   onHideTabBar,
+  onNavigateToHome,
 }) => {
   const [activeCategory, setActiveCategory] = useState<
     'All' | 'Photography' | 'Makeup' | 'Venues' | 'Decor' | 'Entertainment' | 'Cars' | 'Invitations' | 'Mehendi' | 'Catering'

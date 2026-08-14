@@ -667,6 +667,7 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={caterer.id}
         onClose={() => setShowQuoteModal(false)}
         vendorName={caterer.name}
         startingPrice={caterer.startingPrice}
