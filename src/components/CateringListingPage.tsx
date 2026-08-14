@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { CatererDetailPage } from './CatererDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { VendorCompareModal } from './VendorCompareModal';
 import {
   ChevronLeft,
   Search,
@@ -34,6 +35,8 @@ import {
   Utensils,
   User,
   ChevronDown,
+  Scale,
+  ChevronRight,
 } from 'lucide-react';
 
 export interface CateringVendor {
@@ -459,6 +462,8 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
   });
 
   const bookmarkedIds = savedCateringIds || localBookmarkedIds;
+  const savedCaterersList = CATERING_DATA.filter((c) => Boolean(bookmarkedIds[c.id]));
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   const toggleBookmark = (id: string) => {
     if (onToggleSavedCatering) {
@@ -977,6 +982,53 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
         vendorName={quoteCaterer?.name || ''}
         vendorLocation={quoteCaterer?.location || ''}
         onClose={() => setQuoteCaterer(null)}
+      />
+
+      {/* FLOATING COMPARE BAR WHEN 2+ CATERERS ARE SELECTED/SAVED */}
+      <AnimatePresence>
+        {savedCaterersList.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            style={{
+              position: 'fixed' as any,
+              bottom: 24,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 999,
+              pointerEvents: 'none' as any,
+            }}
+          >
+            <TouchableOpacity
+              style={styles.floatingCompareBtn}
+              onPress={() => setShowCompareModal(true)}
+              activeOpacity={0.9}
+            >
+              <View style={styles.floatingCompareBadge}>
+                <Text style={styles.floatingCompareBadgeText}>{savedCaterersList.length}</Text>
+              </View>
+              <Scale className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.floatingCompareBtnText}>Compare ({savedCaterersList.length})</Text>
+              <ChevronRight className="w-4 h-4 text-white ml-1" />
+            </TouchableOpacity>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VENDOR COMPARE MODAL */}
+      <VendorCompareModal
+        visible={showCompareModal}
+        categoryTitle="Catering Services"
+        vendors={savedCaterersList}
+        onClose={() => setShowCompareModal(false)}
+        onSelectVendor={(v) => {
+          const match = CATERING_DATA.find((item) => item.id === v.id);
+          if (match) setSelectedCaterer(match);
+        }}
       />
     </View>
   );
@@ -1610,6 +1662,42 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 6,
     lineHeight: 18,
+  },
+  floatingCompareBtn: {
+    pointerEvents: 'auto' as any,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#581420',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: '#F3ECE4',
+  },
+  floatingCompareBadge: {
+    backgroundColor: '#C28E38',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  floatingCompareBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  floatingCompareBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });
 

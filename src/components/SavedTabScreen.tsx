@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
 } from 'react-native-web';
-import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors, ArrowLeft } from 'lucide-react';
+import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors, ArrowLeft, Scale, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';
 import { StudioDetailPage } from './StudioDetailPage';
@@ -27,6 +27,7 @@ import { MehendiArtist, MEHENDI_DATA } from './MehendiListingPage';
 import { ArtistDetailPage } from './ArtistDetailPage';
 import { CateringVendor, CATERING_DATA } from './CateringListingPage';
 import { CatererDetailPage } from './CatererDetailPage';
+import { VendorCompareModal, GenericVendor } from './VendorCompareModal';
 
 interface SavedTabScreenProps {
   savedStudioIds?: Record<string, boolean>;
@@ -104,6 +105,48 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
   const [selectedMehendi, setSelectedMehendi] = useState<MehendiArtist | null>(null);
   const [selectedCatering, setSelectedCatering] = useState<CateringVendor | null>(null);
 
+  // Vendor Comparison Modal State
+  const [compareModalVisible, setCompareModalVisible] = useState(false);
+  const [compareCategoryTitle, setCompareCategoryTitle] = useState('');
+  const [compareVendorsList, setCompareVendorsList] = useState<GenericVendor[]>([]);
+
+  const handleOpenCompare = (title: string, list: any[]) => {
+    setCompareCategoryTitle(title);
+    setCompareVendorsList(list);
+    setCompareModalVisible(true);
+  };
+
+  const handleSelectVendorFromCompare = (vendor: GenericVendor) => {
+    if (compareCategoryTitle === 'Photography') {
+      const match = STUDIOS_DATA.find((s) => s.id === vendor.id);
+      if (match) setSelectedStudio(match);
+    } else if (compareCategoryTitle === 'Makeup') {
+      const match = MAKEUP_STUDIOS_DATA.find((m) => m.id === vendor.id);
+      if (match) setSelectedMakeup(match);
+    } else if (compareCategoryTitle === 'Decor') {
+      const match = DECOR_STUDIOS_DATA.find((d) => d.id === vendor.id);
+      if (match) setSelectedDecor(match);
+    } else if (compareCategoryTitle === 'Venues') {
+      const match = VENUES_DATA.find((v) => v.id === vendor.id);
+      if (match) setSelectedVenue(match);
+    } else if (compareCategoryTitle === 'Entertainment') {
+      const match = ENTERTAINMENT_DATA.find((e) => e.id === vendor.id);
+      if (match) setSelectedEnt(match);
+    } else if (compareCategoryTitle === 'Cars') {
+      const match = CARS_DATA.find((c) => c.id === vendor.id);
+      if (match) setSelectedCar(match);
+    } else if (compareCategoryTitle === 'Invitations') {
+      const match = INVITATIONS_DATA.find((i) => i.id === vendor.id);
+      if (match) setSelectedInvite(match);
+    } else if (compareCategoryTitle === 'Mehendi') {
+      const match = MEHENDI_DATA.find((m) => m.id === vendor.id);
+      if (match) setSelectedMehendi(match);
+    } else if (compareCategoryTitle === 'Catering') {
+      const match = CATERING_DATA.find((c) => c.id === vendor.id);
+      if (match) setSelectedCatering(match);
+    }
+  };
+
   const isAnyDetailOpen = Boolean(
     selectedStudio ||
     selectedMakeup ||
@@ -113,7 +156,8 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
     selectedCar ||
     selectedInvite ||
     selectedMehendi ||
-    selectedCatering
+    selectedCatering ||
+    compareModalVisible
   );
 
   useEffect(() => {
@@ -482,6 +526,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedStudios.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Photography', savedStudios)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Photography</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -526,6 +583,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedMakeups.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Makeup', savedMakeups)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Makeup</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -570,6 +640,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedDecors.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Decor', savedDecors)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Decorators</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -614,6 +697,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedVenues.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Venues', savedVenues)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Venues</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -658,6 +754,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedEnts.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Entertainment', savedEnts)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Entertainment</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -702,6 +811,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedCars.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Cars', savedCars)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Luxury Cars</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -746,6 +868,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedInvites.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Invitations', savedInvites)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Invitations</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -790,6 +925,19 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedMehendis.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Mehendi', savedMehendis)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Mehendi Artists</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
 
@@ -834,11 +982,33 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
                     </View>
                   </motion.div>
                 ))}
+
+                {/* Compare Button Down (Solid Burgundy Pill) */}
+                {savedCaterings.length >= 2 && (
+                  <View style={styles.compareBtnContainer}>
+                    <TouchableOpacity
+                      style={styles.sectionBottomCompareBtn}
+                      onPress={() => handleOpenCompare('Catering', savedCaterings)}
+                      activeOpacity={0.85}
+                    >
+                      <Text style={styles.sectionBottomCompareBtnText}>Compare Catering</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
           </View>
         )}
       </ScrollView>
+
+      {/* VENDOR COMPARE MODAL */}
+      <VendorCompareModal
+        visible={compareModalVisible}
+        categoryTitle={compareCategoryTitle}
+        vendors={compareVendorsList}
+        onClose={() => setCompareModalVisible(false)}
+        onSelectVendor={handleSelectVendorFromCompare}
+      />
     </View>
   );
 };
@@ -846,7 +1016,14 @@ export const SavedTabScreen: React.FC<SavedTabScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
+    maxHeight: '100%',
+    width: '100%',
     backgroundColor: '#FAF7F2',
+    position: 'relative' as any,
+    overflow: 'hidden',
+    display: 'flex' as any,
+    flexDirection: 'column',
   },
   header: {
     flexDirection: 'row',
@@ -969,6 +1146,21 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#3B2F2F',
   },
+  compareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3ECE4',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D8CEC2',
+  },
+  compareBtnText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#581420',
+  },
   browseMoreText: {
     fontSize: 12,
     fontWeight: '700',
@@ -1051,5 +1243,30 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: '#581420',
+  },
+  compareBtnContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 6,
+    marginBottom: 10,
+  },
+  sectionBottomCompareBtn: {
+    backgroundColor: '#581420',
+    paddingVertical: 10,
+    paddingHorizontal: 26,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#581420',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  sectionBottomCompareBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });

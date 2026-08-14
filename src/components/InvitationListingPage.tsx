@@ -21,12 +21,14 @@ import {
   Bookmark,
   Package,
   Clock,
-  Printer,
   Check,
   X,
+  Scale,
+  ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { InvitationItem, InvitationDetailPage } from './InvitationDetailPage';
+import { VendorCompareModal } from './VendorCompareModal';
 export type { InvitationItem };
 
 export const INVITATIONS_DATA: InvitationItem[] = [
@@ -458,6 +460,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
   const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const savedInvitesList = INVITATIONS_DATA.filter((inv) => Boolean(savedInviteIds[inv.id]));
+  const [showCompareModal, setShowCompareModal] = useState(false);
 
   const filteredInvites = INVITATIONS_DATA.filter((invite) => {
     const matchesCity =
@@ -899,6 +903,53 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* FLOATING COMPARE BAR WHEN 2+ INVITATIONS ARE SELECTED/SAVED */}
+      <AnimatePresence>
+        {savedInvitesList.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            style={{
+              position: 'fixed' as any,
+              bottom: 24,
+              left: 0,
+              right: 0,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 999,
+              pointerEvents: 'none' as any,
+            }}
+          >
+            <TouchableOpacity
+              style={styles.floatingCompareBtn}
+              onPress={() => setShowCompareModal(true)}
+              activeOpacity={0.9}
+            >
+              <View style={styles.floatingCompareBadge}>
+                <Text style={styles.floatingCompareBadgeText}>{savedInvitesList.length}</Text>
+              </View>
+              <Scale className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.floatingCompareBtnText}>Compare ({savedInvitesList.length})</Text>
+              <ChevronRight className="w-4 h-4 text-white ml-1" />
+            </TouchableOpacity>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VENDOR COMPARE MODAL */}
+      <VendorCompareModal
+        visible={showCompareModal}
+        categoryTitle="Invitations"
+        vendors={savedInvitesList}
+        onClose={() => setShowCompareModal(false)}
+        onSelectVendor={(v) => {
+          const match = INVITATIONS_DATA.find((item) => item.id === v.id);
+          if (match) setSelectedInvite(match);
+        }}
+      />
     </View>
   );
 };
@@ -1218,6 +1269,42 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: '#7D6E70',
     marginTop: 4,
+  },
+  floatingCompareBtn: {
+    pointerEvents: 'auto' as any,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#581420',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+    borderWidth: 1.5,
+    borderColor: '#F3ECE4',
+  },
+  floatingCompareBadge: {
+    backgroundColor: '#C28E38',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  floatingCompareBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  floatingCompareBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });
 
