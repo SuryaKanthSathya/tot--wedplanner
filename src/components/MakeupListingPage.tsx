@@ -506,6 +506,8 @@ interface MakeupListingPageProps {
   onToggleSavedMakeup?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
@@ -514,6 +516,8 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
   onToggleSavedMakeup,
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -614,6 +618,23 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         isBookmarked={Boolean(bookmarkedIds[selectedStudio.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedStudio(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedStudio.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedStudio(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedStudio.id } })
+            );
+          }
+        }}
       />
     );
   }
@@ -628,18 +649,22 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
 
         <Text style={styles.headerTitle}>Bridal & Groom Makeup</Text>
 
-        <TouchableOpacity
-          style={styles.savedBadgeBtn}
-          onPress={onOpenSavedTab ? onOpenSavedTab : () => {}}
-          activeOpacity={0.7}
-        >
-          <Heart className={`w-4 h-4 ${activeSavedCount > 0 ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#2A2425]'}`} />
-          {activeSavedCount > 0 && (
-            <View style={styles.savedCountDot}>
-              <Text style={styles.savedCountDotText}>{activeSavedCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        {onOpenSavedTab ? (
+          <TouchableOpacity
+            style={styles.savedBadgeBtn}
+            onPress={onOpenSavedTab}
+            activeOpacity={0.7}
+          >
+            <Heart className={`w-4 h-4 ${activeSavedCount > 0 ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#2A2425]'}`} />
+            {activeSavedCount > 0 && (
+              <View style={styles.savedCountDot}>
+                <Text style={styles.savedCountDotText}>{activeSavedCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 36 }} />
+        )}
       </View>
 
       {/* SEARCH BAR */}

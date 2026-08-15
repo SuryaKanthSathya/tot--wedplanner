@@ -410,6 +410,8 @@ export interface CateringListingPageProps {
   onToggleSavedCatering?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const CateringListingPage: React.FC<CateringListingPageProps> = ({
@@ -418,6 +420,8 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
   onToggleSavedCatering,
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -537,6 +541,23 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
         isBookmarked={Boolean(bookmarkedIds[selectedCaterer.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedCaterer(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedCaterer.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedCaterer(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedCaterer.id } })
+            );
+          }
+        }}
       />
     );
   }
@@ -557,23 +578,21 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
               <Text style={styles.resetBadgeText}>Reset</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            style={styles.iconButton}
-            activeOpacity={0.7}
-            onPress={() => {
-              if (onOpenSavedTab) {
-                onOpenSavedTab();
-              }
-            }}
-          >
-            <Heart
-              className={`w-5 h-5 ${
-                Object.values(bookmarkedIds).some(Boolean)
-                  ? 'text-[#8B1E2F] fill-[#8B1E2F]'
-                  : 'text-[#2A2425]'
-              }`}
-            />
-          </TouchableOpacity>
+          {onOpenSavedTab && (
+            <TouchableOpacity
+              style={styles.iconButton}
+              activeOpacity={0.7}
+              onPress={onOpenSavedTab}
+            >
+              <Heart
+                className={`w-5 h-5 ${
+                  Object.values(bookmarkedIds).some(Boolean)
+                    ? 'text-[#8B1E2F] fill-[#8B1E2F]'
+                    : 'text-[#2A2425]'
+                }`}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

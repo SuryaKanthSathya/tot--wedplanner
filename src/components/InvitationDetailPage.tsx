@@ -30,7 +30,12 @@ import {
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 export interface InvitationItem {
   id: string;
@@ -67,6 +72,9 @@ interface InvitationDetailPageProps {
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
@@ -75,9 +83,13 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Quote Flow Local States
@@ -583,9 +595,17 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
         )}
 
         {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+          <TouchableOpacity
+            style={[styles.btnQuote, { backgroundColor: '#15803D' }]}
+            onPress={() => setShowInvoiceModal(true)}
+            activeOpacity={0.85}
+          >
             <Text style={styles.btnQuoteText}>
-              {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+              {quoteStatus === 'fully_paid'
+                ? 'Fully Paid (Invoice)'
+                : quoteStatus === 'partially_paid'
+                ? 'Partially Paid (Invoice)'
+                : 'View Invoice'}
             </Text>
           </TouchableOpacity>
         )}
@@ -634,10 +654,52 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
         startingPrice={invite.startingPrice}
         category="Invitations"
         packageName="Custom Animated Luxury E-Invite & Printed Cards"
-        includedServices={[ 'Bespoke Animated Video Invitation Design', 'Couple Save-the-Date Digital Flyer', '150 Gold Foil Premium Printed Cards', 'Custom Couple Wedding Monogram Design', 'Digital RSVP Portal & Guest Tracking Link' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={[
+          'Bespoke Animated Video Invitation Design',
+          'Couple Save-the-Date Digital Flyer',
+          '150 Gold Foil Premium Printed Cards',
+          'Custom Couple Wedding Monogram Design',
+          'Digital RSVP Portal & Guest Tracking Link',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={invite.id}
+        vendorName={invite.name}
+        vendorImage={invite.image}
+        vendorLocation={invite.location}
+        category="Invitations"
+        startingPrice={invite.startingPrice || '₹15,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: invite.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: invite.id } })
+            );
+          }
+        }}
       />
     </View>
   );

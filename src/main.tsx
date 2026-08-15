@@ -4,8 +4,15 @@ import App from './App.tsx';
 import './index.css';
 import { clearAllQuotesAndSavedData } from './utils/quotesManager';
 
-// On page reload / refresh, start with empty Saved and My Quotes
-clearAllQuotesAndSavedData(false);
+// On page reload / refresh, reset all application data to start fresh
+try {
+  localStorage.clear();
+  sessionStorage.clear();
+} catch (e) {
+  console.warn('Storage reset error:', e);
+}
+
+clearAllQuotesAndSavedData(true);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -42,7 +42,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { EntertainmentItem as EntertainmentArtist } from '../constants/EntertainmentData';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 interface EntertainmentDetailPageProps {
   onNavigateToQuotesTab?: () => void;
@@ -50,6 +55,9 @@ interface EntertainmentDetailPageProps {
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = ({
@@ -58,11 +66,15 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'videos'>('photos');
   const [isReadMore, setIsReadMore] = useState(false);
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -546,9 +558,17 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
           )}
 
           {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.sendQuoteBtn, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
               <Text style={styles.sendQuoteBtnText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
               </Text>
             </TouchableOpacity>
           )}
@@ -590,10 +610,52 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
         startingPrice={artist.startingPrice}
         category="Entertainment"
         packageName="Grand Wedding DJ & Live Band Entertainment"
-        includedServices={[ 'Professional Live Band & DJ Performance', 'High-End Line Array Sound System Setup', 'Intelligent Dance Floor Lighting Rig', 'Anchor / Emcee for Event Hosting', 'Traditional Nadaswaram Group for Welcoming' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={[
+          'Professional Live Band & DJ Performance',
+          'High-End Line Array Sound System Setup',
+          'Intelligent Dance Floor Lighting Rig',
+          'Anchor / Emcee for Event Hosting',
+          'Traditional Nadaswaram Group for Welcoming',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={artist.id}
+        vendorName={artist.name}
+        vendorImage={artist.image}
+        vendorLocation={artist.location}
+        category="Entertainment"
+        startingPrice={artist.startingPrice || '₹55,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: artist.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: artist.id } })
+            );
+          }
+        }}
       />
     </View>
   );

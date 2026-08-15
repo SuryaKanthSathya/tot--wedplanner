@@ -38,7 +38,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { MehendiArtist } from './MehendiListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 interface ArtistDetailPageProps {
   onNavigateToQuotesTab?: () => void;
@@ -46,6 +51,9 @@ interface ArtistDetailPageProps {
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
@@ -54,10 +62,14 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'designs' | 'reviews'>('portfolio');
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Quote Flow Local States
@@ -648,9 +660,17 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           )}
 
           {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
               <Text style={styles.quoteBtnMainText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
               </Text>
             </TouchableOpacity>
           )}
@@ -696,10 +716,52 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
         startingPrice={artist.startingPrice}
         category="Mehendi"
         packageName="Traditional South Indian Bridal Mehendi Package"
-        includedServices={[ 'Full Bridal Hands Mehendi', 'Bridal Feet Mehendi', 'Guest Mehendi (up to 15 guests)', 'Organic Natural Henna Cones', 'Mehendi Design Consultation' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={[
+          'Full Bridal Hands Mehendi',
+          'Bridal Feet Mehendi',
+          'Guest Mehendi (up to 15 guests)',
+          'Organic Natural Henna Cones',
+          'Mehendi Design Consultation',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={artist.id}
+        vendorName={artist.name}
+        vendorImage={artist.image}
+        vendorLocation={artist.location}
+        category="Mehendi"
+        startingPrice={artist.startingPrice || '₹18,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: artist.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: artist.id } })
+            );
+          }
+        }}
       />
     </View>
   );

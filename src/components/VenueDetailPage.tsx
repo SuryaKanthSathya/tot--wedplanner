@@ -37,6 +37,11 @@ import {
 import { QuotationScreen } from './QuotationScreen';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 export interface VenueItem {
   id: string;
@@ -76,6 +81,9 @@ interface VenueDetailPageProps {
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
@@ -84,9 +92,13 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Quote Flow Local States
@@ -485,9 +497,17 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
           )}
 
           {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
               <Text style={styles.primaryQuoteBtnText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
               </Text>
             </TouchableOpacity>
           )}
@@ -517,16 +537,56 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         startingPrice={venue.startingPrice}
         category="Venues"
         packageName={`${venue.name} - Grand AC Mandapam & Convention Package`}
-        includedServices={venue.amenities && venue.amenities.length > 0 ? venue.amenities : [
-          'Centrally AC Banquet Hall Hire (12 Hours)',
-          'Traditional Grand Stage & Buffet Canopy Setup',
-          '2 AC Deluxe Bridal & Groom Changing Rooms',
-          'Valet Parking Service for up to 150 Vehicles',
-          '100% Uninterrupted Power Backup Generator',
-        ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={
+          venue.amenities && venue.amenities.length > 0
+            ? venue.amenities
+            : [
+                'Centrally AC Banquet Hall Hire (12 Hours)',
+                'Traditional Grand Stage & Buffet Canopy Setup',
+                '2 AC Deluxe Bridal & Groom Changing Rooms',
+                'Valet Parking Service for up to 150 Vehicles',
+                '100% Uninterrupted Power Backup Generator',
+              ]
+        }
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={venue.id}
+        vendorName={venue.name}
+        vendorImage={venue.image}
+        vendorLocation={venue.location || venue.city}
+        category="Venues"
+        startingPrice={venue.startingPrice || '₹2,50,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: venue.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: venue.id } })
+            );
+          }
+        }}
       />
     </View>
   );
