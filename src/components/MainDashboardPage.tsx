@@ -770,42 +770,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedCar={toggleSavedCar}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
-<<<<<<< HEAD
-          onOpenSavedTab={() => setActiveTab('saved')}
-          onNavigateToHome={() => setActiveTab('home')}
-        />
-      ) : activeTab === 'saved' ? (
-        <SavedTabScreen
-          savedStudioIds={savedStudioIds}
-          onToggleSavedStudio={toggleSavedStudio}
-          onExplorePhotography={() => setShowPhotographyListing(true)}
-          savedMakeupIds={savedMakeupIds}
-          onToggleSavedMakeup={toggleSavedMakeup}
-          onExploreMakeup={() => setShowMakeupListing(true)}
-          savedDecorIds={savedDecorIds}
-          onToggleSavedDecor={toggleSavedDecor}
-          onExploreDecor={() => setShowDecorListing(true)}
-          savedVenueIds={savedVenueIds}
-          onToggleSavedVenue={toggleSavedVenue}
-          onExploreVenues={() => { setActiveTab('dashboard'); setShowVenueListing(true); }}
-          savedEntIds={savedEntIds}
-          onToggleSavedEnt={toggleSavedEnt}
-          onExploreEntertainment={() => { setActiveTab('dashboard'); setShowEntertainmentListing(true); }}
-          savedCarIds={savedCarIds}
-          onToggleSavedCar={toggleSavedCar}
-          onExploreCars={() => { setActiveTab('dashboard'); setShowCarsListing(true); }}
-          savedInviteIds={savedInviteIds}
-          onToggleSavedInvite={toggleSavedInvite}
-          onExploreInvitations={() => setShowInvitationListing(true)}
-          savedMehendiIds={savedMehendiIds}
-          onToggleSavedMehendi={toggleSavedMehendi}
-          onExploreMehendi={() => setShowMehendiListing(true)}
-          savedCateringIds={savedCateringIds}
-          onToggleSavedCatering={toggleSavedCatering}
-          onExploreCatering={() => setShowCateringListing(true)}
-          onHideTabBar={setHideTabBar}
-=======
->>>>>>> makeup-quote
           onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'quotes' ? (
