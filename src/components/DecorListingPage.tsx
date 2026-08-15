@@ -43,6 +43,8 @@ export interface DecorListingPageProps {
   onToggleSavedDecor?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 const TAMIL_NADU_DISTRICTS = [
@@ -568,6 +570,8 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
   onToggleSavedDecor,
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
@@ -646,6 +650,23 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
         isBookmarked={Boolean(savedDecorIds[selectedStudio.id])}
         onToggleBookmark={handleToggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedStudio(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedStudio.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedStudio(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedStudio.id } })
+            );
+          }
+        }}
       />
     );
   }

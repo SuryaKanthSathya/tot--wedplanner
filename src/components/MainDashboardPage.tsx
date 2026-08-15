@@ -8,12 +8,16 @@ import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { CarsListingPage } from './CarsListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
 import { DestinationWeddingFlow } from './DestinationWeddingFlow';
-import { SavedTabScreen } from './SavedTabScreen';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
 import { RitualsFlow } from './RitualsFlow';
 import { FindVendorsPage } from './FindVendorsPage';
+import { NotificationsModal } from './NotificationsModal';
+import {
+  AppNotification,
+  getNotifications,
+} from '../utils/notificationsManager';
 import {
   View,
   Text,
@@ -49,7 +53,18 @@ import {
   LogOut,
   MapPin,
   Calendar,
+  CreditCard,
+  CheckCircle2,
+  Clock,
+  Briefcase,
 } from 'lucide-react';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import {
+  WeddingVendorBooking,
+  getAllWeddingBookings,
+  getIndividualBookings,
+  getEntireWeddingBookings,
+} from '../utils/weddingPaymentsManager';
 
 interface MainDashboardPageProps {
   userName: string;
@@ -66,7 +81,7 @@ interface MainDashboardPageProps {
     budget?: string;
     weddingStyle?: string;
   } | null;
-  initialTab?: 'home' | 'my-wedding' | 'saved' | 'quotes' | 'profile';
+  initialTab?: 'home' | 'my-wedding' | 'quotes' | 'profile';
   onLogout?: () => void;
   onNavigateToCoupleOnboarding?: () => void;
 }
@@ -85,11 +100,25 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     weddingProfile && (weddingProfile.brideName || weddingProfile.marriageType)
   );
 
-  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'saved' | 'quotes' | 'profile'>(
+  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'quotes' | 'profile'>(
     initialTab === 'my-wedding' && !isPlannerCreated ? 'home' : initialTab
   );
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [profileActiveTab, setProfileActiveTab] = useState<'profile' | 'mybooking'>('profile');
+  const [profileSelectedBookingVendor, setProfileSelectedBookingVendor] = useState<{
+    vendorId: string;
+    vendorName: string;
+    vendorImage?: string;
+    vendorLocation?: string;
+    category?: string;
+    startingPrice?: string;
+  } | null>(null);
+  const [profileBookings, setProfileBookings] = useState<WeddingVendorBooking[]>(() => {
+    const individual = getIndividualBookings();
+    if (individual.length > 0) return individual;
+    return getAllWeddingBookings();
+  });
   const [showExploreModal, setShowExploreModal] = useState<boolean>(false);
   const [showPhotographyListing, setShowPhotographyListing] = useState<boolean>(false);
   const [showMakeupListing, setShowMakeupListing] = useState<boolean>(false);
@@ -104,6 +133,18 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
   const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
+  const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
+
+  useEffect(() => {
+    const handleNotifUpdate = () => {
+      setNotifications(getNotifications());
+    };
+    window.addEventListener('tot_notifications_updated', handleNotifUpdate);
+    return () => window.removeEventListener('tot_notifications_updated', handleNotifUpdate);
+  }, []);
+
+  const unreadNotifCount = notifications.filter((n) => !n.read).length;
 
   // Persisted Saved Studios State
   const [savedStudioIds, setSavedStudioIds] = useState<Record<string, boolean>>(() => {
@@ -369,11 +410,60 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setSavedMehendiIds({});
       setSavedCateringIds({});
     };
+    const handleSwitchToPayments = () => {
+      setIsPlannerCreated(true);
+      setActiveTab('my-wedding');
+      setShowPhotographyListing(false);
+      setShowMakeupListing(false);
+      setShowDecorListing(false);
+      setShowVenueListing(false);
+      setShowEntertainmentListing(false);
+      setShowCarsListing(false);
+      setShowInvitationListing(false);
+      setShowMehendiListing(false);
+      setShowCateringListing(false);
+      setShowRitualsFlow(false);
+    };
+    const handleHideTabBar = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && typeof customEvent.detail.hide === 'boolean') {
+        setHideTabBar(customEvent.detail.hide);
+      }
+    };
+    const handlePaymentsUpdate = () => {
+      const ind = getIndividualBookings();
+      setProfileBookings(ind.length > 0 ? ind : getAllWeddingBookings());
+    };
+    const handleSwitchToProfileBookings = () => {
+      setShowPhotographyListing(false);
+      setShowMakeupListing(false);
+      setShowDecorListing(false);
+      setShowVenueListing(false);
+      setShowEntertainmentListing(false);
+      setShowCarsListing(false);
+      setShowInvitationListing(false);
+      setShowMehendiListing(false);
+      setShowCateringListing(false);
+      setShowRitualsFlow(false);
+      setActiveTab('profile');
+      setShowProfileModal(true);
+      setProfileActiveTab('mybooking');
+      const ind = getIndividualBookings();
+      setProfileBookings(ind.length > 0 ? ind : getAllWeddingBookings());
+    };
     window.addEventListener('tot_switch_tab', handleSwitchTab);
+    window.addEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
+    window.addEventListener('tot_switch_to_profile_my_bookings', handleSwitchToProfileBookings);
+    window.addEventListener('tot_hide_tab_bar', handleHideTabBar);
     window.addEventListener('tot_saved_updated', handleSavedReset);
+    window.addEventListener('tot_wedding_payments_updated', handlePaymentsUpdate);
     return () => {
       window.removeEventListener('tot_switch_tab', handleSwitchTab);
+      window.removeEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
+      window.removeEventListener('tot_switch_to_profile_my_bookings', handleSwitchToProfileBookings);
+      window.removeEventListener('tot_hide_tab_bar', handleHideTabBar);
       window.removeEventListener('tot_saved_updated', handleSavedReset);
+      window.removeEventListener('tot_wedding_payments_updated', handlePaymentsUpdate);
     };
   }, []);
 
@@ -460,18 +550,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <PhotographyListingPage
         onBack={() => {
           setShowPhotographyListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
-        onOpenSavedTab={() => {
-          setShowPhotographyListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowPhotographyListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -481,18 +568,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <MakeupListingPage
         onBack={() => {
           setShowMakeupListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
-        onOpenSavedTab={() => {
-          setShowMakeupListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowMakeupListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -502,18 +586,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <DecorListingPage
         onBack={() => {
           setShowDecorListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
-        onOpenSavedTab={() => {
-          setShowDecorListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowDecorListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -523,18 +604,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <VenueListingPage
         onBack={() => {
           setShowVenueListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
-        onOpenSavedTab={() => {
-          setShowVenueListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowVenueListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -544,18 +622,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <EntertainmentListingPage
         onBack={() => {
           setShowEntertainmentListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
-        onOpenSavedTab={() => {
-          setShowEntertainmentListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowEntertainmentListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -565,18 +640,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <CarsListingPage
         onBack={() => {
           setShowCarsListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
-        onOpenSavedTab={() => {
-          setShowCarsListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowCarsListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -586,18 +658,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <InvitationListingPage
         onBack={() => {
           setShowInvitationListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
-        onOpenSavedTab={() => {
-          setShowInvitationListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowInvitationListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -607,7 +676,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <DestinationWeddingFlow
         onBack={() => {
           setShowDestinationWeddingFlow(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
@@ -622,18 +691,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <MehendiListingPage
         onBack={() => {
           setShowMehendiListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
-        onOpenSavedTab={() => {
-          setShowMehendiListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowMehendiListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -643,18 +709,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <CateringListingPage
         onBack={() => {
           setShowCateringListing(false);
-          setActiveTab('home');
+          setShowFindVendorsPage(true);
         }}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
-        onOpenSavedTab={() => {
-          setShowCateringListing(false);
-          setActiveTab('saved');
-        }}
         onNavigateToQuotesTab={() => {
           setShowCateringListing(false);
           setActiveTab('quotes');
         }}
+        bookingSource="individual"
       />
     );
   }
@@ -662,7 +725,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showRitualsFlow) {
     return (
       <RitualsFlow
-        onBack={() => setShowRitualsFlow(false)}
+        onBack={() => {
+          setShowRitualsFlow(false);
+          setShowFindVendorsPage(true);
+        }}
         onNavigateToQuotesTab={() => {
           setShowRitualsFlow(false);
           setActiveTab('quotes');
@@ -704,6 +770,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedCar={toggleSavedCar}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
+<<<<<<< HEAD
           onOpenSavedTab={() => setActiveTab('saved')}
           onNavigateToHome={() => setActiveTab('home')}
         />
@@ -737,6 +804,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedCatering={toggleSavedCatering}
           onExploreCatering={() => setShowCateringListing(true)}
           onHideTabBar={setHideTabBar}
+=======
+>>>>>>> makeup-quote
           onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'quotes' ? (
@@ -766,9 +835,19 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             {/* Right Header Icons */}
             <View style={styles.headerRightActions}>
               {/* Notification Bell */}
-              <TouchableOpacity activeOpacity={0.7} style={styles.bellButton}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.bellButton}
+                onPress={() => setShowNotificationsModal(true)}
+              >
                 <Bell className="w-5 h-5 text-stone-700" />
-                <View style={styles.bellBadge} />
+                {unreadNotifCount > 0 && (
+                  <View style={styles.bellBadge}>
+                    <Text style={styles.bellBadgeText}>
+                      {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                    </Text>
+                  </View>
+                )}
               </TouchableOpacity>
 
               {/* Neutral Gender-Free Profile Avatar Button */}
@@ -1066,42 +1145,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
 
           <TouchableOpacity
             style={styles.tabItem}
-            onPress={() => setActiveTab('saved')}
-          >
-            <Heart
-              className={`w-5 h-5 ${activeTab === 'saved' ? 'text-[#581420]' : 'text-stone-400'
-                }`}
-            />
-            <Text
-              style={[
-                styles.tabLabel,
-                activeTab === 'saved' && styles.activeTabLabel,
-              ]}
-            >
-              Saved
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => setActiveTab('quotes')}
-          >
-            <FileText
-              className={`w-5 h-5 ${activeTab === 'quotes' ? 'text-[#581420]' : 'text-stone-400'
-                }`}
-            />
-            <Text
-              style={[
-                styles.tabLabel,
-                activeTab === 'quotes' && styles.activeTabLabel,
-              ]}
-            >
-              My Quotes
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabItem}
             onPress={() => {
               setActiveTab('profile');
               setShowProfileModal(true);
@@ -1123,7 +1166,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         </View>
       )}
 
-      {/* ================= PROFILE DETAILS MODAL ================= */}
+      {/* ================= PROFILE DETAILS & MY BOOKINGS MODAL ================= */}
       <AnimatePresence>
         {showProfileModal && (
           <motion.div
@@ -1137,11 +1180,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-[#FAF6EE] rounded-t-3xl sm:rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-4"
+              className="w-full max-w-sm bg-[#FAF6EE] rounded-t-3xl sm:rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[90vh]"
             >
               {/* Modal Header */}
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>User Profile Details</Text>
+                <Text style={styles.modalTitle}>
+                  {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
+                </Text>
                 <TouchableOpacity
                   onPress={() => setShowProfileModal(false)}
                   style={styles.closeButton}
@@ -1150,73 +1195,218 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              {/* Neutral Avatar & Greeting */}
-              <View style={styles.modalAvatarContainer}>
-                <View style={styles.modalAvatarCircle}>
-                  <User className="w-8 h-8 text-[#581420]" />
-                </View>
-                <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
-                {userId ? (
-                  <Text style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 11, fontWeight: '600', color: '#8C8283', marginTop: -2 }}>
-                    ID: {userId}
+              {/* Profile Segment Tab Bar */}
+              <View style={styles.profileTabBar}>
+                <TouchableOpacity
+                  style={[
+                    styles.profileTabItem,
+                    profileActiveTab === 'profile' && styles.profileTabItemActive,
+                  ]}
+                  onPress={() => setProfileActiveTab('profile')}
+                  activeOpacity={0.8}
+                >
+                  <User className="w-3.5 h-3.5 mr-1.5" />
+                  <Text
+                    style={[
+                      styles.profileTabText,
+                      profileActiveTab === 'profile' && styles.profileTabTextActive,
+                    ]}
+                  >
+                    Profile
                   </Text>
-                ) : null}
-                <View style={styles.verifiedBadge}>
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                  <Text style={styles.verifiedBadgeText}>Verified Account</Text>
-                </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.profileTabItem,
+                    profileActiveTab === 'mybooking' && styles.profileTabItemActive,
+                  ]}
+                  onPress={() => setProfileActiveTab('mybooking')}
+                  activeOpacity={0.8}
+                >
+                  <Briefcase className="w-3.5 h-3.5 mr-1.5" />
+                  <Text
+                    style={[
+                      styles.profileTabText,
+                      profileActiveTab === 'mybooking' && styles.profileTabTextActive,
+                    ]}
+                  >
+                    My Bookings
+                  </Text>
+                  {profileBookings.length > 0 && (
+                    <View style={styles.profileBadgePill}>
+                      <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
               </View>
 
-              {/* User Details Cards */}
-              <View style={styles.modalDetailsList}>
+              {/* ================= TAB 1: PROFILE DETAILS ================= */}
+              {profileActiveTab === 'profile' && (
+                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                  {/* Neutral Avatar & Greeting */}
+                  <View style={styles.modalAvatarContainer}>
+                    <View style={styles.modalAvatarCircle}>
+                      <User className="w-8 h-8 text-[#581420]" />
+                    </View>
+                    <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
+                    {userId ? (
+                      <Text
+                        style={{
+                          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                          fontSize: 11,
+                          fontWeight: '600',
+                          color: '#8C8283',
+                          marginTop: -2,
+                        }}
+                      >
+                        ID: {userId}
+                      </Text>
+                    ) : null}
+                    <View style={styles.verifiedBadge}>
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                      <Text style={styles.verifiedBadgeText}>Verified Account</Text>
+                    </View>
+                  </View>
 
+                  {/* User Details Cards */}
+                  <View style={styles.modalDetailsList}>
+                    {/* 1. Full Name */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <User className="w-4 h-4 text-stone-600" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Full Name</Text>
+                        <Text style={styles.modalDetailValue}>{rawName}</Text>
+                      </View>
+                    </View>
 
-                {/* 1. Full Name */}
-                <View style={styles.modalDetailRow}>
-                  <View style={styles.modalIconBox}>
-                    <User className="w-4 h-4 text-stone-600" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.modalDetailLabel}>Full Name</Text>
-                    <Text style={styles.modalDetailValue}>{rawName}</Text>
-                  </View>
-                </View>
+                    {/* 2. Mobile Number */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <Phone className="w-4 h-4 text-stone-600" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Mobile Number</Text>
+                        <Text style={styles.modalDetailValue}>{displayMobile}</Text>
+                      </View>
+                    </View>
 
-                {/* 2. Mobile Number */}
-                <View style={styles.modalDetailRow}>
-                  <View style={styles.modalIconBox}>
-                    <Phone className="w-4 h-4 text-stone-600" />
+                    {/* 3. Email Address */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <Mail className="w-4 h-4 text-stone-600" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Email Address</Text>
+                        <Text style={styles.modalDetailValue}>{displayEmail}</Text>
+                      </View>
+                    </View>
                   </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.modalDetailLabel}>Mobile Number</Text>
-                    <Text style={styles.modalDetailValue}>{displayMobile}</Text>
-                  </View>
-                </View>
 
-                {/* 3. Email Address */}
-                <View style={styles.modalDetailRow}>
-                  <View style={styles.modalIconBox}>
-                    <Mail className="w-4 h-4 text-stone-600" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.modalDetailLabel}>Email Address</Text>
-                    <Text style={styles.modalDetailValue}>{displayEmail}</Text>
-                  </View>
-                </View>
-              </View>
+                  {/* Sign Out Button */}
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      setShowProfileModal(false);
+                      if (onLogout) onLogout();
+                    }}
+                    style={styles.modalLogoutButton}
+                  >
+                    <LogOut className="w-4 h-4 text-rose-700" />
+                    <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
+                  </TouchableOpacity>
+                </ScrollView>
+              )}
 
-              {/* Actions Button */}
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => {
-                  setShowProfileModal(false);
-                  if (onLogout) onLogout();
-                }}
-                style={styles.modalLogoutButton}
-              >
-                <LogOut className="w-4 h-4 text-rose-700" />
-                <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
-              </TouchableOpacity>
+              {/* ================= TAB 2: MY BOOKINGS ================= */}
+              {profileActiveTab === 'mybooking' && (
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{ gap: 12, paddingBottom: 10 }}
+                >
+                  {profileBookings.length === 0 ? (
+                    <View style={styles.emptyBookingsBox}>
+                      <Briefcase className="w-10 h-10 text-[#C2A6A9]" />
+                      <Text style={styles.emptyBookingsTitle}>No Bookings Yet</Text>
+                      <Text style={styles.emptyBookingsSubtitle}>
+                        You have not confirmed any vendor bookings yet. Browse our wedding services to get started!
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.browseServicesBtn}
+                        onPress={() => {
+                          setShowProfileModal(false);
+                          setShowPhotographyListing(true);
+                        }}
+                        activeOpacity={0.85}
+                      >
+                        <Sparkles className="w-4 h-4 text-white" />
+                        <Text style={styles.browseServicesBtnText}>Browse Vendors</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    profileBookings.map((b) => (
+                      <View key={b.id} style={styles.profileBookingCard}>
+                        <View style={styles.profileBookingTop}>
+                          <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
+                              <View style={styles.profileCategoryBadge}>
+                                <Text style={styles.profileCategoryText}>{b.category}</Text>
+                              </View>
+                            </View>
+                            <Text style={styles.profileBookingPkg} numberOfLines={1}>{b.packageName}</Text>
+                            <Text style={styles.profileBookingDate}>Event: {b.weddingDate}</Text>
+                          </View>
+                        </View>
+
+                        {/* Amount & Status Summary */}
+                        <View style={styles.profileBookingFinanceRow}>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Total Amount</Text>
+                            <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
+                          </View>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
+                            <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
+                              ₹{b.paidAmount.toLocaleString('en-IN')}
+                            </Text>
+                          </View>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Remaining</Text>
+                            <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
+                              ₹{b.remainingAmount.toLocaleString('en-IN')}
+                            </Text>
+                          </View>
+                        </View>
+
+                        {/* Action CTA */}
+                        <TouchableOpacity
+                          style={styles.profileInvoiceBtn}
+                          onPress={() => {
+                            setShowProfileModal(false);
+                            setProfileSelectedBookingVendor({
+                              vendorId: b.vendorId,
+                              vendorName: b.vendorName,
+                              vendorImage: b.image,
+                              vendorLocation: b.location,
+                              category: b.category,
+                              startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
+                            });
+                          }}
+                          activeOpacity={0.85}
+                        >
+                          <FileText className="w-4 h-4 text-white" />
+                          <Text style={styles.profileInvoiceBtnText}>View Invoice & Pay</Text>
+                          <ChevronRight className="w-3.5 h-3.5 text-white" />
+                        </TouchableOpacity>
+                      </View>
+                    ))
+                  )}
+                </ScrollView>
+              )}
             </motion.div>
           </motion.div>
         )}
@@ -1277,6 +1467,56 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* PROFILE BOOKING INVOICE MODAL */}
+      {profileSelectedBookingVendor && (
+        <WeddingInvoicePaymentModal
+          visible={Boolean(profileSelectedBookingVendor)}
+          onClose={() => setProfileSelectedBookingVendor(null)}
+          vendorId={profileSelectedBookingVendor.vendorId}
+          vendorName={profileSelectedBookingVendor.vendorName}
+          vendorImage={profileSelectedBookingVendor.vendorImage}
+          vendorLocation={profileSelectedBookingVendor.vendorLocation}
+          category={profileSelectedBookingVendor.category}
+          startingPrice={profileSelectedBookingVendor.startingPrice}
+        />
+      )}
+
+      {/* NOTIFICATIONS MODAL */}
+      <NotificationsModal
+        visible={showNotificationsModal}
+        onClose={() => setShowNotificationsModal(false)}
+        notifications={notifications}
+        onOpenInvoice={(actionData) => {
+          if (actionData?.bookingSource === 'entire_wedding') {
+            setActiveTab('my-wedding');
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: actionData.vendorId } })
+            );
+          } else {
+            setProfileSelectedBookingVendor({
+              vendorId: actionData?.vendorId || 'studio-1',
+              vendorName: actionData?.vendorName || 'Vendor',
+              vendorImage: actionData?.vendorImage || '',
+              vendorLocation: actionData?.vendorLocation || '',
+              category: actionData?.category || 'Wedding Service',
+              startingPrice: String(actionData?.invoiceAmount || '₹35,000'),
+            });
+          }
+        }}
+        onOpenQuote={(actionData) => {
+          if (actionData?.category === 'Photography') setShowPhotographyListing(true);
+          else if (actionData?.category === 'Makeup') setShowMakeupListing(true);
+          else if (actionData?.category === 'Decor') setShowDecorListing(true);
+          else if (actionData?.category === 'Venue') setShowVenueListing(true);
+          else if (actionData?.category === 'Entertainment') setShowEntertainmentListing(true);
+          else if (actionData?.category === 'Cars') setShowCarsListing(true);
+          else if (actionData?.category === 'Invitations') setShowInvitationListing(true);
+          else if (actionData?.category === 'Mehendi') setShowMehendiListing(true);
+          else if (actionData?.category === 'Catering') setShowCateringListing(true);
+          else setShowFindVendorsPage(true);
+        }}
+      />
     </View>
   );
 };
@@ -1336,12 +1576,23 @@ const styles = StyleSheet.create({
   },
   bellBadge: {
     position: 'absolute',
-    top: 7,
-    right: 8,
-    width: 6,
-    height: 6,
-    borderRadius: 9999,
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: '#581420',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: '#FAF6EE',
+  },
+  bellBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    lineHeight: 11,
   },
   profileAvatarButton: {
     width: 38,
@@ -1670,6 +1921,176 @@ const styles = StyleSheet.create({
   explorePopupOkButtonText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
     fontSize: 13.5,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  profileTabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#FAF5EE',
+    borderRadius: 12,
+    padding: 3,
+    borderWidth: 1,
+    borderColor: '#EFE6D9',
+  },
+  profileTabItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
+    borderRadius: 9,
+    position: 'relative',
+  },
+  profileTabItemActive: {
+    backgroundColor: '#581420',
+    boxShadow: '0 2px 6px rgba(88, 20, 32, 0.2)',
+  },
+  profileTabText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#7D6E70',
+  },
+  profileTabTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  profileBadgePill: {
+    marginLeft: 6,
+    backgroundColor: '#FAF6EE',
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 8,
+  },
+  profileBadgePillText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#581420',
+  },
+  emptyBookingsBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 24,
+    gap: 8,
+    textAlign: 'center',
+  },
+  emptyBookingsTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2425',
+    marginTop: 4,
+  },
+  emptyBookingsSubtitle: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 12,
+    color: '#8C8283',
+    textAlign: 'center',
+    paddingHorizontal: 12,
+    lineHeight: 17,
+  },
+  browseServicesBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#581420',
+    paddingHorizontal: 16,
+    paddingVertical: 9,
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  browseServicesBtnText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  profileBookingCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#EFE7DC',
+    gap: 10,
+    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+  },
+  profileBookingTop: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  profileBookingThumb: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    backgroundColor: '#F3ECE4',
+  },
+  profileBookingVendorName: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  profileCategoryBadge: {
+    backgroundColor: '#F7EFF1',
+    borderWidth: 1,
+    borderColor: '#EBDCE0',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 5,
+  },
+  profileCategoryText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#581420',
+  },
+  profileBookingPkg: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#524345',
+    marginTop: 1,
+  },
+  profileBookingDate: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10,
+    color: '#8C8283',
+    marginTop: 1,
+  },
+  profileBookingFinanceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#FAF7F2',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#EFE7DC',
+  },
+  profileFinanceLabel: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 9.5,
+    color: '#7A7273',
+  },
+  profileFinanceVal: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  profileInvoiceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: '#581420',
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  profileInvoiceBtnText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11.5,
     fontWeight: '700',
     color: '#FFFFFF',
   },

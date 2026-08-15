@@ -18,6 +18,11 @@ import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
 import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
+import { NotificationsModal } from './NotificationsModal';
+import {
+  AppNotification,
+  getNotifications,
+} from '../utils/notificationsManager';
 import {
   Menu,
   Bell,
@@ -39,7 +44,20 @@ import {
   Trash2,
   Flower2,
   Palette,
+  CreditCard,
+  FileText,
+  Lock,
+  Clock,
+  ShieldCheck,
 } from 'lucide-react';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import {
+  WeddingVendorBooking,
+  getAllWeddingBookings,
+  getEntireWeddingBookings,
+  getIndividualBookings,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
 import stageEntertainmentImg from '../assets/images/guest_banquet_hall_stage_1786471284070.jpg';
@@ -396,7 +414,73 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onHideTabBar,
   onOpenQuotesTab,
 }) => {
-  const [activeSegment, setActiveSegment] = useState<'overview' | 'checklist' | 'guests' | 'budget'>('overview');
+  const [activeSegment, setActiveSegment] = useState<'overview' | 'payment'>('overview');
+  const [weddingBookings, setWeddingBookings] = useState<WeddingVendorBooking[]>(() => {
+    const list = getEntireWeddingBookings();
+    if (list.length === 0) {
+      return [
+        saveOrUpdateWeddingBooking({
+          vendorId: 'studio-1',
+          vendorName: 'Memories Studio',
+          category: 'Photography',
+          serviceType: 'Wedding Photography',
+          image: exactWeddingCoupleImg,
+          location: 'Chennai, Tamil Nadu',
+          weddingDate: '15 Dec 2026',
+          totalAmount: 90000,
+          status: 'confirmed',
+          bookingSource: 'entire_wedding',
+        }),
+      ];
+    }
+    return list;
+  });
+
+  const [selectedInvoiceVendor, setSelectedInvoiceVendor] = useState<{
+    vendorId: string;
+    vendorName: string;
+    vendorImage?: string;
+    vendorLocation?: string;
+    category?: string;
+    startingPrice?: string;
+  } | null>(null);
+
+  const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
+  const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setWeddingBookings(getEntireWeddingBookings());
+    };
+    const handleNotifUpdate = () => {
+      setNotifications(getNotifications());
+    };
+    const handleSwitchToPayments = () => {
+      setShowServicesView(false);
+      setShowPhotographyListing(false);
+      setShowMehendiListing(false);
+      setShowCateringListing(false);
+      setShowCarsListing(false);
+      setShowMakeupListing(false);
+      setShowDecorListing(false);
+      setShowVenueListing(false);
+      setShowEntertainmentListing(false);
+      setShowInvitationListing(false);
+      setSelectedInvoiceVendor(null);
+      setActiveSegment('payment');
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    window.addEventListener('tot_notifications_updated', handleNotifUpdate);
+    window.addEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
+    return () => {
+      window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+      window.removeEventListener('tot_notifications_updated', handleNotifUpdate);
+      window.removeEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
+    };
+  }, []);
+
+  const unreadNotifCount = notifications.filter((n) => !n.read).length;
+
   let brideName = '';
   let groomName = '';
 
@@ -526,9 +610,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <MehendiListingPage
         onBack={() => {
           setShowMehendiListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedMehendiIds={{}}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -538,9 +623,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <CateringListingPage
         onBack={() => {
           setShowCateringListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedCateringIds={{}}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -550,11 +636,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <CarsListingPage
         onBack={() => {
           setShowCarsListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedCarIds={savedCarIds}
         onToggleSavedCar={onToggleSavedCar}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -564,11 +650,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <PhotographyListingPage
         onBack={() => {
           setShowPhotographyListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={onToggleSavedStudio}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -578,11 +664,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <MakeupListingPage
         onBack={() => {
           setShowMakeupListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={onToggleSavedMakeup}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
         onNavigateToQuotesTab={() => {
           setShowMakeupListing(false);
           if (onOpenQuotesTab) {
@@ -598,11 +684,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <DecorListingPage
         onBack={() => {
           setShowDecorListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={onToggleSavedDecor}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -612,11 +698,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <VenueListingPage
         onBack={() => {
           setShowVenueListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={onToggleSavedVenue}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -626,11 +712,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <EntertainmentListingPage
         onBack={() => {
           setShowEntertainmentListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={onToggleSavedEnt}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -640,11 +726,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <InvitationListingPage
         onBack={() => {
           setShowInvitationListing(false);
-          if (onNavigateToHome) onNavigateToHome();
+          setShowServicesView(true);
         }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={onToggleSavedInvite}
-        onOpenSavedTab={onOpenSavedTab}
+        bookingSource="entire_wedding"
       />
     );
   }
@@ -848,9 +934,45 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
 
         <Text style={styles.headerTitle}>My Wedding</Text>
 
-        <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.iconBtn}
+          onPress={() => setShowNotificationsModal(true)}
+        >
           <Bell className="w-5 h-5 text-[#2A2425]" />
-          <View style={styles.bellBadge} />
+          {unreadNotifCount > 0 && (
+            <View style={styles.bellBadge}>
+              <Text style={styles.bellBadgeText}>
+                {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* ================= SEGMENT CONTROLS BAR ================= */}
+      <View style={styles.segmentTabBar}>
+        <TouchableOpacity
+          style={[styles.segmentTabItem, activeSegment === 'overview' && styles.segmentTabItemActive]}
+          onPress={() => setActiveSegment('overview')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.segmentTabText, activeSegment === 'overview' && styles.segmentTabTextActive]}>
+            Wedding Overview
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.segmentTabItem, activeSegment === 'payment' && styles.segmentTabItemActive]}
+          onPress={() => setActiveSegment('payment')}
+          activeOpacity={0.8}
+        >
+          <Text style={[styles.segmentTabText, activeSegment === 'payment' && styles.segmentTabTextActive]}>
+            Payments & Invoices
+          </Text>
+          {weddingBookings.some((b) => b.remainingAmount > 0) && (
+            <View style={styles.tabBadgeDot} />
+          )}
         </TouchableOpacity>
       </View>
 
@@ -859,226 +981,350 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* ================= CARD 1: COUPLE BANNER ================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full"
-        >
-          <View style={styles.coupleCard}>
-            {/* Soft decorative content */}
-            <View style={styles.coupleCardInner}>
-              <Text style={styles.coupleNames}>
-                {brideName} <Text style={{ color: '#801524', fontSize: 18 }}>❤️</Text> {groomName}
-              </Text>
-
-              <View style={styles.metaRow}>
-                <Text style={styles.metaText}>{rawDate}</Text>
-              </View>
-
-              <View style={styles.metaRow}>
-                <MapPin className="w-3.5 h-3.5 text-[#2A2425]" />
-                <Text style={styles.metaTextBold}>{rawLocation}</Text>
-              </View>
-            </View>
-          </View>
-        </motion.div>
-
-        {/* ================= CARD 2: WEDDING COUNTDOWN ================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          className="w-full"
-        >
-          <View style={styles.countdownCard}>
-            <View style={styles.countdownLeft}>
-              <Text style={styles.countdownCardTitle}>Wedding Countdown</Text>
-
-              <View style={styles.numberWrapper}>
-                <Text style={styles.countdownNumber}>{daysLeft}</Text>
-                <Text style={styles.daysLabel}>DAYS</Text>
-              </View>
-
-              <Text style={styles.untilText}>Until Your Wedding</Text>
-            </View>
-
-            <View style={styles.countdownRightImage}>
-              <Image
-                source={{ uri: exactWeddingCoupleImg }}
-                style={styles.coupleImageStyle}
-                resizeMode="contain"
-              />
-            </View>
-          </View>
-        </motion.div>
-
-        {/* ================= CARD 3: PLANNING PROGRESS (Strictly 18%, NO "7 of 10 selected") ================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-          className="w-full"
-        >
-          <View style={styles.progressCard}>
-            <View style={styles.progressHeaderRow}>
-              <Text style={styles.progressTitle}>Planning Progress</Text>
-              <Text style={styles.progressPercentText}>18%</Text>
-            </View>
-
-            {/* Progress Bar filled to 18% */}
-            <View style={styles.progressBarTrack}>
-              <View style={[styles.progressBarFill, { width: '18%' }]} />
-            </View>
-          </View>
-        </motion.div>
-
-        {/* ================= SERVICES BUTTON ================= */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.96 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-          className="w-full cursor-pointer"
-          onClick={() => {
-            setShowServicesView(true);
-          }}
-        >
-          <View style={styles.servicesButton}>
-            <View style={styles.servicesButtonLeft}>
-              <View style={styles.sparkleIconCircle}>
-                <Sparkles className="w-5 h-5 text-[#581420]" />
-              </View>
-              <Text style={styles.servicesBtnTitle}>Services</Text>
-            </View>
-            <ChevronRight className="w-5 h-5 text-[#581420]" />
-          </View>
-        </motion.div>
-
-        {/* ================= CHECKLIST SECTION ================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-          className="w-full"
-        >
-          <View style={styles.checklistCard}>
-            <View style={styles.checklistHeaderRow}>
-              <Text style={styles.checklistTitle}>My Checklist</Text>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setShowAddInput(!showAddInput)}
-                  style={styles.addServiceBtn}
-                >
-                  <Plus className="w-3.5 h-3.5 text-[#5C1A24]" />
-                  <Text style={styles.addServiceBtnText}>Add Service</Text>
-                </TouchableOpacity>
+        {/* ================= 1. PAYMENT TAB CONTENT ================= */}
+        {activeSegment === 'payment' && (
+          <View style={{ gap: 14, width: '100%' }}>
+            {/* Financial Summary */}
+            <View style={styles.paymentSummaryCard}>
+              <View style={styles.summaryTopRow}>
+                <View style={styles.summaryTopCol}>
+                  <Text style={styles.summaryTopLabel}>Total Budget</Text>
+                  <Text style={styles.summaryTopVal}>
+                    ₹{weddingBookings.reduce((sum, b) => sum + b.totalAmount, 0).toLocaleString('en-IN')}
+                  </Text>
+                </View>
+                <View style={styles.summaryDividerV} />
+                <View style={styles.summaryTopCol}>
+                  <Text style={styles.summaryTopLabel}>Total Paid</Text>
+                  <Text style={[styles.summaryTopVal, { color: '#15803D' }]}>
+                    ₹{weddingBookings.reduce((sum, b) => sum + b.paidAmount, 0).toLocaleString('en-IN')}
+                  </Text>
+                </View>
+                <View style={styles.summaryDividerV} />
+                <View style={styles.summaryTopCol}>
+                  <Text style={styles.summaryTopLabel}>Remaining</Text>
+                  <Text style={[styles.summaryTopVal, { color: '#581420' }]}>
+                    ₹{weddingBookings.reduce((sum, b) => sum + b.remainingAmount, 0).toLocaleString('en-IN')}
+                  </Text>
+                </View>
               </View>
             </View>
 
-            {/* Add Service Input Toggle */}
-            {showAddInput && (
-              <View style={styles.addInputRow}>
-                <TextInput
-                  value={newServiceInput}
-                  onChangeText={setNewServiceInput}
-                  placeholder="Enter service name (e.g. Mehendi)"
-                  placeholderTextColor="#A1999A"
-                  style={styles.addTextInput}
-                  onSubmitEditing={handleAddService}
-                />
-                <TouchableOpacity
-                  onPress={handleAddService}
-                  style={styles.saveAddBtn}
-                >
-                  <Text style={styles.saveAddBtnText}>Add</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            {/* Invoices List Header */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+              <Text style={styles.paymentSectionTitle}>Vendor Milestone Invoices</Text>
+              <Text style={styles.paymentSectionCount}>{weddingBookings.length} Booked</Text>
+            </View>
 
-            {/* Checklist items list aligned vertically with remove capability */}
-            <View style={styles.checklistVerticalList}>
-              {checklist.length === 0 ? (
-                <Text style={styles.emptyChecklistText}>
-                  No services in checklist. Tap "+ Add Service" to add one.
-                </Text>
-              ) : (
-                checklist.map((item) => (
-                  <div key={item.id}>
-                    <View style={[
-                      styles.checklistItemRow,
-                      item.completed && { backgroundColor: '#F0F7EC', borderColor: '#D4E5CD' }
-                    ]}>
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => {
-                          // Mark as completed/selected since they selected this service
-                          setChecklist((prev) =>
-                            prev.map((c) =>
-                              c.id === item.id ? { ...c, completed: true } : c
-                            )
-                          );
+            {/* Vendor Booking Cards */}
+            {weddingBookings.map((b) => (
+              <View key={b.id} style={styles.vendorPaymentCard}>
+                <View style={styles.vendorPaymentHeader}>
+                  <Image source={{ uri: b.image }} style={styles.vendorPaymentThumb} />
+                  <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Text style={styles.vendorPaymentName}>{b.vendorName}</Text>
+                      <View style={styles.categoryBadgePill}>
+                        <Text style={styles.categoryBadgeText}>{b.category}</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.vendorPaymentPackage}>{b.packageName}</Text>
+                    <Text style={styles.vendorPaymentDate}>Event: {b.weddingDate} • {b.location}</Text>
+                  </View>
+                </View>
 
-                          const t = item.title.toLowerCase();
-                          if (t.includes('photo')) {
-                            setShowPhotographyListing(true);
-                            return;
-                          }
-                          if (t.includes('makeup') || t.includes('beauty')) {
-                            setShowMakeupListing(true);
-                            return;
-                          }
-                          if (t.includes('decor')) {
-                            setShowDecorListing(true);
-                            return;
-                          }
-                          if (t.includes('venue')) {
-                            setShowVenueListing(true);
-                            return;
-                          }
-                          if (t.includes('music') || t.includes('dj') || t.includes('entertainment')) {
-                            setShowEntertainmentListing(true);
-                            return;
-                          }
-                          if (t.includes('invitat') || t.includes('card')) {
-                            setShowInvitationListing(true);
-                            return;
-                          }
-                          if (t.includes('car') || t.includes('bus') || t.includes('transport')) {
-                            setShowCarsListing(true);
-                            return;
-                          }
-                        }}
-                        style={{ flex: 1, paddingVertical: 2 }}
-                      >
+                {/* Milestone Steps Bar */}
+                <View style={styles.milestonesBarWrapper}>
+                  {b.milestones.map((m) => (
+                    <View key={m.id} style={styles.milestoneStepCol}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        {m.status === 'paid' ? (
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+                        ) : m.status === 'pending' ? (
+                          <Clock className="w-3.5 h-3.5 text-amber-700" />
+                        ) : (
+                          <Lock className="w-3 h-3 text-stone-400" />
+                        )}
                         <Text
                           style={[
-                            styles.checklistItemText,
-                            { marginLeft: 0 },
-                            item.completed && styles.checklistItemTextCompleted,
+                            styles.stepNumText,
+                            m.status === 'paid' && { color: '#15803D', fontWeight: '700' },
                           ]}
                         >
-                          {item.title}
+                          M{m.milestoneNumber} ({m.percentage}%)
                         </Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        activeOpacity={0.7}
-                        onPress={() => removeChecklist(item.id)}
-                        style={styles.deleteBtn}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                      >
-                        <Trash2 className="w-4 h-4 text-[#A1999A]" />
-                      </TouchableOpacity>
+                      </View>
+                      <Text style={styles.stepAmountText}>₹{m.amount.toLocaleString('en-IN')}</Text>
                     </View>
-                  </div>
-                ))
-              )}
-            </View>
+                  ))}
+                </View>
+
+                <View style={styles.vendorPaymentFooter}>
+                  <View>
+                    <Text style={styles.footerBalanceLabel}>Remaining Due</Text>
+                    <Text
+                      style={[
+                        styles.footerBalanceVal,
+                        { color: b.remainingAmount === 0 ? '#15803D' : '#581420' },
+                      ]}
+                    >
+                      {b.remainingAmount === 0
+                        ? '✓ Fully Settled'
+                        : `₹${b.remainingAmount.toLocaleString('en-IN')}`}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.viewInvoiceBtn}
+                    onPress={() =>
+                      setSelectedInvoiceVendor({
+                        vendorId: b.vendorId,
+                        vendorName: b.vendorName,
+                        vendorImage: b.image,
+                        vendorLocation: b.location,
+                        category: b.category,
+                        startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
+                      })
+                    }
+                    activeOpacity={0.88}
+                  >
+                    <FileText className="w-4 h-4 text-white" />
+                    <Text style={styles.viewInvoiceBtnText}>View Invoice</Text>
+                    <ChevronRight className="w-3.5 h-3.5 text-white" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
-        </motion.div>
+        )}
+
+        {/* ================= 2. OVERVIEW & CHECKLIST CONTENT ================= */}
+        {activeSegment !== 'payment' && (
+          <View style={{ gap: 14, width: '100%' }}>
+            {activeSegment === 'overview' && (
+              <>
+                {/* ================= CARD 1: COUPLE BANNER ================= */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="w-full"
+                >
+                  <View style={styles.coupleCard}>
+                    {/* Soft decorative content */}
+                    <View style={styles.coupleCardInner}>
+                      <Text style={styles.coupleNames}>
+                        {brideName} <Text style={{ color: '#801524', fontSize: 18 }}>❤️</Text> {groomName}
+                      </Text>
+
+                      <View style={styles.metaRow}>
+                        <Text style={styles.metaText}>{rawDate}</Text>
+                      </View>
+
+                      <View style={styles.metaRow}>
+                        <MapPin className="w-3.5 h-3.5 text-[#2A2425]" />
+                        <Text style={styles.metaTextBold}>{rawLocation}</Text>
+                      </View>
+                    </View>
+                  </View>
+                </motion.div>
+
+                {/* ================= CARD 2: WEDDING COUNTDOWN ================= */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                  className="w-full"
+                >
+                  <View style={styles.countdownCard}>
+                    <View style={styles.countdownLeft}>
+                      <Text style={styles.countdownCardTitle}>Wedding Countdown</Text>
+
+                      <View style={styles.numberWrapper}>
+                        <Text style={styles.countdownNumber}>{daysLeft}</Text>
+                        <Text style={styles.daysLabel}>DAYS</Text>
+                      </View>
+
+                      <Text style={styles.untilText}>Until Your Wedding</Text>
+                    </View>
+
+                    <View style={styles.countdownRightImage}>
+                      <Image
+                        source={{ uri: exactWeddingCoupleImg }}
+                        style={styles.coupleImageStyle}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
+                </motion.div>
+
+                {/* ================= CARD 3: PLANNING PROGRESS ================= */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.2 }}
+                  className="w-full"
+                >
+                  <View style={styles.progressCard}>
+                    <View style={styles.progressHeaderRow}>
+                      <Text style={styles.progressTitle}>Planning Progress</Text>
+                      <Text style={styles.progressPercentText}>18%</Text>
+                    </View>
+
+                    <View style={styles.progressBarTrack}>
+                      <View style={[styles.progressBarFill, { width: '18%' }]} />
+                    </View>
+                  </View>
+                </motion.div>
+
+                {/* ================= SERVICES BUTTON ================= */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  className="w-full cursor-pointer"
+                  onClick={() => {
+                    setShowServicesView(true);
+                  }}
+                >
+                  <View style={styles.servicesButton}>
+                    <View style={styles.servicesButtonLeft}>
+                      <View style={styles.sparkleIconCircle}>
+                        <Sparkles className="w-5 h-5 text-[#581420]" />
+                      </View>
+                      <Text style={styles.servicesBtnTitle}>Services</Text>
+                    </View>
+                    <ChevronRight className="w-5 h-5 text-[#581420]" />
+                  </View>
+                </motion.div>
+              </>
+            )}
+
+            {/* ================= CHECKLIST SECTION ================= */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+              className="w-full"
+            >
+              <View style={styles.checklistCard}>
+                <View style={styles.checklistHeaderRow}>
+                  <Text style={styles.checklistTitle}>My Checklist</Text>
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => setShowAddInput(!showAddInput)}
+                      style={styles.addServiceBtn}
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#5C1A24]" />
+                      <Text style={styles.addServiceBtnText}>Add Service</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                {/* Add Service Input Toggle */}
+                {showAddInput && (
+                  <View style={styles.addInputRow}>
+                    <TextInput
+                      value={newServiceInput}
+                      onChangeText={setNewServiceInput}
+                      placeholder="Enter service name (e.g. Mehendi)"
+                      placeholderTextColor="#A1999A"
+                      style={styles.addTextInput}
+                      onSubmitEditing={handleAddService}
+                    />
+                    <TouchableOpacity
+                      onPress={handleAddService}
+                      style={styles.saveAddBtn}
+                    >
+                      <Text style={styles.saveAddBtnText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {/* Checklist items list */}
+                <View style={styles.checklistVerticalList}>
+                  {checklist.length === 0 ? (
+                    <Text style={styles.emptyChecklistText}>
+                      No services in checklist. Tap "+ Add Service" to add one.
+                    </Text>
+                  ) : (
+                    checklist.map((item) => (
+                      <div key={item.id}>
+                        <View style={[
+                          styles.checklistItemRow,
+                          item.completed && { backgroundColor: '#F0F7EC', borderColor: '#D4E5CD' }
+                        ]}>
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => {
+                              setChecklist((prev) =>
+                                prev.map((c) =>
+                                  c.id === item.id ? { ...c, completed: true } : c
+                                )
+                              );
+
+                              const t = item.title.toLowerCase();
+                              if (t.includes('photo')) {
+                                setShowPhotographyListing(true);
+                                return;
+                              }
+                              if (t.includes('makeup') || t.includes('beauty')) {
+                                setShowMakeupListing(true);
+                                return;
+                              }
+                              if (t.includes('decor')) {
+                                setShowDecorListing(true);
+                                return;
+                              }
+                              if (t.includes('venue')) {
+                                setShowVenueListing(true);
+                                return;
+                              }
+                              if (t.includes('music') || t.includes('dj') || t.includes('entertainment')) {
+                                setShowEntertainmentListing(true);
+                                return;
+                              }
+                              if (t.includes('invitat') || t.includes('card')) {
+                                setShowInvitationListing(true);
+                                return;
+                              }
+                              if (t.includes('car') || t.includes('bus') || t.includes('transport')) {
+                                setShowCarsListing(true);
+                                return;
+                              }
+                            }}
+                            style={{ flex: 1, paddingVertical: 2 }}
+                          >
+                            <Text
+                              style={[
+                                styles.checklistItemText,
+                                { marginLeft: 0 },
+                                item.completed && styles.checklistItemTextCompleted,
+                              ]}
+                            >
+                              {item.title}
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            activeOpacity={0.7}
+                            onPress={() => removeChecklist(item.id)}
+                            style={styles.deleteBtn}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          >
+                            <Trash2 className="w-4 h-4 text-[#A1999A]" />
+                          </TouchableOpacity>
+                        </View>
+                      </div>
+                    ))
+                  )}
+                </View>
+              </View>
+            </motion.div>
+          </View>
+        )}
       </ScrollView>
 
       {/* Services Modal if opened */}
@@ -1198,6 +1444,52 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* WEDDING INVOICE & MILESTONES PAYMENT MODAL */}
+      {selectedInvoiceVendor && (
+        <WeddingInvoicePaymentModal
+          visible={Boolean(selectedInvoiceVendor)}
+          onClose={() => setSelectedInvoiceVendor(null)}
+          vendorId={selectedInvoiceVendor.vendorId}
+          vendorName={selectedInvoiceVendor.vendorName}
+          vendorImage={selectedInvoiceVendor.vendorImage}
+          vendorLocation={selectedInvoiceVendor.vendorLocation}
+          category={selectedInvoiceVendor.category}
+          startingPrice={selectedInvoiceVendor.startingPrice}
+          onNavigateToMyWeddingPayments={() => {
+            setSelectedInvoiceVendor(null);
+            setActiveSegment('payment');
+          }}
+        />
+      )}
+      {/* NOTIFICATIONS MODAL */}
+      <NotificationsModal
+        visible={showNotificationsModal}
+        onClose={() => setShowNotificationsModal(false)}
+        notifications={notifications}
+        onOpenInvoice={(actionData) => {
+          setSelectedInvoiceVendor({
+            vendorId: actionData?.vendorId || 'studio-1',
+            vendorName: actionData?.vendorName || 'Vendor',
+            vendorImage: actionData?.vendorImage || '',
+            vendorLocation: actionData?.vendorLocation || '',
+            category: actionData?.category || 'Photography',
+            startingPrice: String(actionData?.invoiceAmount || '₹85,000'),
+          });
+        }}
+        onOpenQuote={(actionData) => {
+          if (actionData?.category === 'Photography') setShowPhotographyListing(true);
+          else if (actionData?.category === 'Makeup') setShowMakeupListing(true);
+          else if (actionData?.category === 'Decor') setShowDecorListing(true);
+          else if (actionData?.category === 'Venue') setShowVenueListing(true);
+          else if (actionData?.category === 'Entertainment') setShowEntertainmentListing(true);
+          else if (actionData?.category === 'Cars') setShowCarsListing(true);
+          else if (actionData?.category === 'Invitations') setShowInvitationListing(true);
+          else if (actionData?.category === 'Mehendi') setShowMehendiListing(true);
+          else if (actionData?.category === 'Catering') setShowCateringListing(true);
+          else setShowServicesView(true);
+        }}
+      />
     </View>
   );
 };
@@ -1236,12 +1528,23 @@ const styles: any = StyleSheet.create({
   },
   bellBadge: {
     position: 'absolute',
-    top: 8,
-    right: 9,
-    width: 6,
-    height: 6,
-    borderRadius: 9999,
-    backgroundColor: '#5C1A24',
+    top: -2,
+    right: -2,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#581420',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: '#FAF6EE',
+  },
+  bellBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    lineHeight: 11,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -1707,6 +2010,203 @@ const styles: any = StyleSheet.create({
     justifyContent: 'center',
   },
   quoteViewBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  segmentTabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#FAF5EE',
+    marginHorizontal: 16,
+    marginBottom: 10,
+    borderRadius: 14,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: '#EFE6D9',
+  },
+  segmentTabItem: {
+    flex: 1,
+    paddingVertical: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    position: 'relative',
+  },
+  segmentTabItemActive: {
+    backgroundColor: '#581420',
+    boxShadow: '0 2px 6px rgba(88, 20, 32, 0.2)',
+  },
+  segmentTabText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: '#7D6E70',
+  },
+  segmentTabTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  tabBadgeDot: {
+    position: 'absolute',
+    top: 6,
+    right: 14,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#F59E0B',
+  },
+  paymentSummaryCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EFE7DC',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+  },
+  summaryTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  summaryTopCol: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 3,
+  },
+  summaryTopLabel: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11,
+    color: '#7A7273',
+  },
+  summaryTopVal: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#2A2425',
+  },
+  paymentSectionTitle: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  paymentSectionCount: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: '#581420',
+    backgroundColor: '#F7EFF1',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  vendorPaymentCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EFE7DC',
+    gap: 12,
+    boxShadow: '0 3px 10px rgba(0,0,0,0.04)',
+  },
+  vendorPaymentHeader: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  vendorPaymentThumb: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: '#F3ECE4',
+  },
+  vendorPaymentName: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  categoryBadgePill: {
+    backgroundColor: '#F7EFF1',
+    borderWidth: 1,
+    borderColor: '#EBDCE0',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  categoryBadgeText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#581420',
+  },
+  vendorPaymentPackage: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: '#524345',
+    marginTop: 2,
+  },
+  vendorPaymentDate: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10.5,
+    color: '#8C8283',
+    marginTop: 2,
+  },
+  milestonesBarWrapper: {
+    flexDirection: 'row',
+    backgroundColor: '#FAF7F2',
+    borderRadius: 12,
+    padding: 10,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#EFE7DC',
+  },
+  milestoneStepCol: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 2,
+  },
+  stepNumText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#7A7273',
+  },
+  stepAmountText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  vendorPaymentFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#EFE7DC',
+  },
+  footerBalanceLabel: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 10.5,
+    color: '#7A7273',
+  },
+  footerBalanceVal: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 13.5,
+    fontWeight: '800',
+  },
+  viewInvoiceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#581420',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 10,
+    boxShadow: '0 2px 8px rgba(88, 20, 32, 0.2)',
+  },
+  viewInvoiceBtnText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
     fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',

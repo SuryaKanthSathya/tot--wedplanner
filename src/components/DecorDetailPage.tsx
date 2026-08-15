@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   ChevronLeft,
@@ -63,6 +64,9 @@ interface DecorDetailPageProps {
   onBack: () => void;
   isBookmarked?: boolean;
   onToggleBookmark?: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
@@ -71,10 +75,14 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   onBack,
   isBookmarked = false,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeTab, setActiveTab] = useState<'about' | 'gallery' | 'packages' | 'reviews'>('about');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Quote Flow Local States
@@ -593,9 +601,17 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
           )}
 
           {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
               <Text style={styles.primaryQuoteBtnText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
               </Text>
             </TouchableOpacity>
           )}
@@ -638,10 +654,52 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
         startingPrice={studio.startingPrice}
         category="Decor"
         packageName="Exquisite Mandap & Entrance Stage Decor"
-        includedServices={[ 'Grand Mandap Stage Floral Backdrop', 'Bespoke Wooden Mandap Structure Setup', 'Royal Entrance Arch Floral Decor', 'Groom & Bride Pathway Flowers', 'Ambient Mood Lighting & LED Accents' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={[
+          'Grand Mandap Stage Floral Backdrop',
+          'Bespoke Wooden Mandap Structure Setup',
+          'Royal Entrance Arch Floral Decor',
+          'Groom & Bride Pathway Flowers',
+          'Ambient Mood Lighting & LED Accents',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={studio.id}
+        vendorName={studio.name}
+        vendorImage={studio.image}
+        vendorLocation={studio.location}
+        category="Decor"
+        startingPrice={studio.startingPrice || '₹1,50,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: studio.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: studio.id } })
+            );
+          }
+        }}
       />
     </View>
   );

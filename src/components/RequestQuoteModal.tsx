@@ -366,6 +366,17 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (visible) {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: true } }));
+    } else {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: false } }));
+    }
+    return () => {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: false } }));
+    };
+  }, [visible]);
+
   if (!visible) return null;
 
   return (

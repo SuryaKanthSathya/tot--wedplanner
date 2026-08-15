@@ -142,6 +142,17 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
     setMockQuoteDetails(defaultDetails);
   }, [vendorId, vendorName, startingPrice, vendorLocation, packageName, includedServices]);
 
+  useEffect(() => {
+    if (visible) {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: true } }));
+    } else {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: false } }));
+    }
+    return () => {
+      window.dispatchEvent(new CustomEvent('tot_hide_tab_bar', { detail: { hide: false } }));
+    };
+  }, [visible]);
+
   // Handle counter-offer response simulation
   useEffect(() => {
     if (quoteStatus === 'negotiating') {
@@ -197,8 +208,25 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
       invoiceDate: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
     });
 
+    try {
+      const { saveOrUpdateWeddingBooking } = require('../utils/weddingPaymentsManager');
+      saveOrUpdateWeddingBooking({
+        vendorId,
+        vendorName,
+        category,
+        image: vendorImage,
+        location: vendorLocation,
+        totalAmount: mockQuoteDetails.totalAmount,
+        status: 'confirmed',
+        packageName: mockQuoteDetails.packageName,
+        includedServices: mockQuoteDetails.includedServices,
+      });
+    } catch (e) {
+      console.warn(e);
+    }
+
     onClose();
-    showToast('Quote Confirmed! Added to My Quotes', 3500);
+    showToast('✓ Quote Confirmed! View Invoice is now ready.', 3500);
   };
 
   const handleRejectQuote = () => {
@@ -401,15 +429,13 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
             style={styles.confirmQuoteBtn}
             onPress={() => {
               onClose();
-              if (onBack) onBack();
               if (onNavigateToQuotesTab) {
                 onNavigateToQuotesTab();
               }
-              window.dispatchEvent(new CustomEvent('tot_switch_tab', { detail: { tab: 'quotes' } }));
             }}
             activeOpacity={0.85}
           >
-            <Text style={styles.confirmQuoteBtnText}>Go to My Quotes to Pay</Text>
+            <Text style={styles.confirmQuoteBtnText}>View Invoice & Pay</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={[styles.confirmQuoteBtn, { backgroundColor: '#15803D' }]} onPress={onClose} activeOpacity={0.85}>

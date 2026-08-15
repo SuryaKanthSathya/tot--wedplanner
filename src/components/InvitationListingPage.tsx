@@ -455,12 +455,14 @@ const TYPE_OPTIONS = [
   'Wooden Box',
 ];
 
-interface InvitationListingPageProps {
+export interface InvitationListingPageProps {
   onBack: () => void;
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
@@ -469,6 +471,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
   onToggleSavedInvite = (_id?: string) => { },
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [selectedBudget, setSelectedBudget] = useState<string>('All');
@@ -525,6 +529,23 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
         isBookmarked={Boolean(savedInviteIds[selectedInvite.id])}
         onToggleBookmark={onToggleSavedInvite}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedInvite(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedInvite.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedInvite(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedInvite.id } })
+            );
+          }
+        }}
       />
     );
   }

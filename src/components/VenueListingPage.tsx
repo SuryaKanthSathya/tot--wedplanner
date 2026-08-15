@@ -2779,6 +2779,8 @@ interface VenueListingPageProps {
   onToggleSavedVenue?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
@@ -2787,6 +2789,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   onToggleSavedVenue = (_id?: string) => { },
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [selectedBudget, setSelectedBudget] = useState<string>('All');
@@ -2843,6 +2847,23 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         isBookmarked={Boolean(savedVenueIds[selectedVenue.id])}
         onToggleBookmark={onToggleSavedVenue}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedVenue(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedVenue.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedVenue(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedVenue.id } })
+            );
+          }
+        }}
       />
     );
   }

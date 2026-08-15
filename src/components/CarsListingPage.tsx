@@ -95,6 +95,8 @@ export interface CarsListingPageProps {
   onToggleSavedCar?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToQuotesTab?: () => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const CarsListingPage: React.FC<CarsListingPageProps> = ({
@@ -103,6 +105,8 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
   onToggleSavedCar,
   onOpenSavedTab,
   onNavigateToQuotesTab,
+  bookingSource = 'entire_wedding',
+  onNavigateToProfileMyBookings,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -224,6 +228,23 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
         isBookmarked={Boolean(bookmarkedIds[selectedCar.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setSelectedCar(null);
+          window.dispatchEvent(
+            new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedCar.id } })
+          );
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setSelectedCar(null);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: selectedCar.id } })
+            );
+          }
+        }}
       />
     );
   }
@@ -244,23 +265,21 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
               <Text style={styles.resetBadgeText}>Reset</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity
-            style={styles.iconButton}
-            activeOpacity={0.7}
-            onPress={() => {
-              if (onOpenSavedTab) {
-                onOpenSavedTab();
-              }
-            }}
-          >
-            <Heart
-              className={`w-5 h-5 ${
-                Object.values(bookmarkedIds).some(Boolean)
-                  ? 'text-[#8B1E2F] fill-[#8B1E2F]'
-                  : 'text-[#2A2425]'
-              }`}
-            />
-          </TouchableOpacity>
+          {onOpenSavedTab && (
+            <TouchableOpacity
+              style={styles.iconButton}
+              activeOpacity={0.7}
+              onPress={onOpenSavedTab}
+            >
+              <Heart
+                className={`w-5 h-5 ${
+                  Object.values(bookmarkedIds).some(Boolean)
+                    ? 'text-[#8B1E2F] fill-[#8B1E2F]'
+                    : 'text-[#2A2425]'
+                }`}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -39,121 +39,105 @@ import {
   FileText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { QuotationScreen } from './QuotationScreen';
-import { saveOrUpdateQuote } from '../utils/quotesManager';
 import { PhotographyStudio } from './PhotographyListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { QuotationScreen } from './QuotationScreen';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 interface StudioDetailPageProps {
-  onNavigateToQuotesTab?: () => void;
   studio: PhotographyStudio;
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
-  onNavigateToQuotesTab,
   studio,
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'videos'>('photos');
   const [isReadMore, setIsReadMore] = useState(false);
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
-  const [quoteSuccess, setQuoteSuccess] = useState(false);
+  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Quote Flow Local States
+  // Quote / Booking state from weddingPaymentsManager
   const [quoteStatus, setQuoteStatus] = useState<
     'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
   >(() => {
-    try {
-      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
-      if (savedQuotesJson) {
-        const quotes = JSON.parse(savedQuotesJson);
-        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
-        if (match) {
-          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
-          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
-          if (match.status === 'confirmed') return 'confirmed';
-        }
-      }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[studio.id]) {
-          return statuses[studio.id];
-        }
-      }
-    } catch (e) {
-      console.warn(e);
-    }
+    const existing = getWeddingBookingByVendorId(studio.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
-    setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[studio.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
-  };
-
-  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
-
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(studio.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [studio.id]);
 
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
-    updateQuoteStatus('requested');
-    const basePrice = parseInt((studio.startingPrice || '₹75,000').replace(/[^0-9]/g, ''), 10) || 75000;
-    saveOrUpdateQuote({
-      id: `quote-${studio.id}`,
+    setQuoteStatus('requested');
+    const basePrice = parseInt((studio.startingPrice || '₹90,000').replace(/[^0-9]/g, ''), 10) || 90000;
+    saveOrUpdateWeddingBooking({
       vendorId: studio.id,
       vendorName: studio.name,
       category: 'Photography',
-      packageName: 'Premium Candid Photography & Wedding Highlight Film',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: eventDate || '15 Dec 2026',
-      location: studio.location || 'Chennai, Tamil Nadu',
-      includedServices: [
-        '2 Elite Candid Wedding Photographers',
-        '1 Cinematic Traditional Videographer',
-        'Wedding Highlight Film & Teaser Reel',
-        'Pre-Wedding Couple Outdoor Photoshoot',
-        'Luxury Glass-Covered Leather Album',
-      ],
+      serviceType: 'Wedding Photography',
       image: studio.image,
+      location: studio.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: 'requested',
     });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
 
-    // Simulate response after 3 seconds
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
+
+    // Simulate vendor response ready after 2.5s
     setTimeout(() => {
-      updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${studio.id}`,
+      setQuoteStatus('response_ready');
+      saveOrUpdateWeddingBooking({
+        vendorId: studio.id,
+        vendorName: studio.name,
         status: 'response_ready',
       });
-      setToastMessage('Vendor Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
-    }, 3000);
+      setToastMessage('Quotation Received! Click "View Quote"');
+    }, 2500);
   };
 
+  const handleConfirmQuoteFromQuotation = () => {
+    setQuoteStatus('confirmed');
+    const basePrice = parseInt((studio.startingPrice || '₹90,000').replace(/[^0-9]/g, ''), 10) || 90000;
+    saveOrUpdateWeddingBooking({
+      vendorId: studio.id,
+      vendorName: studio.name,
+      category: 'Photography',
+      serviceType: 'Wedding Photography',
+      image: studio.image,
+      location: studio.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: 'confirmed',
+    });
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
+  };
 
   // Quote form state
   const [customerName, setCustomerName] = useState('');
@@ -510,48 +494,49 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
           <Text style={styles.callNowBtnText}>Call Now</Text>
         </TouchableOpacity>
 
-                  {quoteStatus === 'initial' && (
-            <TouchableOpacity
-              style={styles.sendQuoteBtn}
-              onPress={() => setShowQuoteModal(true)}
-              activeOpacity={0.85}
-            >
-              <Send className="w-4 h-4 text-white mr-1.5" />
-              <Text style={styles.sendQuoteBtnText}>Request Quote</Text>
-            </TouchableOpacity>
-          )}
+        {quoteStatus === 'initial' && (
+          <TouchableOpacity
+            style={styles.sendQuoteBtn}
+            onPress={() => setShowQuoteModal(true)}
+            activeOpacity={0.85}
+          >
+            <Send className="w-4 h-4 text-white mr-1.5" />
+            <Text style={styles.sendQuoteBtnText}>Request Quote</Text>
+          </TouchableOpacity>
+        )}
 
-          {quoteStatus === 'requested' && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.sendQuoteBtnText}>Pending Response</Text>
-            </TouchableOpacity>
-          )}
+        {quoteStatus === 'requested' && (
+          <TouchableOpacity
+            style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]}
+            disabled
+            activeOpacity={1}
+          >
+            <Clock className="w-4 h-4 text-white mr-1.5" />
+            <Text style={styles.sendQuoteBtnText}>Pending Response</Text>
+          </TouchableOpacity>
+        )}
 
-          {quoteStatus === 'negotiating' && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.sendQuoteBtnText}>Negotiating...</Text>
-            </TouchableOpacity>
-          )}
+        {quoteStatus === 'response_ready' && (
+          <TouchableOpacity
+            style={[styles.sendQuoteBtn, { backgroundColor: '#10B981' }]}
+            onPress={() => setShowQuotationScreen(true)}
+            activeOpacity={0.85}
+          >
+            <FileText className="w-4 h-4 text-white mr-1.5" />
+            <Text style={styles.sendQuoteBtnText}>View Quote</Text>
+          </TouchableOpacity>
+        )}
 
-          {quoteStatus === 'rejected' && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-              <Text style={styles.sendQuoteBtnText}>Rejected (Reset)</Text>
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'response_ready' && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.sendQuoteBtnText}>View Quote</Text>
-            </TouchableOpacity>
-          )}
-
-          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.sendQuoteBtn, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.sendQuoteBtnText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
-              </Text>
-            </TouchableOpacity>
-          )}
+        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+          <TouchableOpacity
+            style={[styles.sendQuoteBtn, { backgroundColor: '#581420' }]}
+            onPress={() => setShowInvoiceModal(true)}
+            activeOpacity={0.85}
+          >
+            <FileText className="w-4 h-4 text-white mr-1.5" />
+            <Text style={styles.sendQuoteBtnText}>View Invoice</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       {/* LIGHTBOX PHOTO MODAL */}
@@ -570,30 +555,71 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
         visible={showQuoteModal}
-        vendorId={studio.id}
         vendorName={studio.name}
         vendorLocation={studio.location}
-        category="photography"
         onQuoteSent={handleQuoteRequestSent}
         onClose={() => setShowQuoteModal(false)}
       />
 
+      {/* QUOTATION SCREEN */}
       <QuotationScreen
         visible={showQuotationScreen}
         onClose={() => setShowQuotationScreen(false)}
         quoteStatus={quoteStatus}
-        setQuoteStatus={updateQuoteStatus}
+        setQuoteStatus={setQuoteStatus}
         vendorId={studio.id}
         vendorName={studio.name}
         vendorImage={studio.image}
         vendorLocation={studio.location}
         startingPrice={studio.startingPrice}
         category="Photography"
-        packageName="Premium Candid Photography & Wedding Highlight Film"
-        includedServices={[ '2 Elite Candid Wedding Photographers', '1 Cinematic Traditional Videographer', 'Wedding Highlight Film & Teaser Reel', 'Pre-Wedding Couple Outdoor Photoshoot', 'Luxury Glass-Covered Leather Album' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
-        onBack={onBack}
-        onShowToast={handleShowToast}
+        packageName="Signature Candid Photography & Cinematic Teaser"
+        includedServices={[
+          '2 Elite Candid Wedding Photographers',
+          '1 Cinematic Traditional Videographer',
+          'Wedding Highlight Film & 4K Teaser Reel',
+          'Pre-Wedding Couple Outdoor Shoot',
+          'Luxury Flush-Mount Leather Wedding Album',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
+        onBack={() => setShowQuotationScreen(false)}
+        onShowToast={(msg) => setToastMessage(msg)}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={studio.id}
+        vendorName={studio.name}
+        vendorImage={studio.image}
+        vendorLocation={studio.location}
+        category="Photography"
+        startingPrice={studio.startingPrice || '₹90,000'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: studio.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: studio.id } })
+            );
+          }
+        }}
       />
     </View>
   );

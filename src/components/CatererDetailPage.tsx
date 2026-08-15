@@ -38,7 +38,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { CateringVendor } from './CateringListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 interface CatererDetailPageProps {
   onNavigateToQuotesTab?: () => void;
@@ -46,6 +51,9 @@ interface CatererDetailPageProps {
   onBack: () => void;
   isBookmarked: boolean;
   onToggleBookmark: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
+  onNavigateToMyWeddingPayments?: () => void;
+  onNavigateToProfileMyBookings?: () => void;
 }
 
 export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
@@ -54,10 +62,14 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
   onBack,
   isBookmarked,
   onToggleBookmark,
+  bookingSource = 'entire_wedding',
+  onNavigateToMyWeddingPayments,
+  onNavigateToProfileMyBookings,
 }) => {
   const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'highlights' | 'reviews'>('portfolio');
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Quote Flow Local States
@@ -640,9 +652,17 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
           )}
 
           {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
               <Text style={styles.quoteBtnMainText}>
-                {quoteStatus === 'fully_paid' ? 'Fully Paid' : quoteStatus === 'partially_paid' ? 'Partially Paid' : 'Confirmed'}
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
               </Text>
             </TouchableOpacity>
           )}
@@ -688,10 +708,52 @@ export const CatererDetailPage: React.FC<CatererDetailPageProps> = ({
         startingPrice={caterer.startingPrice}
         category="Catering"
         packageName="Grand Royal Buffet Wedding Menu"
-        includedServices={[ 'Traditional Welcome Drinks & Shorba', 'Gourmet Starters & Live Counters (5 Items)', 'Traditional Main Course (12 Special Items)', 'Artisanal Dessert Station (4 Items)', 'Premium Catering Staff & Table Service' ]}
-        onNavigateToQuotesTab={onNavigateToQuotesTab}
+        includedServices={[
+          'Traditional Welcome Drinks & Shorba',
+          'Gourmet Starters & Live Counters (5 Items)',
+          'Traditional Main Course (12 Special Items)',
+          'Artisanal Dessert Station (4 Items)',
+          'Premium Catering Staff & Table Service',
+        ]}
+        onNavigateToQuotesTab={() => {
+          setShowQuotationScreen(false);
+          setShowInvoiceModal(true);
+        }}
         onBack={onBack}
         onShowToast={handleShowToast}
+      />
+
+      {/* INVOICE & MILESTONES PAYMENT MODAL */}
+      <WeddingInvoicePaymentModal
+        visible={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        vendorId={caterer.id}
+        vendorName={caterer.name}
+        vendorImage={caterer.image}
+        vendorLocation={caterer.location}
+        category="Catering"
+        startingPrice={caterer.startingPrice || '₹750 / plate'}
+        bookingSource={bookingSource}
+        onNavigateToMyWeddingPayments={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToMyWeddingPayments) {
+            onNavigateToMyWeddingPayments();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: caterer.id } })
+            );
+          }
+        }}
+        onNavigateToProfileMyBookings={() => {
+          setShowInvoiceModal(false);
+          if (onNavigateToProfileMyBookings) {
+            onNavigateToProfileMyBookings();
+          } else {
+            window.dispatchEvent(
+              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: caterer.id } })
+            );
+          }
+        }}
       />
     </View>
   );
