@@ -155,24 +155,8 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
 
   const innerLandingContent = (
     <View style={[styles.innerContainer, { backgroundColor: '#FAF6EE' }]}>
-      {/* ================= TOP PHOTO SECTION (56% Height) ================= */}
-      <View style={styles.topPhotoSection}>
-        {/* Background Image with subtle entrance animation */}
-        <motion.div
-          initial={{ scale: 1.02, opacity: 0.9 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="absolute inset-0 z-0"
-        >
-          <Image
-            source={{ uri: coupleImage }}
-            style={styles.backgroundImage}
-            resizeMode="cover"
-          />
-          {/* Subtle gradient overlay tint */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent" />
-        </motion.div>
-
+      {/* ================= TOP LOGO SECTION (56% Height) ================= */}
+      <View style={[styles.topPhotoSection, { justifyContent: 'center', paddingTop: 0 }]}>
         {/* Floating White Square Logo Card + Title overlay */}
         <View style={styles.logoCardWrapper}>
           <FloatingLogoCard
@@ -181,14 +165,6 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
             tagline="Your Dream, Our Passion"
           />
         </View>
-
-        {/* Soft Gradient Mask at Bottom blending seamlessly into lower container */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-28 sm:h-36 z-10 pointer-events-none"
-          style={{
-            background: `linear-gradient(to bottom, rgba(250, 246, 238, 0) 0%, rgba(250, 246, 238, 0.85) 75%, #FAF6EE 100%)`,
-          }}
-        />
       </View>
 
       {/* ================= BOTTOM TEXT & ACTION SECTION (44% Height) ================= */}

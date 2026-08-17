@@ -86,6 +86,27 @@ interface MainDashboardPageProps {
   onNavigateToCoupleOnboarding?: () => void;
 }
 
+const HoverMarquee = ({ text, textStyle, className }: { text: string, textStyle: any, className?: string }) => {
+  return (
+    <div className={`group overflow-hidden whitespace-nowrap relative flex flex-col justify-center ${className || ''}`} style={{ flexShrink: 1, minWidth: 0 }}>
+      {/* Default text with ellipsis */}
+      <div className="group-hover:opacity-0 transition-opacity duration-300 flex items-center" style={{ overflow: 'hidden' }}>
+        <Text style={[textStyle, { flexShrink: 1 }]} numberOfLines={1}>{text}</Text>
+      </div>
+
+      {/* Scrolling text on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center">
+        <div 
+          className="transition-transform duration-[3000ms] ease-linear transform translate-x-0 group-hover:-translate-x-[40%]"
+          style={{ whiteSpace: 'nowrap', width: 'max-content' }}
+        >
+          <Text style={textStyle} numberOfLines={1}>{text}</Text>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   userName,
   userMobile,
@@ -398,6 +419,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         setShowCateringListing(false);
         setShowRitualsFlow(false);
         setShowFindVendorsPage(false);
+        setShowDestinationWeddingFlow(false);
       }
     };
     const handleSavedReset = () => {
@@ -424,6 +446,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowMehendiListing(false);
       setShowCateringListing(false);
       setShowRitualsFlow(false);
+      setShowDestinationWeddingFlow(false);
     };
     const handleHideTabBar = (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -446,6 +469,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowMehendiListing(false);
       setShowCateringListing(false);
       setShowRitualsFlow(false);
+      setShowDestinationWeddingFlow(false);
       setActiveTab('profile');
       setShowProfileModal(true);
       setProfileActiveTab('mybooking');
@@ -682,6 +706,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
         }}
+        onComplete={() => {
+          setShowDestinationWeddingFlow(false);
+          setActiveTab('home');
+        }}
       />
     );
   }
@@ -871,6 +899,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             </View>
           </View>
 
+
           {/* ================= SECTION 2: Destination Wedding Banner ================= */}
           <motion.div
             whileHover={{ scale: 1.03, y: -2 }}
@@ -899,8 +928,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               </View>
             </View>
           </motion.div>
-
-          {/* ================= SECTION 3: Popular Services ================= */}
           <View style={styles.servicesSection}>
             <View style={styles.servicesHeaderRow}>
               <Text style={styles.servicesTitle}>Popular Services</Text>
@@ -1128,14 +1155,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4"
+            className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-[#FAF6EE] rounded-t-3xl sm:rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[90vh]"
+              className="w-[95%] max-w-[400px] bg-[#FAF6EE] rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[85%]"
             >
               {/* Modal Header */}
               <View style={styles.modalHeader}>
@@ -1160,15 +1187,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   onPress={() => setProfileActiveTab('profile')}
                   activeOpacity={0.8}
                 >
-                  <User className="w-3.5 h-3.5 mr-1.5" />
-                  <Text
-                    style={[
-                      styles.profileTabText,
-                      profileActiveTab === 'profile' && styles.profileTabTextActive,
-                    ]}
-                  >
-                    Profile
-                  </Text>
+                  <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                  <HoverMarquee text="Profile" textStyle={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -1179,15 +1199,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   onPress={() => setProfileActiveTab('mybooking')}
                   activeOpacity={0.8}
                 >
-                  <Briefcase className="w-3.5 h-3.5 mr-1.5" />
-                  <Text
-                    style={[
-                      styles.profileTabText,
-                      profileActiveTab === 'mybooking' && styles.profileTabTextActive,
-                    ]}
-                  >
-                    My Bookings
-                  </Text>
+                  <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                  <HoverMarquee text="My Bookings" textStyle={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]} />
                   {profileBookings.length > 0 && (
                     <View style={styles.profileBadgePill}>
                       <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
