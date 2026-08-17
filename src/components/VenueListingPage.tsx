@@ -7,10 +7,9 @@ import {
   Image,
   StyleSheet,
   TextInput,
-} from 'react-native';
+} from 'react-native-web';
 import {
   ArrowLeft,
-  ChevronLeft,
   Star,
   MapPin,
   Heart,
@@ -30,7 +29,6 @@ import {
   Check,
   X,
   Scale,
-  SlidersHorizontal,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { VenueItem, VenueDetailPage } from './VenueDetailPage';
@@ -2783,6 +2781,11 @@ interface VenueListingPageProps {
   onNavigateToQuotesTab?: () => void;
   bookingSource?: 'entire_wedding' | 'individual';
   onNavigateToProfileMyBookings?: () => void;
+  collectionData?: {
+    title: string;
+    description: string;
+    image: string;
+  };
 }
 
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
@@ -2793,73 +2796,53 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   onNavigateToQuotesTab,
   bookingSource = 'entire_wedding',
   onNavigateToProfileMyBookings,
+  collectionData,
 }) => {
-  const [selectedCity, setSelectedCity] = useState<string>('All');
+  const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [selectedBudget, setSelectedBudget] = useState<string>('All');
   const [selectedRating, setSelectedRating] = useState<string>('All');
   const [selectedTier, setSelectedTier] = useState<string>('All');
-  const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
+  const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const savedVenuesList = VENUES_DATA.filter((v) => Boolean(savedVenueIds && savedVenueIds[v.id]));
+  const savedVenuesList = VENUES_DATA.filter((v) => Boolean(savedVenueIds[v.id]));
   const [showCompareModal, setShowCompareModal] = useState(false);
 
-  const resetAllFilters = () => {
-    setSelectedCity('All');
-    setSelectedBudget('All');
-    setSelectedRating('All');
-    setSelectedTier('All');
-    setSearchQuery('');
-  };
-
-  const isAnyFilterActive =
-    selectedCity !== 'All' ||
-    selectedBudget !== 'All' ||
-    selectedRating !== 'All' ||
-    selectedTier !== 'All' ||
-    searchQuery.trim() !== '';
-
   const filteredVenues = VENUES_DATA.filter((venue) => {
-    const vCity = (venue.city || '').toLowerCase();
-    const vLocation = (venue.location || '').toLowerCase();
-    const vCategory = (venue.category || '').toLowerCase();
-    const vName = (venue.name || '').toLowerCase();
-    const qCity = selectedCity.toLowerCase();
-    const qSearch = searchQuery.trim().toLowerCase();
-
     const matchesCity =
-      selectedCity === 'All' ||
       selectedCity === 'All Cities' ||
-      vCity === qCity ||
-      vLocation.includes(qCity) ||
-      qCity.includes(vCity);
+      selectedCity === 'All' ||
+      venue.city.toLowerCase() === selectedCity.toLowerCase() ||
+      venue.location.toLowerCase().includes(selectedCity.toLowerCase()) ||
+      selectedCity.toLowerCase().includes(venue.city.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === 'All Types' ||
+      venue.category.toLowerCase().includes(selectedCategory.toLowerCase());
 
     const matchesSearch =
-      qSearch === '' ||
-      vName.includes(qSearch) ||
-      vCity.includes(qSearch) ||
-      vCategory.includes(qSearch) ||
-      vLocation.includes(qSearch);
+      searchQuery.trim() === '' ||
+      venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      venue.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      venue.category.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const venueRating = venue.rating || 4.8;
     const matchesRating =
       selectedRating === 'All'
         ? true
         : selectedRating === '4.8'
-          ? venueRating >= 4.8
-          : venueRating >= 4.9;
+          ? venue.rating >= 4.8
+          : venue.rating >= 4.9;
 
-    const venueTier = venue.tier || 'Signature';
-    const matchesTier = selectedTier === 'All' ? true : venueTier === selectedTier;
+    const matchesTier = selectedTier === 'All' ? true : venue.tier === selectedTier;
 
-    const price = venue.priceValue || 200000;
     let matchesBudget = true;
-    if (selectedBudget === 'under-2l') matchesBudget = price < 200000;
-    else if (selectedBudget === '2l-3.5l') matchesBudget = price >= 200000 && price <= 350000;
-    else if (selectedBudget === '3.5l-5l') matchesBudget = price > 350000 && price <= 500000;
-    else if (selectedBudget === 'above-5l') matchesBudget = price > 500000;
+    if (selectedBudget === 'under-2l') matchesBudget = venue.priceValue < 200000;
+    else if (selectedBudget === '2l-3.5l') matchesBudget = venue.priceValue >= 200000 && venue.priceValue <= 350000;
+    else if (selectedBudget === '3.5l-5l') matchesBudget = venue.priceValue > 350000 && venue.priceValue <= 500000;
+    else if (selectedBudget === 'above-5l') matchesBudget = venue.priceValue > 500000;
 
-    return matchesCity && matchesSearch && matchesRating && matchesTier && matchesBudget;
+    return matchesCity && matchesCategory && matchesSearch && matchesRating && matchesTier && matchesBudget;
   });
 
   if (selectedVenue) {
@@ -2867,7 +2850,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
       <VenueDetailPage
         venue={selectedVenue}
         onBack={() => setSelectedVenue(null)}
-        isBookmarked={Boolean(savedVenueIds && savedVenueIds[selectedVenue.id])}
+        isBookmarked={Boolean(savedVenueIds[selectedVenue.id])}
         onToggleBookmark={onToggleSavedVenue}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
@@ -2893,238 +2876,192 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Top Header */}
-      <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.iconButton} onPress={onBack} activeOpacity={0.7}>
-          <ChevronLeft className="w-6 h-6 text-[#2A2425]" />
+      {/* HEADER */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={onBack} activeOpacity={0.8}>
+          <ArrowLeft className="w-5 h-5 text-stone-800" />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>Venues & Mandapams</Text>
-
-        <View style={styles.headerRightIcons}>
-          {isAnyFilterActive && (
-            <TouchableOpacity style={styles.resetBadgeBtn} onPress={resetAllFilters} activeOpacity={0.7}>
-              <Text style={styles.resetBadgeText}>Reset</Text>
-            </TouchableOpacity>
-          )}
-          {onOpenSavedTab && (
-            <TouchableOpacity
-              style={styles.iconButton}
-              activeOpacity={0.7}
-              onPress={onOpenSavedTab}
-            >
-              <Heart
-                className={`w-5 h-5 ${
-                  Object.values(savedVenueIds || {}).some(Boolean)
-                    ? 'text-[#8B1E2F] fill-[#8B1E2F]'
-                    : 'text-[#2A2425]'
-                }`}
-              />
-            </TouchableOpacity>
-          )}
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Text style={styles.headerTitle}>{collectionData ? 'Collections' : 'Wedding Venues'}</Text>
+          {!collectionData && <Text style={styles.headerSubtitle}>Mandapams, Resorts, 5-Star Hotels & Lawns</Text>}
         </View>
-      </View>
 
-      {/* Search Input Bar */}
-      <View style={styles.searchBarContainer}>
-        <Search className="w-4 h-4 text-[#8C7A7C] mr-2" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search by venue, mandapam, resort, or city..."
-          placeholderTextColor="#9A888A"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <X className="w-4 h-4 text-[#8C7A7C]" />
+        {onOpenSavedTab && (
+          <TouchableOpacity style={styles.savedBadgeBtn} onPress={onOpenSavedTab} activeOpacity={0.8}>
+            <Bookmark className="w-4 h-4 text-[#581420]" />
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Filter Chips Bar */}
-      <View style={styles.filterRowContainer}>
-        {/* City Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedCity !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('city')}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[styles.filterChipText, selectedCity !== 'All' && styles.filterChipTextActive]}
-            numberOfLines={1}
-          >
-            {selectedCity === 'All' ? 'All Cities ▼' : `${selectedCity} ▼`}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Budget Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('budget')}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[styles.filterChipText, selectedBudget !== 'All' && styles.filterChipTextActive]}
-            numberOfLines={1}
-          >
-            {selectedBudget === 'All'
-              ? 'Budget ▼'
-              : `${BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'} ▼`}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Rating Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('rating')}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[styles.filterChipText, selectedRating !== 'All' && styles.filterChipTextActive]}
-            numberOfLines={1}
-          >
-            {selectedRating === 'All' ? 'Rating ▼' : `${selectedRating}★ ▼`}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Tier Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('tier')}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[styles.filterChipText, selectedTier !== 'All' && styles.filterChipTextActive]}
-            numberOfLines={1}
-          >
-            {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Subtitle Section & Result Count */}
-      <View style={styles.recommendedRow}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.recommendedTitle}>Recommended Venues</Text>
-          <Sparkles className="w-4 h-4 text-[#C28E38] ml-1.5" />
-        </View>
-        <Text style={styles.resultCountText}>{filteredVenues.length} venues</Text>
-      </View>
-
-      {/* Venues Vertical List */}
-      <ScrollView
-        style={styles.listScrollView}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredVenues.length === 0 ? (
-          <View style={styles.emptyStateContainer}>
-            <Building2 className="w-10 h-10 text-[#C2B5A8] mb-2" />
-            <Text style={styles.emptyStateTitle}>No venues found</Text>
-            <Text style={styles.emptyStateSub}>
-              Try adjusting your city, budget range, or rating filter.
-            </Text>
-            <TouchableOpacity style={styles.emptyResetBtn} onPress={resetAllFilters}>
-              <Text style={styles.emptyResetBtnText}>Reset All Filters</Text>
+      {!collectionData && (
+        <View style={styles.searchBarWrapper}>
+          <Search className="w-4 h-4 text-stone-400 mr-2" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search Mandapam, Resort, City or Hotel..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <X className="w-4 h-4 text-stone-400" />
             </TouchableOpacity>
+          )}
+        </View>
+      )}
+
+      {/* Filter Chips Bar */}
+      {!collectionData && (
+        <View style={styles.filterRowContainer}>
+          {/* City Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('city')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedCity === 'All Cities' || selectedCity === 'All' ? 'All Cities ▼' : `${selectedCity} ▼`}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Budget Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('budget')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedBudget !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedBudget === 'All' ? 'Budget ▼' : `${BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'} ▼`}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Rating Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('rating')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedRating !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedRating === 'All' ? 'Rating ▼' : `${selectedRating}★ ▼`}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Tier Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('tier')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedTier !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* LIST OF VENUE CARDS */}
+      <ScrollView
+        style={{ flex: 1, overflowY: 'auto' } as any}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+      >
+        {/* The large cover image has been removed per user's new layout requirement. 
+            The page will just list the venues directly under the header. */}
+        {filteredVenues.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Building2 className="w-12 h-12 text-stone-300 mb-2" />
+            <Text style={styles.emptyTitle}>No Venues Found</Text>
+            <Text style={styles.emptySub}>Try adjusting your search query or city filters.</Text>
           </View>
         ) : (
           filteredVenues.map((venue) => {
-            const isSaved = Boolean(savedVenueIds && savedVenueIds[venue.id]);
+            const isSaved = Boolean(savedVenueIds[venue.id]);
             return (
-              <motion.div
-                key={venue.id}
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full mb-3.5"
-              >
-                <View style={styles.venueCard}>
-                  {/* Left Photo */}
-                  <Image
-                    source={{ uri: venue.image || '/src/assets/images/beach_resort_decor.jpg' }}
-                    style={styles.venueImage}
-                    resizeMode="cover"
-                  />
+              <motion.div key={venue.id} whileHover={{ y: -2 }} className="w-full mb-4">
+                <TouchableOpacity
+                  style={styles.cardContainer}
+                  onPress={() => setSelectedVenue(venue)}
+                  activeOpacity={0.9}
+                >
+                  {/* CARD IMAGE */}
+                  <View style={styles.imageWrapper}>
+                    <Image source={{ uri: venue.image }} style={styles.cardImage} resizeMode="cover" />
 
-                  {/* Right Info Details */}
-                  <View style={styles.cardRightCol}>
-                    <View style={styles.cardHeaderRow}>
-                      <Text style={styles.venueCardTitle} numberOfLines={1}>
-                        {venue.name}
-                      </Text>
+                    <View style={styles.badgeRow}>
+                      <View style={styles.tierTag}>
+                        <Sparkles className="w-3 h-3 text-amber-600 mr-1" />
+                        <Text style={styles.tierTagText}>{venue.tier}</Text>
+                      </View>
+
                       <TouchableOpacity
-                        onPress={() => onToggleSavedVenue(venue.id)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                        style={styles.bookmarkBtn}
+                        onPress={(e) => {
+                          e.stopPropagation();
+                          onToggleSavedVenue(venue.id);
+                        }}
                       >
-                        <Bookmark
-                          className={`w-4 h-4 ${
-                            isSaved ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'
-                          }`}
+                        <Heart
+                          className={`w-4 h-4 ${isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
+                            }`}
                         />
                       </TouchableOpacity>
                     </View>
 
-                    {/* Rating & Tier Badge */}
-                    <View style={styles.ratingRow}>
-                      <Star className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-1" />
-                      <Text style={styles.ratingText}>
-                        {venue.rating || 4.8}{' '}
-                        <Text style={styles.reviewsText}>({venue.reviewsCount || 100})</Text>
-                      </Text>
-                      <View
-                        style={[
-                          styles.tierPill,
-                          venue.tier === 'Signature' && { backgroundColor: '#FEF3C7', borderWidth: 1, borderColor: '#FDE68A' },
-                          venue.tier === 'Premium' && { backgroundColor: '#F5E8EA', borderWidth: 1, borderColor: '#E8D2D5' },
-                          venue.tier === 'Luxury' && { backgroundColor: '#F3E8FF', borderWidth: 1, borderColor: '#E9D5FF' },
-                          venue.tier === 'Popular' && { backgroundColor: '#E6F4EA', borderWidth: 1, borderColor: '#CEEAD6' },
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.tierPillText,
-                            venue.tier === 'Signature' && { color: '#92400E' },
-                            venue.tier === 'Premium' && { color: '#581420' },
-                            venue.tier === 'Luxury' && { color: '#6B21A8' },
-                            venue.tier === 'Popular' && { color: '#137333' },
-                          ]}
-                        >
-                          {venue.tier || 'Signature'}
-                        </Text>
-                      </View>
+                    <View style={styles.ratingBadge}>
+                      <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
+                      <Text style={styles.ratingText}>{venue.rating}</Text>
+                      <Text style={styles.reviewsText}>({venue.reviewsCount})</Text>
                     </View>
-
-                    {/* Location */}
-                    <View style={styles.locationRow}>
-                      <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
-                      <Text style={styles.locationText}>{venue.location || venue.city}</Text>
-                    </View>
-
-                    {/* Capacity */}
-                    <Text style={styles.categoryText} numberOfLines={1}>
-                      {venue.capacity || '200-1000 Guests'} • {venue.category || 'Resort & Hall'}
-                    </Text>
-
-                    {/* Starting Price */}
-                    <Text style={styles.priceText}>{venue.startingPrice || '₹2,50,000 onwards'}</Text>
-
-                    {/* View Details Pill Button */}
-                    <TouchableOpacity
-                      style={styles.viewDetailsBtn}
-                      onPress={() => setSelectedVenue(venue)}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={styles.viewDetailsBtnText}>View Details</Text>
-                    </TouchableOpacity>
                   </View>
-                </View>
+
+                  {/* CARD DETAILS */}
+                  <View style={styles.cardBody}>
+                    <Text style={styles.venueName} numberOfLines={1}>{venue.name}</Text>
+
+                    <View style={styles.locationRow}>
+                      <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
+                      <Text style={styles.locationText}>{venue.location}, {venue.city}</Text>
+                    </View>
+
+                    <View style={styles.capacityRow}>
+                      <Users className="w-3.5 h-3.5 text-stone-500 mr-1" />
+                      <Text style={styles.capacityText}>{venue.capacity}</Text>
+                    </View>
+
+                    {/* FEATURE CHIPS */}
+                    <View style={styles.featuresRow}>
+                      {venue.features.slice(0, 3).map((feat, idx) => (
+                        <View key={idx} style={styles.featureChip}>
+                          <Text style={styles.featureChipText}>{feat}</Text>
+                        </View>
+                      ))}
+                    </View>
+
+                    <View style={styles.cardDivider} />
+
+                    {/* PRICE & VIEW DETAILS BUTTON */}
+                    <View style={styles.cardFooter}>
+                      <View>
+                        <Text style={styles.priceLabel}>STARTING PRICE</Text>
+                        <Text style={styles.priceValue}>{venue.startingPrice}</Text>
+                      </View>
+
+                      <TouchableOpacity
+                        style={styles.viewDetailsBtn}
+                        onPress={() => setSelectedVenue(venue)}
+                        activeOpacity={0.85}
+                      >
+                        <Eye className="w-3.5 h-3.5 text-white mr-1.5" />
+                        <Text style={styles.viewDetailsBtnText}>View Details</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableOpacity>
               </motion.div>
             );
           })
         )}
-
-        <View style={{ height: 40 }} />
       </ScrollView>
 
       {/* FILTER DROPDOWN MODAL */}
@@ -3360,50 +3297,43 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
-    maxHeight: '100%',
-    width: '100%',
     backgroundColor: '#FAF7F2',
-    overflow: 'hidden',
-    display: 'flex' as any,
-    flexDirection: 'column',
   },
-  headerRow: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8DFD5',
   },
-  iconButton: {
-    padding: 6,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-  },
-  resetBadgeBtn: {
-    backgroundColor: '#8B1E2F',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  resetBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '600',
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3ECE4',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerTitle: {
-    fontFamily: 'Playfair Display, Georgia, serif',
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#2A2425',
-    textAlign: 'center',
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#581420',
   },
-  headerRightIcons: {
-    flexDirection: 'row',
+  headerSubtitle: {
+    fontSize: 11.5,
+    color: '#7D6E70',
+  },
+  savedBadgeBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#F3ECE4',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
   },
-  searchBarContainer: {
+  searchBarWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
@@ -3419,8 +3349,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 12,
-    color: '#2A2425',
+    color: '#1C1917',
     padding: 0,
+    outlineStyle: 'none' as any,
   },
   filterRowContainer: {
     flexDirection: 'row',
@@ -3428,11 +3359,14 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 8,
     alignItems: 'center',
+    width: '100%',
+    boxSizing: 'border-box' as any,
   },
   filterChip: {
     flex: 1,
+    minWidth: 0,
     height: 32,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
     borderRadius: 20,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
@@ -3450,156 +3384,12 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#332B2C',
     textAlign: 'center',
+    whiteSpace: 'nowrap' as any,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis' as any,
   },
   filterChipTextActive: {
     color: '#581420',
-    fontWeight: '600',
-  },
-  recommendedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    marginTop: 2,
-    marginBottom: 8,
-  },
-  recommendedTitle: {
-    fontFamily: 'Playfair Display, Georgia, serif',
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#2A2425',
-  },
-  resultCountText: {
-    fontSize: 11,
-    color: '#8C7A7C',
-    fontWeight: '500',
-  },
-  listScrollView: {
-    flex: 1,
-    height: '100%',
-  },
-  listContent: {
-    paddingHorizontal: 16,
-  },
-  venueCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#F0E8DF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  venueImage: {
-    width: 105,
-    height: 125,
-    borderRadius: 10,
-  },
-  cardRightCol: {
-    flex: 1,
-    marginLeft: 12,
-    justifyContent: 'space-between',
-  },
-  cardHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  venueCardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1A1415',
-    flex: 1,
-    marginRight: 6,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#2A2425',
-  },
-  reviewsText: {
-    fontWeight: '400',
-    color: '#7C6B6D',
-  },
-  tierPill: {
-    backgroundColor: '#F3EFEA',
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 8,
-    marginLeft: 8,
-  },
-  tierPillText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: '#581420',
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 3,
-  },
-  locationText: {
-    fontSize: 11,
-    color: '#6B5A5C',
-  },
-  categoryText: {
-    fontSize: 11,
-    color: '#8C7A7C',
-    marginTop: 2,
-  },
-  priceText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#2A2425',
-    marginTop: 3,
-  },
-  viewDetailsBtn: {
-    backgroundColor: '#581420',
-    paddingVertical: 6,
-    borderRadius: 18,
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  viewDetailsBtnText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  emptyStateContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 50,
-  },
-  emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2A2425',
-    marginBottom: 4,
-  },
-  emptyStateSub: {
-    fontSize: 12,
-    color: '#8C7A7C',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  emptyResetBtn: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  emptyResetBtnText: {
-    color: '#FFFFFF',
-    fontSize: 12,
     fontWeight: '600',
   },
   modalBackdrop: {
@@ -3652,6 +3442,54 @@ const styles = StyleSheet.create({
   optionsList: {
     paddingVertical: 4,
   },
+  listContent: {
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 100,
+  },
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+  },
+  imageWrapper: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: '#27272A',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  badgeRow: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    right: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tierTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  tierTagText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#581420',
+  },
+  venueItemTierText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#92400E',
+  },
   floatingCompareBtn: {
     pointerEvents: 'auto' as any,
     flexDirection: 'row',
@@ -3687,6 +3525,130 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.2,
+  },
+  bookmarkBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ratingBadge: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  ratingText: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 12,
+  },
+  reviewsText: {
+    color: '#D6D3D1',
+    fontSize: 10.5,
+    marginLeft: 3,
+  },
+  cardBody: {
+    padding: 14,
+  },
+  venueName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#581420',
+    marginBottom: 4,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  locationText: {
+    fontSize: 12.5,
+    color: '#6B5E5E',
+  },
+  capacityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  capacityText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#3B2F2F',
+  },
+  featuresRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 10,
+  },
+  featureChip: {
+    backgroundColor: '#FAF7F2',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  featureChipText: {
+    fontSize: 11,
+    color: '#581420',
+    fontWeight: '600',
+  },
+  cardDivider: {
+    height: 1,
+    backgroundColor: '#E8DFD5',
+    marginBottom: 10,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  priceLabel: {
+    fontSize: 9.5,
+    color: '#7D6E70',
+    fontWeight: '700',
+  },
+  priceValue: {
+    fontSize: 13.5,
+    fontWeight: '800',
+    color: '#581420',
+  },
+  viewDetailsBtn: {
+    backgroundColor: '#581420',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
+  },
+  viewDetailsBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 50,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#3B2F2F',
+  },
+  emptySub: {
+    fontSize: 12.5,
+    color: '#7D6E70',
+    marginTop: 4,
   },
 });
 
