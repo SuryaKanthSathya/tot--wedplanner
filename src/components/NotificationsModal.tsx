@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Image,
-} from 'react-native-web';
+} from 'react-native';
 import {
   Bell,
   X,
@@ -36,6 +36,27 @@ interface NotificationsModalProps {
   onOpenInvoice?: (actionData: AppNotification['actionData']) => void;
   onOpenQuote?: (actionData: AppNotification['actionData']) => void;
 }
+
+const HoverMarquee = ({ text, textStyle, className }: { text: string, textStyle: any, className?: string }) => {
+  return (
+    <div className={`group overflow-hidden whitespace-nowrap relative flex flex-col justify-center ${className || ''}`} style={{ flexShrink: 1, minWidth: 0 }}>
+      {/* Default text with ellipsis */}
+      <div className="group-hover:opacity-0 transition-opacity duration-300 flex items-center" style={{ overflow: 'hidden' }}>
+        <Text style={[textStyle, { flexShrink: 1 }]} numberOfLines={1}>{text}</Text>
+      </div>
+
+      {/* Scrolling text on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center">
+        <div 
+          className="transition-transform duration-[3000ms] ease-linear transform translate-x-0 group-hover:-translate-x-[40%]"
+          style={{ whiteSpace: 'nowrap', width: 'max-content' }}
+        >
+          <Text style={textStyle} numberOfLines={1}>{text}</Text>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const NotificationsModal: React.FC<NotificationsModalProps> = ({
   visible,
@@ -76,31 +97,30 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-xs p-0 sm:p-4">
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
         <motion.div
-          initial={{ y: '100%', opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: '100%', opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: 'spring', damping: 26, stiffness: 320 }}
-          className="w-full max-w-md bg-[#FAF7F2] rounded-t-3xl sm:rounded-2xl border border-stone-200 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden"
-          style={{ height: '80vh' }}
+          className="w-[95%] max-w-[400px] bg-[#FAF7F2] rounded-2xl border border-stone-200 shadow-2xl flex flex-col max-h-[85%] overflow-hidden"
         >
           {/* Header */}
           <View style={styles.headerContainer}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, overflow: 'hidden' }}>
               <View style={styles.headerIconCircle}>
                 <Bell className="w-5 h-5 text-[#581420]" />
               </View>
-              <View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Text style={styles.headerTitle}>Notifications</Text>
+              <View style={{ flex: 1, overflow: 'hidden' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 }}>
+                  <HoverMarquee text="Notifications" textStyle={styles.headerTitle} />
                   {unreadCount > 0 && (
                     <View style={styles.unreadBadge}>
                       <Text style={styles.unreadBadgeText}>{unreadCount} New</Text>
                     </View>
                   )}
                 </View>
-                <Text style={styles.headerSubtitle}>Admin invoices, vendor replies & updates</Text>
+                <HoverMarquee text="Admin invoices, vendor replies & updates" textStyle={styles.headerSubtitle} />
               </View>
             </View>
 
@@ -112,7 +132,12 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
           {/* Quick Action Bar (Mark all as read / Clear) */}
           <View style={styles.quickActionsBar}>
             {/* Filter Tabs */}
-            <View style={styles.filterChipsRow}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ flex: 1, marginRight: 12 }}
+              contentContainerStyle={styles.filterChipsRow}
+            >
               {(['all', 'invoice', 'message', 'quote'] as const).map((filterKey) => (
                 <TouchableOpacity
                   key={filterKey}
@@ -139,7 +164,7 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
 
             {unreadCount > 0 && (
               <TouchableOpacity
@@ -203,11 +228,9 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                           )}
                         </View>
 
-                        <View style={{ flex: 1 }}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                            <Text style={styles.senderName} numberOfLines={1}>
-                              {item.sender}
-                            </Text>
+                        <View style={{ flex: 1, overflow: 'hidden' }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 }}>
+                            <HoverMarquee text={item.sender} textStyle={styles.senderName} />
                             <View
                               style={[
                                 styles.roleBadge,
@@ -230,8 +253,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
                     </View>
 
                     {/* Title & Preview Message */}
-                    <Text style={styles.notificationTitle}>{item.title}</Text>
-                    <Text style={styles.notificationMessage} numberOfLines={2}>
+                    <Text style={styles.notificationTitle} selectable={true}>{item.title}</Text>
+                    <Text style={styles.notificationMessage} numberOfLines={3} selectable={true}>
                       {item.message}
                     </Text>
 
@@ -315,8 +338,8 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 
                 {/* Detail Content */}
                 <View style={styles.detailContentBox}>
-                  <Text style={styles.detailTitle}>{selectedNotification.title}</Text>
-                  <Text style={styles.detailBody}>{selectedNotification.message}</Text>
+                  <Text style={styles.detailTitle} selectable={true}>{selectedNotification.title}</Text>
+                  <Text style={styles.detailBody} selectable={true}>{selectedNotification.message}</Text>
                   {selectedNotification.actionData?.detailText && (
                     <View style={styles.detailHighlightBox}>
                       <Text style={styles.detailHighlightText}>
@@ -474,6 +497,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
+    paddingBottom: 32,
     gap: 12,
   },
   emptyStateContainer: {

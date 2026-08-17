@@ -50,6 +50,7 @@ import {
   Phone,
   ShieldCheck,
   ChevronRight,
+  ChevronLeft,
   LogOut,
   MapPin,
   Calendar,
@@ -85,6 +86,27 @@ interface MainDashboardPageProps {
   onLogout?: () => void;
   onNavigateToCoupleOnboarding?: () => void;
 }
+
+const HoverMarquee = ({ text, textStyle, className }: { text: string, textStyle: any, className?: string }) => {
+  return (
+    <div className={`group overflow-hidden whitespace-nowrap relative flex flex-col justify-center ${className || ''}`} style={{ flexShrink: 1, minWidth: 0 }}>
+      {/* Default text with ellipsis */}
+      <div className="group-hover:opacity-0 transition-opacity duration-300 flex items-center" style={{ overflow: 'hidden' }}>
+        <Text style={[textStyle, { flexShrink: 1 }]} numberOfLines={1}>{text}</Text>
+      </div>
+
+      {/* Scrolling text on hover */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex items-center">
+        <div 
+          className="transition-transform duration-[3000ms] ease-linear transform translate-x-0 group-hover:-translate-x-[40%]"
+          style={{ whiteSpace: 'nowrap', width: 'max-content' }}
+        >
+          <Text style={textStyle} numberOfLines={1}>{text}</Text>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   userName,
@@ -132,6 +154,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
   const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
   const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
+  const [vendorNavSource, setVendorNavSource] = useState<'home' | 'find_vendors'>('home');
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
   const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
@@ -449,7 +472,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowRitualsFlow(false);
       setShowDestinationWeddingFlow(false);
       setActiveTab('profile');
-      setShowProfileModal(true);
       setProfileActiveTab('mybooking');
       const ind = getIndividualBookings();
       setProfileBookings(ind.length > 0 ? ind : getAllWeddingBookings());
@@ -470,60 +492,59 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     };
   }, []);
 
-  const handleOptionPress = (featureName: string) => {
-    if (featureName === 'Photography') {
+  const handleOptionPress = (featureName: string, source: 'home' | 'find_vendors' = 'home') => {
+    setVendorNavSource(source);
+    const fn = (featureName || '').toLowerCase().trim();
+
+    if (fn.includes('photo')) {
       setShowPhotographyListing(true);
       return;
     }
-    if (featureName === 'Makeup' || featureName === 'Bridal & Groom Makeup') {
+    if (fn.includes('makeup') || fn.includes('beauty')) {
       setShowMakeupListing(true);
       return;
     }
-    if (featureName === 'Decor' || featureName === 'Stage & Mandap Decor') {
+    if (fn.includes('decor') || fn.includes('stage')) {
       setShowDecorListing(true);
       return;
     }
-    if (featureName === 'Venue' || featureName === 'Mandapams & Venues') {
+    if (fn.includes('venue') || fn.includes('mandapam') || fn.includes('hall') || fn.includes('resort') || fn.includes('palace')) {
       setShowVenueListing(true);
       return;
     }
-    if (featureName === 'Entertainment' || featureName === 'DJs & Music') {
+    if (fn.includes('entertain') || fn.includes('music') || fn.includes('dj')) {
       setShowEntertainmentListing(true);
       return;
     }
-    if (featureName === 'Invitations' || featureName === 'Wedding Cards & Invites') {
+    if (fn.includes('invit') || fn.includes('card') || fn.includes('myinvitation')) {
       setShowInvitationListing(true);
       return;
     }
-    if (featureName === 'Cars') {
+    if (fn.includes('car') || fn.includes('travel') || fn.includes('transport') || fn.includes('bus')) {
       setShowCarsListing(true);
       return;
     }
-    if (featureName === 'Destination Wedding') {
-      setShowDestinationWeddingFlow(true);
-      return;
-    }
-    if (featureName === 'Plan My Entire Wedding') {
-      window.scrollTo(0, 0);
-      setShowDestinationWeddingFlow(true);
-    }
-    if (featureName === 'Mehendi') {
-      setShowMehendiListing(true);
-      return;
-    }
-    if (featureName === 'Catering') {
+    if (fn.includes('cater') || fn.includes('food')) {
       setShowCateringListing(true);
       return;
     }
-    if (featureName === 'Rituals') {
+    if (fn.includes('mehendi')) {
+      setShowMehendiListing(true);
+      return;
+    }
+    if (fn.includes('destination') || fn.includes('beach') || fn.includes('royal')) {
+      setShowDestinationWeddingFlow(true);
+      return;
+    }
+    if (fn.includes('ritual') || fn.includes('pooja') || fn.includes('iyer') || fn.includes('pastor') || fn.includes('imam')) {
       setShowRitualsFlow(true);
       return;
     }
-    if (featureName === 'Find Individual Vendors') {
+    if (fn.includes('find individual') || fn.includes('find vendor')) {
       setShowFindVendorsPage(true);
       return;
     }
-    if (featureName === 'Plan My Entire Wedding') {
+    if (fn.includes('entire wedding') || fn.includes('plan my entire')) {
       if (onNavigateToCoupleOnboarding) {
         onNavigateToCoupleOnboarding();
       } else {
@@ -546,15 +567,30 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     setShowProfileModal(true);
   };
 
+  const handleListingBack = () => {
+    setShowPhotographyListing(false);
+    setShowMakeupListing(false);
+    setShowDecorListing(false);
+    setShowVenueListing(false);
+    setShowEntertainmentListing(false);
+    setShowCarsListing(false);
+    setShowInvitationListing(false);
+    setShowMehendiListing(false);
+    setShowCateringListing(false);
+    setShowDestinationWeddingFlow(false);
+    setShowRitualsFlow(false);
 
+    if (vendorNavSource === 'find_vendors') {
+      setShowFindVendorsPage(true);
+    } else {
+      setShowFindVendorsPage(false);
+    }
+  };
 
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
-        onBack={() => {
-          setShowPhotographyListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
         onNavigateToQuotesTab={() => {
@@ -569,10 +605,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMakeupListing) {
     return (
       <MakeupListingPage
-        onBack={() => {
-          setShowMakeupListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
         onNavigateToQuotesTab={() => {
@@ -587,10 +620,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDecorListing) {
     return (
       <DecorListingPage
-        onBack={() => {
-          setShowDecorListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
         onNavigateToQuotesTab={() => {
@@ -605,10 +635,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showVenueListing) {
     return (
       <VenueListingPage
-        onBack={() => {
-          setShowVenueListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
         onNavigateToQuotesTab={() => {
@@ -623,10 +650,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showEntertainmentListing) {
     return (
       <EntertainmentListingPage
-        onBack={() => {
-          setShowEntertainmentListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
         onNavigateToQuotesTab={() => {
@@ -641,10 +665,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCarsListing) {
     return (
       <CarsListingPage
-        onBack={() => {
-          setShowCarsListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
         onNavigateToQuotesTab={() => {
@@ -659,10 +680,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showInvitationListing) {
     return (
       <InvitationListingPage
-        onBack={() => {
-          setShowInvitationListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
         onNavigateToQuotesTab={() => {
@@ -677,10 +695,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDestinationWeddingFlow) {
     return (
       <DestinationWeddingFlow
-        onBack={() => {
-          setShowDestinationWeddingFlow(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
@@ -696,10 +711,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMehendiListing) {
     return (
       <MehendiListingPage
-        onBack={() => {
-          setShowMehendiListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
         onNavigateToQuotesTab={() => {
@@ -714,10 +726,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCateringListing) {
     return (
       <CateringListingPage
-        onBack={() => {
-          setShowCateringListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
         onNavigateToQuotesTab={() => {
@@ -732,10 +741,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showRitualsFlow) {
     return (
       <RitualsFlow
-        onBack={() => {
-          setShowRitualsFlow(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         onNavigateToQuotesTab={() => {
           setShowRitualsFlow(false);
           setActiveTab('quotes');
@@ -751,7 +757,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <FindVendorsPage
         onBack={() => setShowFindVendorsPage(false)}
         onSelectCategory={(category) => {
-          handleOptionPress(category);
+          handleOptionPress(category, 'find_vendors');
         }}
       />
     );
@@ -777,6 +783,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedCar={toggleSavedCar}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
+          savedRitualsIds={savedRitualsIds}
+          onToggleSavedRitual={toggleSavedRitual}
           onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'quotes' ? (
@@ -784,6 +792,246 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onHideTabBar={setHideTabBar}
           onExploreVendors={() => setActiveTab('home')}
         />
+      ) : activeTab === 'profile' ? (
+        <View style={{ flex: 1, backgroundColor: '#FAF6EE' }}>
+          {/* Full Page Header */}
+          <View
+            style={{
+              paddingTop: 48,
+              paddingBottom: 16,
+              alignItems: 'center',
+              backgroundColor: '#F8F4EE',
+              borderBottomWidth: 1,
+              borderBottomColor: '#EFE7DC',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              position: 'relative',
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => setActiveTab('home')}
+              style={{
+                position: 'absolute',
+                left: 16,
+                top: 48,
+                padding: 4,
+                zIndex: 10,
+              }}
+              activeOpacity={0.7}
+            >
+              <ChevronLeft size={28} color="#581420" />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: 20,
+                fontWeight: '700',
+                color: '#581420',
+              }}
+            >
+              {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
+            </Text>
+          </View>
+
+          {/* Profile Segment Tab Bar */}
+          <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
+            <View style={styles.profileTabBar}>
+              <TouchableOpacity
+                style={[
+                  styles.profileTabItem,
+                  profileActiveTab === 'profile' && styles.profileTabItemActive,
+                ]}
+                onPress={() => setProfileActiveTab('profile')}
+                activeOpacity={0.8}
+              >
+                <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                <HoverMarquee text="Profile" textStyle={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]} />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.profileTabItem,
+                  profileActiveTab === 'mybooking' && styles.profileTabItemActive,
+                ]}
+                onPress={() => setProfileActiveTab('mybooking')}
+                activeOpacity={0.8}
+              >
+                <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                <HoverMarquee text="My Bookings" textStyle={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]} />
+                {profileBookings.length > 0 && (
+                  <View style={styles.profileBadgePill}>
+                    <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Scrollable Content */}
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 14, paddingTop: 8 }}
+          >
+            {profileActiveTab === 'profile' && (
+              <>
+                {/* Avatar & Greeting */}
+                <View style={styles.modalAvatarContainer}>
+                  <View style={styles.modalAvatarCircle}>
+                    <User className="w-10 h-10 text-[#581420]" />
+                  </View>
+                  <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
+                  {userId ? (
+                    <Text
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                        fontSize: 12,
+                        fontWeight: '600',
+                        color: '#8C8283',
+                        marginTop: -2,
+                      }}
+                    >
+                      ID: {userId}
+                    </Text>
+                  ) : null}
+                  <View style={styles.verifiedBadge}>
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                    <Text style={styles.verifiedBadgeText}>Verified Account</Text>
+                  </View>
+                </View>
+
+                {/* User Details Cards */}
+                <View style={styles.modalDetailsList}>
+                  {/* 1. Full Name */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <User className="w-4 h-4 text-stone-600" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Full Name</Text>
+                      <Text style={styles.modalDetailValue}>{rawName || 'Not Set'}</Text>
+                    </View>
+                  </View>
+
+                  {/* 2. Mobile Number */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <Phone className="w-4 h-4 text-stone-600" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Mobile Number</Text>
+                      <Text style={styles.modalDetailValue}>{displayMobile || 'Not Set'}</Text>
+                    </View>
+                  </View>
+
+                  {/* 3. Email Address */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <Mail className="w-4 h-4 text-stone-600" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Email Address</Text>
+                      <Text style={styles.modalDetailValue}>{displayEmail || 'Not Set'}</Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* Sign Out Button */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    if (onLogout) onLogout();
+                  }}
+                  style={styles.modalLogoutButton}
+                >
+                  <LogOut className="w-4 h-4 text-rose-700" />
+                  <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            {profileActiveTab === 'mybooking' && (
+              <>
+                {profileBookings.length === 0 ? (
+                  <View style={styles.emptyBookingsBox}>
+                    <Briefcase className="w-10 h-10 text-[#C2A6A9]" />
+                    <Text style={styles.emptyBookingsTitle}>No Bookings Yet</Text>
+                    <Text style={styles.emptyBookingsSubtitle}>
+                      You have not confirmed any vendor bookings yet. Browse our wedding services to get started!
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.browseServicesBtn}
+                      onPress={() => {
+                        setShowPhotographyListing(true);
+                      }}
+                      activeOpacity={0.85}
+                    >
+                      <Sparkles className="w-4 h-4 text-white" />
+                      <Text style={styles.browseServicesBtnText}>Browse Vendors</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  profileBookings.map((b) => (
+                    <View key={b.id} style={styles.profileBookingCard}>
+                      <View style={styles.profileBookingTop}>
+                        <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
+                        <View style={{ flex: 1 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
+                            <View style={styles.profileCategoryBadge}>
+                              <Text style={styles.profileCategoryText}>{b.category}</Text>
+                            </View>
+                          </View>
+                          <Text style={styles.profileBookingPkg} numberOfLines={1}>{b.packageName}</Text>
+                          <Text style={styles.profileBookingDate}>Event: {b.weddingDate}</Text>
+                        </View>
+                      </View>
+
+                      {/* Amount & Status Summary */}
+                      <View style={styles.profileBookingFinanceRow}>
+                        <View>
+                          <Text style={styles.profileFinanceLabel}>Total Amount</Text>
+                          <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
+                        </View>
+                        <View>
+                          <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
+                          <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
+                            ₹{b.paidAmount.toLocaleString('en-IN')}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text style={styles.profileFinanceLabel}>Remaining</Text>
+                          <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
+                            ₹{b.remainingAmount.toLocaleString('en-IN')}
+                          </Text>
+                        </View>
+                      </View>
+
+                      {/* Action CTA */}
+                      <TouchableOpacity
+                        style={styles.profileInvoiceBtn}
+                        onPress={() => {
+                          setProfileSelectedBookingVendor({
+                            vendorId: b.vendorId,
+                            vendorName: b.vendorName,
+                            vendorImage: b.image,
+                            vendorLocation: b.location,
+                            category: b.category,
+                            startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
+                          });
+                        }}
+                        activeOpacity={0.85}
+                      >
+                        <FileText className="w-4 h-4 text-white" />
+                        <Text style={styles.profileInvoiceBtnText}>View Invoice & Pay</Text>
+                        <ChevronRight className="w-3.5 h-3.5 text-white" />
+                      </TouchableOpacity>
+                    </View>
+                  ))
+                )}
+              </>
+            )}
+          </ScrollView>
+        </View>
       ) : (
         /* Scrollable Main Content */
         <ScrollView
@@ -1217,7 +1465,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             style={styles.tabItem}
             onPress={() => {
               setActiveTab('profile');
-              setShowProfileModal(true);
             }}
           >
             <User
@@ -1236,27 +1483,26 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         </View>
       )}
 
-      {/* ================= PROFILE DETAILS & MY BOOKINGS MODAL ================= */}
+
+      {/* ================= PROFILE DETAILS & MY BOOKINGS POPUP MODAL ================= */}
       <AnimatePresence>
         {showProfileModal && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4"
+            className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
           >
             <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-sm bg-[#FAF6EE] rounded-t-3xl sm:rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[90vh]"
+              className="w-[95%] max-w-[400px] bg-[#FAF6EE] rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[85%]"
             >
               {/* Modal Header */}
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>
-                  {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
-                </Text>
+                <Text style={styles.modalTitle}>User Profile</Text>
                 <TouchableOpacity
                   onPress={() => setShowProfileModal(false)}
                   style={styles.closeButton}
@@ -1265,223 +1511,86 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                 </TouchableOpacity>
               </View>
 
-              {/* Profile Segment Tab Bar */}
-              <View style={styles.profileTabBar}>
-                <TouchableOpacity
-                  style={[
-                    styles.profileTabItem,
-                    profileActiveTab === 'profile' && styles.profileTabItemActive,
-                  ]}
-                  onPress={() => setProfileActiveTab('profile')}
-                  activeOpacity={0.8}
-                >
-                  <User className="w-3.5 h-3.5 mr-1.5" />
-                  <Text
-                    style={[
-                      styles.profileTabText,
-                      profileActiveTab === 'profile' && styles.profileTabTextActive,
-                    ]}
-                  >
-                    Profile
-                  </Text>
-                </TouchableOpacity>
+              {/* Scrollable Content */}
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
+                {/* Neutral Avatar & Greeting */}
+                <View style={styles.modalAvatarContainer}>
+                  <View style={styles.modalAvatarCircle}>
+                    <User className="w-8 h-8 text-[#581420]" />
+                  </View>
+                  <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
+                  {userId ? (
+                    <Text
+                      style={{
+                        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                        fontSize: 11,
+                        fontWeight: '600',
+                        color: '#8C8283',
+                        marginTop: -2,
+                      }}
+                    >
+                      ID: {userId}
+                    </Text>
+                  ) : null}
+                  <View style={styles.verifiedBadge}>
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                    <Text style={styles.verifiedBadgeText}>Verified Account</Text>
+                  </View>
+                </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.profileTabItem,
-                    profileActiveTab === 'mybooking' && styles.profileTabItemActive,
-                  ]}
-                  onPress={() => setProfileActiveTab('mybooking')}
-                  activeOpacity={0.8}
-                >
-                  <Briefcase className="w-3.5 h-3.5 mr-1.5" />
-                  <Text
-                    style={[
-                      styles.profileTabText,
-                      profileActiveTab === 'mybooking' && styles.profileTabTextActive,
-                    ]}
-                  >
-                    My Bookings
-                  </Text>
-                  {profileBookings.length > 0 && (
-                    <View style={styles.profileBadgePill}>
-                      <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
+                {/* User Details Cards */}
+                <View style={styles.modalDetailsList}>
+                  {/* 1. Full Name */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <User className="w-4 h-4 text-stone-600" />
                     </View>
-                  )}
-                </TouchableOpacity>
-              </View>
-
-              {/* ================= TAB 1: PROFILE DETAILS ================= */}
-              {profileActiveTab === 'profile' && (
-                <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 12 }}>
-                  {/* Neutral Avatar & Greeting */}
-                  <View style={styles.modalAvatarContainer}>
-                    <View style={styles.modalAvatarCircle}>
-                      <User className="w-8 h-8 text-[#581420]" />
-                    </View>
-                    <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
-                    {userId ? (
-                      <Text
-                        style={{
-                          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                          fontSize: 11,
-                          fontWeight: '600',
-                          color: '#8C8283',
-                          marginTop: -2,
-                        }}
-                      >
-                        ID: {userId}
-                      </Text>
-                    ) : null}
-                    <View style={styles.verifiedBadge}>
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                      <Text style={styles.verifiedBadgeText}>Verified Account</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Full Name</Text>
+                      <Text style={styles.modalDetailValue}>{rawName || 'Not Set'}</Text>
                     </View>
                   </View>
 
-                  {/* User Details Cards */}
-                  <View style={styles.modalDetailsList}>
-                    {/* 1. Full Name */}
-                    <View style={styles.modalDetailRow}>
-                      <View style={styles.modalIconBox}>
-                        <User className="w-4 h-4 text-stone-600" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.modalDetailLabel}>Full Name</Text>
-                        <Text style={styles.modalDetailValue}>{rawName}</Text>
-                      </View>
+                  {/* 2. Mobile Number */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <Phone className="w-4 h-4 text-stone-600" />
                     </View>
-
-                    {/* 2. Mobile Number */}
-                    <View style={styles.modalDetailRow}>
-                      <View style={styles.modalIconBox}>
-                        <Phone className="w-4 h-4 text-stone-600" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.modalDetailLabel}>Mobile Number</Text>
-                        <Text style={styles.modalDetailValue}>{displayMobile}</Text>
-                      </View>
-                    </View>
-
-                    {/* 3. Email Address */}
-                    <View style={styles.modalDetailRow}>
-                      <View style={styles.modalIconBox}>
-                        <Mail className="w-4 h-4 text-stone-600" />
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.modalDetailLabel}>Email Address</Text>
-                        <Text style={styles.modalDetailValue}>{displayEmail}</Text>
-                      </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Mobile Number</Text>
+                      <Text style={styles.modalDetailValue}>{displayMobile || 'Not Set'}</Text>
                     </View>
                   </View>
 
-                  {/* Sign Out Button */}
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      setShowProfileModal(false);
-                      if (onLogout) onLogout();
-                    }}
-                    style={styles.modalLogoutButton}
-                  >
-                    <LogOut className="w-4 h-4 text-rose-700" />
-                    <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              )}
-
-              {/* ================= TAB 2: MY BOOKINGS ================= */}
-              {profileActiveTab === 'mybooking' && (
-                <ScrollView
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ gap: 12, paddingBottom: 10 }}
-                >
-                  {profileBookings.length === 0 ? (
-                    <View style={styles.emptyBookingsBox}>
-                      <Briefcase className="w-10 h-10 text-[#C2A6A9]" />
-                      <Text style={styles.emptyBookingsTitle}>No Bookings Yet</Text>
-                      <Text style={styles.emptyBookingsSubtitle}>
-                        You have not confirmed any vendor bookings yet. Browse our wedding services to get started!
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.browseServicesBtn}
-                        onPress={() => {
-                          setShowProfileModal(false);
-                          setShowPhotographyListing(true);
-                        }}
-                        activeOpacity={0.85}
-                      >
-                        <Sparkles className="w-4 h-4 text-white" />
-                        <Text style={styles.browseServicesBtnText}>Browse Vendors</Text>
-                      </TouchableOpacity>
+                  {/* 3. Email Address */}
+                  <View style={styles.modalDetailRow}>
+                    <View style={styles.modalIconBox}>
+                      <Mail className="w-4 h-4 text-stone-600" />
                     </View>
-                  ) : (
-                    profileBookings.map((b) => (
-                      <View key={b.id} style={styles.profileBookingCard}>
-                        <View style={styles.profileBookingTop}>
-                          <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
-                          <View style={{ flex: 1 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
-                              <View style={styles.profileCategoryBadge}>
-                                <Text style={styles.profileCategoryText}>{b.category}</Text>
-                              </View>
-                            </View>
-                            <Text style={styles.profileBookingPkg} numberOfLines={1}>{b.packageName}</Text>
-                            <Text style={styles.profileBookingDate}>Event: {b.weddingDate}</Text>
-                          </View>
-                        </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.modalDetailLabel}>Email Address</Text>
+                      <Text style={styles.modalDetailValue}>{displayEmail || 'Not Set'}</Text>
+                    </View>
+                  </View>
+                </View>
 
-                        {/* Amount & Status Summary */}
-                        <View style={styles.profileBookingFinanceRow}>
-                          <View>
-                            <Text style={styles.profileFinanceLabel}>Total Amount</Text>
-                            <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
-                          </View>
-                          <View>
-                            <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
-                            <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
-                              ₹{b.paidAmount.toLocaleString('en-IN')}
-                            </Text>
-                          </View>
-                          <View>
-                            <Text style={styles.profileFinanceLabel}>Remaining</Text>
-                            <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
-                              ₹{b.remainingAmount.toLocaleString('en-IN')}
-                            </Text>
-                          </View>
-                        </View>
-
-                        {/* Action CTA */}
-                        <TouchableOpacity
-                          style={styles.profileInvoiceBtn}
-                          onPress={() => {
-                            setShowProfileModal(false);
-                            setProfileSelectedBookingVendor({
-                              vendorId: b.vendorId,
-                              vendorName: b.vendorName,
-                              vendorImage: b.image,
-                              vendorLocation: b.location,
-                              category: b.category,
-                              startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
-                            });
-                          }}
-                          activeOpacity={0.85}
-                        >
-                          <FileText className="w-4 h-4 text-white" />
-                          <Text style={styles.profileInvoiceBtnText}>View Invoice & Pay</Text>
-                          <ChevronRight className="w-3.5 h-3.5 text-white" />
-                        </TouchableOpacity>
-                      </View>
-                    ))
-                  )}
-                </ScrollView>
-              )}
+                {/* Sign Out Button */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setShowProfileModal(false);
+                    if (onLogout) onLogout();
+                  }}
+                  style={styles.modalLogoutButton}
+                >
+                  <LogOut className="w-4 h-4 text-rose-700" />
+                  <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
+                </TouchableOpacity>
+              </ScrollView>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
 
       {/* ================= REGISTER TO EXPLORE MORE POPUP MODAL ================= */}
       <AnimatePresence>

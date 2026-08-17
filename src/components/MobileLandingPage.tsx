@@ -25,6 +25,7 @@ interface MobileLandingPageProps {
   onOpenGetStarted: () => void;
   onOpenLogin: () => void;
   loginSuccessTrigger?: number;
+  loginEmail?: string;
 }
 
 export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
@@ -33,6 +34,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
   onOpenGetStarted,
   onOpenLogin,
   loginSuccessTrigger,
+  loginEmail,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -58,10 +60,29 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     if (loginSuccessTrigger && loginSuccessTrigger > 0) {
       const currentId = userId || 'TOT-' + Math.floor(100000 + Math.random() * 900000);
       setUserId(currentId);
-      saveUserDataToStorage(userName, userMobile, userEmail, currentId, weddingProfile);
+
+      let finalEmail = userEmail;
+      let finalName = userName;
+      let finalMobile = userMobile;
+
+      if (loginEmail) {
+        finalEmail = loginEmail;
+        const parts = loginEmail.split('@')[0].split(/[._\-+]/);
+        finalName = parts
+          .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+          .join(' ');
+        if (!finalMobile) {
+          finalMobile = '+91 98401 23456';
+        }
+        setUserName(finalName);
+        setUserEmail(finalEmail);
+        setUserMobile(finalMobile);
+      }
+
+      saveUserDataToStorage(finalName, finalMobile, finalEmail, currentId, weddingProfile);
       setActiveScreen('dashboard');
     }
-  }, [loginSuccessTrigger]);
+  }, [loginSuccessTrigger, loginEmail]);
 
   // Restore saved registration / couple details from localStorage on initial load
   useEffect(() => {
