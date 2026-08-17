@@ -16,7 +16,7 @@ interface LoginModalProps {
   onClose: () => void;
   primaryColor?: string;
   bgColor?: string;
-  onLoginSuccess?: () => void;
+  onLoginSuccess?: (email: string) => void;
 }
 
 export const LoginModal: React.FC<LoginModalProps> = ({
@@ -44,12 +44,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({
 
   const handleClose = () => {
     const wasSuccess = isSuccess;
+    const loginEmail = email;
     setIsSuccess(false);
     setEmail('');
     setPassword('');
     onClose();
     if (wasSuccess && onLoginSuccess) {
-      onLoginSuccess();
+      onLoginSuccess(loginEmail);
     }
   };
 
