@@ -18,6 +18,7 @@ import { DecorListingPage } from './DecorListingPage';
 import { VenueListingPage } from './VenueListingPage';
 import { EntertainmentListingPage } from './EntertainmentListingPage';
 import { InvitationListingPage } from './InvitationListingPage';
+import { RitualsFlow, ReligionType } from './RitualsFlow';
 import { NotificationsModal } from './NotificationsModal';
 import {
   AppNotification,
@@ -160,6 +161,8 @@ interface MyWeddingTabScreenProps {
   onToggleSavedCar?: (id: string) => void;
   savedInviteIds?: Record<string, boolean>;
   onToggleSavedInvite?: (id: string) => void;
+  savedRitualsIds?: Record<string, boolean>;
+  onToggleSavedRitual?: (id: string) => void;
   onOpenSavedTab?: () => void;
   onNavigateToHome?: () => void;
   onHideTabBar?: (hide: boolean) => void;
@@ -469,6 +472,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onToggleSavedCar,
   savedInviteIds = {},
   onToggleSavedInvite,
+  savedRitualsIds = {},
+  onToggleSavedRitual,
   onOpenSavedTab,
   onNavigateToHome,
   onHideTabBar,
@@ -513,6 +518,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       setShowVenueListing(false);
       setShowEntertainmentListing(false);
       setShowInvitationListing(false);
+      setShowRitualsListing(false);
       setSelectedInvoiceVendor(null);
       setActiveSegment('payment');
     };
@@ -656,7 +662,17 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showVenueListing, setShowVenueListing] = useState(false);
   const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState(false);
+  const [showRitualsListing, setShowRitualsListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (addedToast) {
+      const timer = setTimeout(() => {
+        setAddedToast(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToast]);
 
   const isAnyListingOpen = Boolean(
     showServicesView ||
@@ -668,7 +684,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
     showDecorListing ||
     showVenueListing ||
     showEntertainmentListing ||
-    showInvitationListing
+    showInvitationListing ||
+    showRitualsListing
   );
 
   useEffect(() => {
@@ -813,6 +830,24 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
     );
   }
 
+  if (showRitualsListing) {
+    const userReligion: ReligionType =
+      poojaService.id === 'imam' ? 'Muslim' : poojaService.id === 'pastor' ? 'Christian' : 'Hindu';
+    return (
+      <RitualsFlow
+        onBack={() => {
+          setShowRitualsListing(false);
+          setShowServicesView(true);
+        }}
+        savedRitualsIds={savedRitualsIds}
+        onToggleSavedRitual={onToggleSavedRitual}
+        onNavigateToQuotesTab={onOpenQuotesTab}
+        initialReligion={userReligion}
+        bookingSource="entire_wedding"
+      />
+    );
+  }
+
 
 
   const toggleChecklist = (id: string) => {
@@ -905,39 +940,53 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                   const sname = service.name.toLowerCase();
 
                   if (sid === 'photography' || sname.includes('photo')) {
+                    setShowServicesView(false);
                     setShowPhotographyListing(true);
                     return;
                   }
                   if (sid === 'makeup' || sname.includes('makeup')) {
+                    setShowServicesView(false);
                     setShowMakeupListing(true);
                     return;
                   }
                   if (sid === 'decor' || sname.includes('decor')) {
+                    setShowServicesView(false);
                     setShowDecorListing(true);
                     return;
                   }
                   if (sid === 'venue' || sname.includes('venue')) {
+                    setShowServicesView(false);
                     setShowVenueListing(true);
                     return;
                   }
                   if (sid === 'entertainment' || sname.includes('entertainment')) {
+                    setShowServicesView(false);
                     setShowEntertainmentListing(true);
                     return;
                   }
                   if (sid === 'invitation' || sname.includes('invit')) {
+                    setShowServicesView(false);
                     setShowInvitationListing(true);
                     return;
                   }
                   if (sid === 'mehendi' || sname.includes('mehendi')) {
+                    setShowServicesView(false);
                     setShowMehendiListing(true);
                     return;
                   }
                   if (sid === 'catering' || sname.includes('cater')) {
+                    setShowServicesView(false);
                     setShowCateringListing(true);
                     return;
                   }
                   if (sid === 'cars' || sname.includes('car')) {
+                    setShowServicesView(false);
                     setShowCarsListing(true);
+                    return;
+                  }
+                  if (sid === 'rituals' || sid === 'ritual' || sname.includes('ritual') || sname.includes('pooja') || sname.includes('iyer') || sname.includes('pastor') || sname.includes('imam')) {
+                    setShowServicesView(false);
+                    setShowRitualsListing(true);
                     return;
                   }
 
@@ -974,16 +1023,8 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 className="cursor-pointer"
                 style={{ width: '64%', alignItems: 'center' }}
                 onClick={() => {
-                  if (!checklist.some((c) => c.title.toLowerCase().includes(poojaService.name.toLowerCase()))) {
-                    updateChecklist((prev) => [
-                      ...prev,
-                      { id: Date.now().toString(), title: poojaService.name, category: poojaService.name, completed: false },
-                    ]);
-                    setAddedToast(`Added ${poojaService.name} to checklist`);
-                  } else {
-                    setAddedToast(`${poojaService.name} is in checklist`);
-                  }
-                  setTimeout(() => setAddedToast(null), 2000);
+                  setShowServicesView(false);
+                  setShowRitualsListing(true);
                 }}
               >
                 <View style={styles.poojaItemContainer}>
@@ -1400,6 +1441,10 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                                   setShowCarsListing(true);
                                   return;
                                 }
+                                if (t.includes('pooja') || t.includes('ritual') || t.includes('iyer') || t.includes('pastor') || t.includes('imam') || c.includes('ritual') || c.includes('pooja')) {
+                                  setShowRitualsListing(true);
+                                  return;
+                                }
                                 toggleChecklist(item.id);
                               }}
                               style={{ flex: 1, paddingVertical: 2 }}
@@ -1523,6 +1568,11 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                           if (sname.includes('car') || sname.includes('bus') || sname.includes('transport')) {
                             setShowServicesModal(false);
                             setShowCarsListing(true);
+                            return;
+                          }
+                          if (sname.includes('ritual') || sname.includes('pooja') || sname.includes('iyer') || sname.includes('pastor') || sname.includes('imam')) {
+                            setShowServicesModal(false);
+                            setShowRitualsListing(true);
                             return;
                           }
 

@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   Image,
-} from 'react-native-web';
+} from 'react-native';
 import {
   Bell,
   X,

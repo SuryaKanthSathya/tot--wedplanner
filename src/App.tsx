@@ -20,6 +20,7 @@ export default function App() {
   const [isGetStartedOpen, setIsGetStartedOpen] = useState<boolean>(false);
   const [isLoginOpen, setIsLoginOpen] = useState<boolean>(false);
   const [loginSuccessTrigger, setLoginSuccessTrigger] = useState<number>(0);
+  const [loginEmail, setLoginEmail] = useState<string>('');
 
   const theme = THEMES[currentTheme];
 
@@ -33,6 +34,7 @@ export default function App() {
           onOpenGetStarted={() => setIsGetStartedOpen(true)}
           onOpenLogin={() => setIsLoginOpen(true)}
           loginSuccessTrigger={loginSuccessTrigger}
+          loginEmail={loginEmail}
         />
       </View>
 
@@ -47,8 +49,9 @@ export default function App() {
       <LoginModal
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
-        onLoginSuccess={() => {
+        onLoginSuccess={(email) => {
           setIsLoginOpen(false);
+          setLoginEmail(email);
           setLoginSuccessTrigger((prev) => prev + 1);
         }}
         primaryColor={theme.primary}

@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
   Modal,
-} from 'react-native-web';
+} from 'react-native';
 import {
   X,
   Star,

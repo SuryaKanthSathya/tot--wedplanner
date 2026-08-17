@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import {
   ArrowLeft,
   Star,
@@ -486,37 +486,48 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
   const [showCompareModal, setShowCompareModal] = useState(false);
 
   const filteredInvites = INVITATIONS_DATA.filter((invite) => {
+    const iCity = (invite.city || '').toLowerCase();
+    const iLocation = (invite.location || '').toLowerCase();
+    const iCategory = (invite.category || '').toLowerCase();
+    const iName = (invite.name || '').toLowerCase();
+    const qCity = selectedCity.toLowerCase();
+    const qSearch = searchQuery.trim().toLowerCase();
+
     const matchesCity =
       selectedCity === 'All Cities' ||
       selectedCity === 'All' ||
-      invite.city.toLowerCase() === selectedCity.toLowerCase() ||
-      invite.location.toLowerCase().includes(selectedCity.toLowerCase()) ||
-      selectedCity.toLowerCase().includes(invite.city.toLowerCase());
+      iCity === qCity ||
+      iLocation.includes(qCity) ||
+      qCity.includes(iCity);
 
     const matchesCategory =
       selectedCategory === 'All Types' ||
-      invite.category.toLowerCase().includes(selectedCategory.toLowerCase());
+      iCategory.includes(selectedCategory.toLowerCase());
 
     const matchesSearch =
-      searchQuery.trim() === '' ||
-      invite.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invite.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invite.category.toLowerCase().includes(searchQuery.toLowerCase());
+      qSearch === '' ||
+      iName.includes(qSearch) ||
+      iCity.includes(qSearch) ||
+      iCategory.includes(qSearch) ||
+      iLocation.includes(qSearch);
 
+    const inviteRating = invite.rating || 4.8;
     const matchesRating =
       selectedRating === 'All'
         ? true
         : selectedRating === '4.8'
-          ? invite.rating >= 4.8
-          : invite.rating >= 4.9;
+          ? inviteRating >= 4.8
+          : inviteRating >= 4.9;
 
-    const matchesTier = selectedTier === 'All' ? true : invite.tier === selectedTier;
+    const inviteTier = invite.tier || 'Signature';
+    const matchesTier = selectedTier === 'All' ? true : inviteTier === selectedTier;
 
+    const price = invite.priceValue || 150;
     let matchesBudget = true;
-    if (selectedBudget === 'under-100') matchesBudget = invite.priceValue < 100;
-    else if (selectedBudget === '100-300') matchesBudget = invite.priceValue >= 100 && invite.priceValue <= 300;
-    else if (selectedBudget === '300-600') matchesBudget = invite.priceValue > 300 && invite.priceValue <= 600;
-    else if (selectedBudget === 'above-600') matchesBudget = invite.priceValue > 600;
+    if (selectedBudget === 'under-100') matchesBudget = price < 100;
+    else if (selectedBudget === '100-300') matchesBudget = price >= 100 && price <= 300;
+    else if (selectedBudget === '300-600') matchesBudget = price > 300 && price <= 600;
+    else if (selectedBudget === 'above-600') matchesBudget = price > 600;
 
     return matchesCity && matchesCategory && matchesSearch && matchesRating && matchesTier && matchesBudget;
   });
@@ -635,7 +646,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
 
       {/* LIST OF CARDS */}
       <ScrollView
-        style={{ flex: 1, overflowY: 'auto' } as any}
+        style={{ flex: 1 }}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       >
@@ -690,16 +701,16 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
 
                     <View style={styles.locationRow}>
                       <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
-                      <Text style={styles.locationText}>{invite.location}, {invite.city}</Text>
+                      <Text style={styles.locationText}>{invite.location || invite.city}, {invite.city}</Text>
                     </View>
 
                     <View style={styles.capacityRow}>
                       <Package className="w-3.5 h-3.5 text-stone-500 mr-1" />
-                      <Text style={styles.capacityText}>Min: {invite.minOrderQuantity} • Delivery: {invite.turnaroundTime}</Text>
+                      <Text style={styles.capacityText}>Min: {invite.minOrderQuantity || (invite as any).minimumOrder || '50 Pcs'} • Delivery: {invite.turnaroundTime || '1-2 Weeks'}</Text>
                     </View>
 
                     <View style={styles.featuresRow}>
-                      {invite.features.slice(0, 3).map((feat, idx) => (
+                      {(invite.features || invite.specialties || (invite as any).services || ['Custom Invites', 'Digital Cards', 'Fast Delivery']).slice(0, 3).map((feat, idx) => (
                         <View key={idx} style={styles.featureChip}>
                           <Text style={styles.featureChipText}>{feat}</Text>
                         </View>
@@ -711,7 +722,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
                     <View style={styles.cardFooter}>
                       <View>
                         <Text style={styles.priceLabel}>STARTING PRICE</Text>
-                        <Text style={styles.priceValue}>{invite.startingPrice}</Text>
+                        <Text style={styles.priceValue}>{invite.startingPrice || '₹15,000 onwards'}</Text>
                       </View>
 
                       <TouchableOpacity
@@ -997,7 +1008,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
+    maxHeight: '100%',
+    width: '100%',
     backgroundColor: '#FAF7F2',
+    overflow: 'hidden',
+    display: 'flex' as any,
+    flexDirection: 'column',
   },
   header: {
     flexDirection: 'row',

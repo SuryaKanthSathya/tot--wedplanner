@@ -7,7 +7,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronLeft,
@@ -419,7 +419,7 @@ const ReligionSelectionScreen: React.FC<ReligionSelectionScreenProps> = ({ onBac
       >
         {/* Hero Text */}
         <View style={selStyles.heroSection}>
-          <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}&amp; Ceremony</Text>
+          <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}& Ceremony</Text>
           <Text style={selStyles.heroSubtitle}>
             Choose your wedding tradition to find the right ceremony services and vendors.
           </Text>
@@ -465,6 +465,7 @@ interface RitualsListingPageProps {
   onNavigateToQuotesTab?: () => void;
   savedRitualsIds: Record<string, boolean>;
   onToggleSavedRitual: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
 }
 
 const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
@@ -473,6 +474,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
   onNavigateToQuotesTab,
   savedRitualsIds,
   onToggleSavedRitual,
+  bookingSource = 'entire_wedding',
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All Cities');
@@ -529,6 +531,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
         onBack={() => setSelectedVendor(null)}
         isBookmarked={Boolean(savedRitualsIds[selectedVendor.id])}
         onToggleBookmark={onToggleSavedRitual}
+        bookingSource={bookingSource}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
@@ -714,6 +717,8 @@ interface RitualsFlowProps {
   onNavigateToQuotesTab?: () => void;
   savedRitualsIds?: Record<string, boolean>;
   onToggleSavedRitual?: (id: string) => void;
+  initialReligion?: ReligionType | null;
+  bookingSource?: 'entire_wedding' | 'individual';
 }
 
 export const RitualsFlow: React.FC<RitualsFlowProps> = ({
@@ -721,17 +726,26 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
   onNavigateToQuotesTab,
   savedRitualsIds = {},
   onToggleSavedRitual = () => {},
+  initialReligion = null,
+  bookingSource = 'entire_wedding',
 }) => {
-  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(null);
+  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(initialReligion);
 
   if (selectedReligion) {
     return (
       <RitualsListingPage
         religion={selectedReligion}
-        onBack={() => setSelectedReligion(null)}
+        onBack={() => {
+          if (initialReligion) {
+            onBack();
+          } else {
+            setSelectedReligion(null);
+          }
+        }}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={onToggleSavedRitual}
+        bookingSource={bookingSource}
       />
     );
   }

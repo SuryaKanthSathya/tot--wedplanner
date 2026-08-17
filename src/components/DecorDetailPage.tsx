@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Image,
   Modal,
   Linking,
-} from 'react-native-web';
+} from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { RequestQuoteModal } from './RequestQuoteModal';
@@ -84,6 +84,15 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
@@ -169,7 +178,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
         status: 'response_ready',
       });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
+      setTimeout(() => setToastMessage(null), 5000);
     }, 3000);
   };
 

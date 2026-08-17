@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Modal,
   Linking,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import {
   ChevronLeft,
   Share2,
@@ -65,6 +65,15 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
@@ -183,7 +192,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
         status: 'response_ready',
       });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
+      setTimeout(() => setToastMessage(null), 5000);
     }, 3000);
   };
 
