@@ -27,6 +27,7 @@ import {
   ChevronRight,
   DollarSign,
   Receipt,
+  Check,
 } from 'lucide-react';
 import {
   WeddingVendorBooking,
@@ -518,7 +519,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                   transition={{ type: 'spring', damping: 15, stiffness: 220 }}
                   style={styles.successTickCircle}
                 >
-                  <CheckCircle2 className="w-12 h-12 text-white" />
+                  <Check className="w-10 h-10 text-white" strokeWidth={3} />
                 </motion.div>
 
                 <Text style={styles.successHeaderTitle}>Payment Successful!</Text>
@@ -1074,6 +1075,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     height: 64,
     borderRadius: 32,
     backgroundColor: '#15803D',
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: '0 4px 14px rgba(21, 128, 61, 0.3)',

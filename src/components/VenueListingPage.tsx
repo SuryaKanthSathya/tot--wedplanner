@@ -2781,6 +2781,11 @@ interface VenueListingPageProps {
   onNavigateToQuotesTab?: () => void;
   bookingSource?: 'entire_wedding' | 'individual';
   onNavigateToProfileMyBookings?: () => void;
+  collectionData?: {
+    title: string;
+    description: string;
+    image: string;
+  };
 }
 
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
@@ -2791,6 +2796,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   onNavigateToQuotesTab,
   bookingSource = 'entire_wedding',
   onNavigateToProfileMyBookings,
+  collectionData,
 }) => {
   const [selectedCity, setSelectedCity] = useState<string>('All Cities');
   const [selectedBudget, setSelectedBudget] = useState<string>('All');
@@ -2877,8 +2883,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         </TouchableOpacity>
 
         <View style={{ flex: 1, marginLeft: 10 }}>
-          <Text style={styles.headerTitle}>Wedding Venues</Text>
-          <Text style={styles.headerSubtitle}>Mandapams, Resorts, 5-Star Hotels & Lawns</Text>
+          <Text style={styles.headerTitle}>{collectionData ? 'Collections' : 'Wedding Venues'}</Text>
+          {!collectionData && <Text style={styles.headerSubtitle}>Mandapams, Resorts, 5-Star Hotels & Lawns</Text>}
         </View>
 
         {onOpenSavedTab && (
@@ -2888,68 +2894,71 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         )}
       </View>
 
-      {/* SEARCH BAR */}
-      <View style={styles.searchBarWrapper}>
-        <Search className="w-4 h-4 text-stone-400 mr-2" />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search Mandapam, Resort, City or Hotel..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <X className="w-4 h-4 text-stone-400" />
-          </TouchableOpacity>
-        )}
-      </View>
+      {!collectionData && (
+        <View style={styles.searchBarWrapper}>
+          <Search className="w-4 h-4 text-stone-400 mr-2" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search Mandapam, Resort, City or Hotel..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <X className="w-4 h-4 text-stone-400" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       {/* Filter Chips Bar */}
-      <View style={styles.filterRowContainer}>
-        {/* City Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('city')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedCity === 'All Cities' || selectedCity === 'All' ? 'All Cities ▼' : `${selectedCity} ▼`}
-          </Text>
-        </TouchableOpacity>
+      {!collectionData && (
+        <View style={styles.filterRowContainer}>
+          {/* City Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('city')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedCity !== 'All Cities' && selectedCity !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedCity === 'All Cities' || selectedCity === 'All' ? 'All Cities ▼' : `${selectedCity} ▼`}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Budget Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('budget')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedBudget !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedBudget === 'All' ? 'Budget ▼' : `${BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'} ▼`}
-          </Text>
-        </TouchableOpacity>
+          {/* Budget Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedBudget !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('budget')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedBudget !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedBudget === 'All' ? 'Budget ▼' : `${BUDGET_OPTIONS.find((b) => b.id === selectedBudget)?.label || 'Budget'} ▼`}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Rating Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('rating')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedRating !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedRating === 'All' ? 'Rating ▼' : `${selectedRating}★ ▼`}
-          </Text>
-        </TouchableOpacity>
+          {/* Rating Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedRating !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('rating')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedRating !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedRating === 'All' ? 'Rating ▼' : `${selectedRating}★ ▼`}
+            </Text>
+          </TouchableOpacity>
 
-        {/* Tier Filter */}
-        <TouchableOpacity
-          style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
-          onPress={() => setActiveFilterModal('tier')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.filterChipText, selectedTier !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
-            {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
-          </Text>
-        </TouchableOpacity>
-      </View>
+          {/* Tier Filter */}
+          <TouchableOpacity
+            style={[styles.filterChip, selectedTier !== 'All' && styles.filterChipActive]}
+            onPress={() => setActiveFilterModal('tier')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.filterChipText, selectedTier !== 'All' && styles.filterChipTextActive]} numberOfLines={1}>
+              {selectedTier === 'All' ? 'Tier ▼' : `${selectedTier} ▼`}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* LIST OF VENUE CARDS */}
       <ScrollView
@@ -2957,6 +2966,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
       >
+        {/* The large cover image has been removed per user's new layout requirement. 
+            The page will just list the venues directly under the header. */}
         {filteredVenues.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Building2 className="w-12 h-12 text-stone-300 mb-2" />

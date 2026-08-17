@@ -24,6 +24,10 @@ import {
   Send,
   X,
   Share2,
+  Bookmark,
+  MoreVertical,
+  Camera,
+  ChevronDown,
   Sparkles,
   Car,
   Home,
@@ -73,6 +77,10 @@ export interface VenueItem {
   phone?: string;
   whatsapp?: string;
   instagram?: string;
+  website?: string;
+  isPremium?: boolean;
+  priceLabel?: string;
+  priceText?: string;
 }
 
 interface VenueDetailPageProps {
@@ -85,6 +93,13 @@ interface VenueDetailPageProps {
   onNavigateToMyWeddingPayments?: () => void;
   onNavigateToProfileMyBookings?: () => void;
 }
+
+// Reusable Components
+const Card = ({ children, style }: { children: React.ReactNode; style?: any }) => (
+  <View style={[styles.card, style]}>{children}</View>
+);
+
+const Divider = () => <View style={styles.divider} />;
 
 export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   onNavigateToQuotesTab,
@@ -99,420 +114,317 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showQuotationScreen, setShowQuotationScreen] = useState<boolean>(false);
 
-  // Quote Flow Local States
-  const [quoteStatus, setQuoteStatus] = useState<
-    'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
-  >(() => {
-    try {
-      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
-      if (savedQuotesJson) {
-        const quotes = JSON.parse(savedQuotesJson);
-        const match = quotes.find((q: any) => q.id === `quote-${venue.id}`);
-        if (match) {
-          if (match.paymentStatus === 'fully_paid') return 'fully_paid';
-          if (match.paymentStatus === 'partially_paid') return 'partially_paid';
-          if (match.status === 'confirmed') return 'confirmed';
-        }
-      }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[venue.id]) {
-          return statuses[venue.id];
-        }
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-    return 'initial';
-  });
+  const heroImages = venue.portfolio && venue.portfolio.length > 0 ? venue.portfolio : [
+    'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=800&q=80'
+  ];
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
-    setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[venue.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev + 1) % heroImages.length);
+  };
+
+  const shareVenue = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: venue.name,
+        url: window.location.href
+      });
+    } else {
+      alert('Share link copied to clipboard!');
     }
   };
 
-  const [showQuotationScreen, setShowQuotationScreen] = useState(false);
-
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  const handleQuoteRequestSent = () => {
-    setShowQuoteModal(false);
-    updateQuoteStatus('requested');
-    const basePrice = parseInt((venue.startingPrice || '₹2,50,000').replace(/[^0-9]/g, ''), 10) || 250000;
-    saveOrUpdateQuote({
-      id: `quote-${venue.id}`,
+  const handleInstantBook = () => {
+    const basePrice = venue.priceValue || parseInt((venue.startingPrice || '₹2,50,000').replace(/[^0-9]/g, ''), 10) || 250000;
+    
+    saveOrUpdateWeddingBooking({
+      id: `booking-${venue.id}-${Date.now()}`,
       vendorId: venue.id,
       vendorName: venue.name,
-      category: 'Venues',
-      packageName: `${venue.name} - Grand AC Mandapam & Convention Package`,
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      category: venue.category || 'Venues',
+      serviceType: 'Venue Rental',
+      image: heroImages[0] || venue.image || '',
+      location: venue.location || venue.city || '',
       weddingDate: '24 Oct 2026',
-      location: venue.location || venue.city,
-      includedServices: venue.amenities && venue.amenities.length > 0 ? venue.amenities : [
-        'Centrally AC Banquet Hall Hire (12 Hours)',
-        'Traditional Grand Stage & Buffet Canopy Setup',
-        '2 AC Deluxe Bridal & Groom Changing Rooms',
-        'Valet Parking Service for up to 150 Vehicles',
-        '100% Uninterrupted Power Backup Generator',
+      packageName: 'Premium Destination Package',
+      totalAmount: basePrice,
+      paidAmount: 0,
+      remainingAmount: basePrice,
+      status: 'confirmed',
+      invoiceNo: `INV-${Math.floor(Math.random() * 10000)}`,
+      invoiceDate: new Date().toLocaleDateString('en-GB'),
+      milestones: [
+        {
+          id: 'm-1',
+          milestoneNumber: 1,
+          title: 'Advance Payment',
+          percentage: 30,
+          amount: Math.round(basePrice * 0.3),
+          status: 'pending'
+        },
+        {
+          id: 'm-2',
+          milestoneNumber: 2,
+          title: 'Final Payment',
+          percentage: 70,
+          amount: Math.round(basePrice * 0.7),
+          status: 'locked'
+        }
       ],
-      image: venue.image,
+      includedServices: ['Venue Rental', 'Catering'],
+      lastUpdated: new Date().toISOString()
     });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
 
-    // Simulate response after 3 seconds
-    setTimeout(() => {
-      updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${venue.id}`,
-        status: 'response_ready',
-      });
-      setToastMessage('Venue Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
-    }, 3000);
-  };
-
-  const [quoteSuccess, setQuoteSuccess] = useState<boolean>(false);
-
-  // Quote Form State
-  const [guestName, setGuestName] = useState<string>('');
-  const [guestPhone, setGuestPhone] = useState<string>('');
-  const [eventDate, setEventDate] = useState<string>('');
-  const [guestCount, setGuestCount] = useState<string>('500 - 1,000 Guests');
-  const [roomRequirement, setRoomRequirement] = useState<string>('10 - 20 Rooms');
-  const [cateringPreference, setCateringPreference] = useState<string>('Pure Veg (In-house)');
-  const [additionalNotes, setAdditionalNotes] = useState<string>('');
-
-  const phoneNum = venue.phone || '+91 91501 97966';
-  const whatsappNum = venue.whatsapp || '919150197966';
-
-  const handleCall = () => {
-    Linking.openURL(`tel:${phoneNum}`);
-  };
-
-  const handleWhatsApp = () => {
-    const text = encodeURIComponent(
-      `Hi ${venue.name}, I am interested in booking your wedding venue in ${venue.city} via Tale of Two App. Please share date availability and rental package details.`
-    );
-    Linking.openURL(`https://wa.me/${whatsappNum}?text=${text}`);
-  };
-
-  const handleInstagram = () => {
-    const handle = venue.instagram || '@_ranjith_r.r_';
-    const username = handle.replace('@', '');
-    Linking.openURL(`https://instagram.com/${username}`);
-  };
-
-    const handleSubmitQuote = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!guestName.trim() || !guestPhone.trim() || !eventDate.trim()) {
-      alert('Please fill in your name, phone number, and event date.');
-      return;
+    window.dispatchEvent(new Event('tot_wedding_payments_updated'));
+    
+    if (onNavigateToProfileMyBookings) {
+      onNavigateToProfileMyBookings();
+    } else {
+      window.dispatchEvent(new Event('tot_switch_to_profile_my_bookings'));
     }
-    setQuoteSuccess(true);
-    setTimeout(() => {
-      setQuoteSuccess(false);
-      setShowQuoteModal(false);
-      handleQuoteRequestSent();
-    }, 1500);
   };
 
   return (
-    <View style={styles.container}>
-      {/* TOAST NOTIFICATION */}
-      {toastMessage && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] px-5 py-2.5 bg-stone-900/90 rounded-xl shadow-lg">
-          <span className="text-white text-sm font-medium">{toastMessage}</span>
-        </div>
-      )}
+    <View style={styles.pageContainer}>
+      {/* 1. TOP HEADER */}
       <View style={styles.topHeader}>
-        <TouchableOpacity
-          style={styles.iconCircleBtn}
-          onPress={onBack}
-          activeOpacity={0.8}
-        >
-          <ArrowLeft className="w-5 h-5 text-stone-800" />
+        <TouchableOpacity onPress={onBack} style={styles.iconBtn}>
+          <ArrowLeft className="w-5 h-5 text-[#3B2F2F]" />
+        </TouchableOpacity>
+        
+        <Text style={styles.headerTitle}>Venues in {venue.city || 'Chail'}</Text>
+        
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.iconBtn} onPress={shareVenue}>
+            <Share2 className="w-5 h-5 text-[#3B2F2F]" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bookNowBtn} onPress={handleInstantBook}>
+            <Text style={styles.bookNowBtnText}>Book Now</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
+        
+        {/* 2. HERO IMAGE GALLERY */}
+        <TouchableOpacity style={styles.heroContainer} activeOpacity={0.95} onPress={handleNextImage}>
+          <Image source={{ uri: heroImages[activeImageIndex] }} style={styles.heroImage} />
+          
+          <View style={styles.bookingBadge}>
+            <Text style={styles.bookingBadgeText}>1 booking recently</Text>
+          </View>
+          
+          <View style={styles.imageCounter}>
+            <Camera className="w-3.5 h-3.5 text-[#3B2F2F] mr-1" />
+            <Text style={styles.imageCounterText}>{activeImageIndex + 1}/{heroImages.length + 90}</Text>
+          </View>
+          
+          <View style={styles.carouselDots}>
+            {heroImages.map((_, i) => (
+              <View key={i} style={[styles.dot, i === activeImageIndex && styles.dotActive]} />
+            ))}
+          </View>
         </TouchableOpacity>
 
-        <Text style={styles.headerTitleText} numberOfLines={1}>
-          {venue.name}
-        </Text>
-
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <TouchableOpacity
-            style={styles.iconCircleBtn}
-            onPress={() => onToggleBookmark(venue.id)}
-            activeOpacity={0.8}
-          >
-            <Heart
-              className={`w-5 h-5 ${
-                isBookmarked
-                  ? 'text-[#581420] fill-[#581420]'
-                  : 'text-stone-700'
-              }`}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* SCROLLABLE MAIN BODY */}
-      <ScrollView
-        style={{ flex: 1, overflowY: 'auto' } as any}
-        contentContainerStyle={{ paddingBottom: 120 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* HERO IMAGE & CAROUSEL PREVIEW */}
-        <View style={styles.heroWrapper}>
-          <Image
-            source={{ uri: venue.portfolio[activeImageIndex] || venue.image }}
-            style={styles.heroImage}
-            resizeMode="cover"
-          />
-
-          {/* Tier Badge */}
-          <View style={styles.tierBadge}>
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 mr-1" />
-            <Text style={styles.tierBadgeText}>{venue.tier} Venue</Text>
+        {/* 3. VENUE SUMMARY CARD */}
+        <Card style={styles.firstCard}>
+          <View style={styles.rowBetween}>
+            <Text style={styles.venueNameText}>{venue.name}</Text>
+            <TouchableOpacity style={styles.moreBtn}>
+              <MoreVertical className="w-5 h-5 text-gray-500" />
+            </TouchableOpacity>
           </View>
-
-          {/* Rating Overlay */}
-          <View style={styles.ratingOverlay}>
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400 mr-1" />
-            <Text style={styles.ratingValueText}>{venue.rating}</Text>
-            <Text style={styles.ratingCountText}>({venue.reviewsCount} reviews)</Text>
+          
+          <View style={styles.ratingRow}>
+            <Star className="w-4 h-4 text-[#16A34A] fill-[#16A34A] mr-1" />
+            <Text style={styles.ratingScore}>{venue.rating}</Text>
+            <Text style={styles.ratingLabel}>Review Score</Text>
+            <Text style={styles.ratingCount}>({venue.reviewsCount} Reviews)</Text>
           </View>
-
-          {/* Thumbnail Gallery Row */}
-          <View style={styles.thumbRow}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {venue.portfolio.map((imgUrl, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  onPress={() => setActiveImageIndex(idx)}
-                  activeOpacity={0.85}
-                  style={[
-                    styles.thumbBox,
-                    activeImageIndex === idx && styles.thumbBoxActive,
-                  ]}
-                >
-                  <Image
-                    source={{ uri: imgUrl }}
-                    style={styles.thumbImage}
-                    resizeMode="cover"
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-
-        {/* VENUE TITLE & LOCATION */}
-        <View style={styles.detailsCard}>
-          <Text style={styles.venueTitle}>{venue.name}</Text>
-
+          
           <View style={styles.locationRow}>
-            <MapPin className="w-4 h-4 text-[#581420] mr-1" />
-            <Text style={styles.locationText}>
-              {venue.location}, {venue.city}
-            </Text>
+            <MapPin className="w-3.5 h-3.5 text-gray-400 mr-1" />
+            <Text style={styles.locationText}>{venue.location || venue.city}</Text>
+            <Text style={styles.locationSeparator}>|</Text>
+            <Text style={styles.locationText}>Location</Text>
           </View>
+        </Card>
 
-          <Text style={styles.categoryBadge}>{venue.category}</Text>
-
-          {/* QUICK HIGHLIGHT STATS GRID */}
-          <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Users className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Capacity</Text>
-              <Text style={styles.statValue}>{venue.capacity}</Text>
+        {/* 4. VENUE TYPE / CAPACITY CARD */}
+        <Card>
+          <Text style={styles.cardTitle}>5 Star Mountain Hotel</Text>
+          <Text style={styles.cardSubtitle}>Say "I do" amongst the Mountains</Text>
+          
+          <View style={styles.metadataRow}>
+            <View style={styles.metadataItem}>
+              <Users className="w-4 h-4 text-gray-500 mr-1.5" />
+              <Text style={styles.metadataText}>{venue.capacity || '150 - 200 pax'}</Text>
             </View>
-
-            <View style={styles.statBox}>
-              <Home className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>AC Rooms</Text>
-              <Text style={styles.statValue}>{venue.roomsAvailable}</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Car className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Parking</Text>
-              <Text style={styles.statValue}>{venue.parkingSpace}</Text>
-            </View>
-
-            <View style={styles.statBox}>
-              <Utensils className="w-5 h-5 text-[#581420] mb-1" />
-              <Text style={styles.statLabel}>Catering Policy</Text>
-              <Text style={styles.statValue}>{venue.cateringPolicy}</Text>
+            <View style={styles.metadataItem}>
+              <Building2 className="w-4 h-4 text-gray-500 mr-1.5" />
+              <Text style={styles.metadataText}>{venue.roomsAvailable || '65 Rooms'}</Text>
             </View>
           </View>
-        </View>
+        </Card>
 
-        {/* DESCRIPTION */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeaderTitle}>About the Venue</Text>
-          <Text style={styles.descriptionText}>{venue.description}</Text>
-          <View style={styles.expBadgeRow}>
-            <Award className="w-4 h-4 text-amber-700 mr-1.5" />
-            <Text style={styles.expBadgeText}>{venue.experience} Hosting Weddings</Text>
-          </View>
-        </View>
-
-        {/* VENUE AMENITIES & HIGHLIGHTS */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeaderTitle}>Key Amenities & Facilities</Text>
-          <View style={styles.amenitiesGrid}>
-            {venue.amenities.map((item, idx) => (
-              <View key={idx} style={styles.amenityChip}>
-                <CheckCircle2 className="w-4 h-4 text-[#581420] mr-2" />
-                <Text style={styles.amenityText}>{item}</Text>
+        {/* 5. PRICING INFORMATION CARD */}
+        <Card>
+          <Text style={styles.cardTitle}>Pricing Info</Text>
+          
+          <View style={styles.priceRow}>
+            <View style={styles.priceLeft}>
+              <View style={styles.vegIcon} />
+              <View>
+                <Text style={styles.priceTitle}>Veg price (taxes extra)</Text>
+                <Text style={styles.priceSub}>starting price</Text>
               </View>
-            ))}
+            </View>
+            <View style={styles.priceRight}>
+              <Text style={styles.priceValue}>₹ 3,000</Text>
+              <Text style={styles.priceSub}>per plate</Text>
+            </View>
           </View>
-        </View>
+          <Divider />
+          
+          <View style={styles.priceRow}>
+            <View style={styles.priceLeft}>
+              <View style={styles.nonVegIcon} />
+              <View>
+                <Text style={styles.priceTitle}>Non Veg price (taxes extra)</Text>
+                <Text style={styles.priceSub}>starting price</Text>
+              </View>
+            </View>
+            <View style={styles.priceRight}>
+              <Text style={styles.priceValue}>₹ 3,500</Text>
+              <Text style={styles.priceSub}>per plate</Text>
+            </View>
+          </View>
+          <Divider />
+          
+          <View style={styles.priceRow}>
+            <View style={styles.priceLeft}>
+              <Building2 className="w-4 h-4 text-[#581420] mr-2" />
+              <View>
+                <Text style={styles.priceTitle}>Destination Price</Text>
+                <Text style={styles.priceSub}>(incl. Rooms + 3 Meals + Venue)</Text>
+              </View>
+            </View>
+            <View style={styles.priceRight}>
+              <Text style={styles.priceValue}>₹ 23.00 Lakhs</Text>
+              <Text style={styles.priceSub}>/day for 65 rooms</Text>
+            </View>
+          </View>
+          <Divider />
+          
+          <View style={styles.priceRow}>
+            <View style={styles.priceLeft}>
+              <Building2 className="w-4 h-4 text-[#581420] mr-2" />
+              <Text style={styles.priceTitle}>Destination package</Text>
+            </View>
+            <View style={styles.priceRight}>
+              <Text style={styles.priceValue}>₹ 2,300,000</Text>
+            </View>
+          </View>
+        </Card>
 
-        {/* PACKAGES / RENTAL PRICING */}
-        {venue.packages && venue.packages.length > 0 && (
-          <View style={styles.sectionCard}>
-            <Text style={styles.sectionHeaderTitle}>Rental Packages & Pricing</Text>
-            {venue.packages.map((pkg, idx) => (
-              <View key={idx} style={styles.packageCard}>
-                <View style={styles.packageHeader}>
-                  <Text style={styles.packageTitle}>{pkg.title}</Text>
-                  <Text style={styles.packagePrice}>{pkg.price}</Text>
+        {/* 6. CHECK AVAILABILITY CARD */}
+        <Card>
+          <Text style={styles.cardTitle}>Check Availability</Text>
+          <View style={styles.availabilityRow}>
+            <View style={styles.inputGroup}>
+              <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+              <TextInput style={styles.inputText} placeholder="Event date" />
+            </View>
+            <View style={styles.inputDivider} />
+            <View style={styles.inputGroup}>
+              <Users className="w-4 h-4 text-gray-400 mr-2" />
+              <TextInput style={styles.inputText} placeholder="Guest" />
+            </View>
+            <TouchableOpacity style={styles.checkDatesBtn} onPress={() => setShowQuoteModal(true)}>
+              <Text style={styles.checkDatesBtnText}>Check Dates</Text>
+            </TouchableOpacity>
+          </View>
+        </Card>
+
+        {/* 7. BANQUETS SECTION */}
+        <Card>
+          <Text style={styles.cardTitle}>Banquets 2</Text>
+          
+          <View style={styles.banquetItem}>
+            <View style={styles.banquetHeaderRow}>
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=100&q=80' }} style={styles.banquetThumb} />
+              <View style={styles.banquetInfo}>
+                <Text style={styles.banquetName}>Banquet - Regalia</Text>
+                <View style={styles.banquetCapacity}>
+                  <Users className="w-3.5 h-3.5 text-gray-400 mr-1" />
+                  <Text style={styles.banquetCapacityText}>150 Seating | 200 Floating</Text>
                 </View>
-                <Text style={styles.packageDesc}>{pkg.description}</Text>
+                <Text style={styles.viewAreaText}>View Indoor Area</Text>
               </View>
-            ))}
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </View>
+            <View style={styles.banquetImageGrid}>
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=300&q=80' }} style={styles.banquetGridImg} />
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80' }} style={styles.banquetGridImg} />
+            </View>
           </View>
-        )}
+          
+          <View style={styles.banquetItem}>
+            <View style={styles.banquetHeaderRow}>
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=100&q=80' }} style={styles.banquetThumb} />
+              <View style={styles.banquetInfo}>
+                <Text style={styles.banquetName}>Vue</Text>
+                <View style={styles.banquetCapacity}>
+                  <Users className="w-3.5 h-3.5 text-gray-400 mr-1" />
+                  <Text style={styles.banquetCapacityText}>150 Seating | 200 Floating</Text>
+                </View>
+                <Text style={styles.viewAreaText}>View Outdoor Area</Text>
+              </View>
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            </View>
+            <View style={styles.banquetImageGrid}>
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=300&q=80' }} style={styles.banquetGridImg} />
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=300&q=80' }} style={styles.banquetGridImg} />
+            </View>
+          </View>
+        </Card>
 
-        {/* LOCATION MAP PREVIEW CARD */}
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeaderTitle}>Location & Accessibility</Text>
-          <View style={styles.mapCard}>
-            <MapPin className="w-8 h-8 text-[#581420] mb-2" />
-            <Text style={styles.mapCardTitle}>{venue.name}</Text>
-            <Text style={styles.mapCardSub}>{venue.location}, {venue.city}</Text>
-            <TouchableOpacity
-              style={styles.directionsBtn}
-              onPress={() =>
-                Linking.openURL(
-                  `https://maps.google.com/?q=${encodeURIComponent(
-                    venue.name + ' ' + venue.city
-                  )}`
-                )
-              }
-              activeOpacity={0.8}
-            >
-              <Text style={styles.directionsBtnText}>Open in Google Maps</Text>
-            </TouchableOpacity>
+        {/* 8. ALBUMS SECTION */}
+        <Card>
+          <View style={styles.rowLeft}>
+            <Text style={styles.cardTitle}>Albums</Text>
+            <View style={styles.albumCountBadge}>
+              <Text style={styles.albumCountText}>6 nos.</Text>
+            </View>
           </View>
-        </View>
+          
+          <View style={styles.albumGrid}>
+            <View style={styles.albumLarge}>
+              <Image source={{ uri: heroImages[0] }} style={styles.albumLargeImg} />
+              <View style={styles.portfolioOverlay}>
+                <View style={styles.portfolioBadge}>
+                  <Camera className="w-3 h-3 text-[#3B2F2F] mr-1" />
+                  <Text style={styles.portfolioBadgeText}>63</Text>
+                </View>
+                <Text style={styles.portfolioTitle}>Portfolio</Text>
+              </View>
+            </View>
+            <View style={styles.albumSmallCol}>
+              <Image source={{ uri: heroImages[1] || 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=300&q=80' }} style={styles.albumSmallImg} />
+              <Image source={{ uri: heroImages[2] || 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=300&q=80' }} style={styles.albumSmallImg} />
+            </View>
+            <View style={styles.albumSmallCol}>
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=300&q=80' }} style={styles.albumSmallImg} />
+              <Image source={{ uri: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80' }} style={styles.albumSmallImg} />
+            </View>
+          </View>
+        </Card>
+        
+        <View style={{ height: 60 }} />
       </ScrollView>
-
-      {/* FIXED BOTTOM ACTION BAR */}
-      <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting Rent</Text>
-          <Text style={styles.bottomPriceValue}>{venue.startingPrice}</Text>
-        </View>
-
-        <View style={styles.bottomActionsRow}>
-          <TouchableOpacity
-            style={styles.circleCallBtn}
-            onPress={handleCall}
-            activeOpacity={0.8}
-          >
-            <Phone className="w-4 h-4 text-[#581420]" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.circleWhatsAppBtn}
-            onPress={handleWhatsApp}
-            activeOpacity={0.8}
-          >
-            <MessageCircle className="w-4 h-4 text-emerald-700" />
-          </TouchableOpacity>
-
-          {venue.instagram && (
-            <TouchableOpacity
-              style={styles.circleInstagramBtn}
-              onPress={handleInstagram}
-              activeOpacity={0.85}
-            >
-              <Instagram className="w-4 h-4 text-[#C13584]" />
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'initial' && (
-            <TouchableOpacity
-              style={styles.primaryQuoteBtn}
-              onPress={() => setShowQuoteModal(true)}
-              activeOpacity={0.85}
-            >
-              <Send className="w-4 h-4 text-white mr-1.5" />
-              <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'requested' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.primaryQuoteBtnText}>Pending Response</Text>
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'negotiating' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.primaryQuoteBtnText}>Negotiating...</Text>
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'rejected' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-              <Text style={styles.primaryQuoteBtnText}>Rejected (Reset)</Text>
-            </TouchableOpacity>
-          )}
-
-          {quoteStatus === 'response_ready' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.primaryQuoteBtnText}>View Quote</Text>
-            </TouchableOpacity>
-          )}
-
-          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity
-              style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]}
-              onPress={() => setShowInvoiceModal(true)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.primaryQuoteBtnText}>
-                {quoteStatus === 'fully_paid'
-                  ? 'Fully Paid (Invoice)'
-                  : quoteStatus === 'partially_paid'
-                  ? 'Partially Paid (Invoice)'
-                  : 'View Invoice'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
 
       <RequestQuoteModal
         visible={showQuoteModal}
@@ -522,531 +434,431 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         location={venue.location || venue.city}
         category="venue"
         onClose={() => setShowQuoteModal(false)}
-        onQuoteSent={handleQuoteRequestSent}
-      />
-
-      <QuotationScreen
-        visible={showQuotationScreen}
-        onClose={() => setShowQuotationScreen(false)}
-        quoteStatus={quoteStatus}
-        setQuoteStatus={updateQuoteStatus}
-        vendorId={venue.id}
-        vendorName={venue.name}
-        vendorImage={venue.image}
-        vendorLocation={venue.location || venue.city}
-        startingPrice={venue.startingPrice}
-        category="Venues"
-        packageName={`${venue.name} - Grand AC Mandapam & Convention Package`}
-        includedServices={
-          venue.amenities && venue.amenities.length > 0
-            ? venue.amenities
-            : [
-                'Centrally AC Banquet Hall Hire (12 Hours)',
-                'Traditional Grand Stage & Buffet Canopy Setup',
-                '2 AC Deluxe Bridal & Groom Changing Rooms',
-                'Valet Parking Service for up to 150 Vehicles',
-                '100% Uninterrupted Power Backup Generator',
-              ]
-        }
-        onNavigateToQuotesTab={() => {
-          setShowQuotationScreen(false);
-          setShowInvoiceModal(true);
-        }}
-        onBack={onBack}
-        onShowToast={handleShowToast}
-      />
-
-      {/* INVOICE & MILESTONES PAYMENT MODAL */}
-      <WeddingInvoicePaymentModal
-        visible={showInvoiceModal}
-        onClose={() => setShowInvoiceModal(false)}
-        vendorId={venue.id}
-        vendorName={venue.name}
-        vendorImage={venue.image}
-        vendorLocation={venue.location || venue.city}
-        category="Venues"
-        startingPrice={venue.startingPrice || '₹2,50,000'}
-        bookingSource={bookingSource}
-        onNavigateToMyWeddingPayments={() => {
-          setShowInvoiceModal(false);
-          if (onNavigateToMyWeddingPayments) {
-            onNavigateToMyWeddingPayments();
-          } else {
-            window.dispatchEvent(
-              new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: venue.id } })
-            );
-          }
-        }}
-        onNavigateToProfileMyBookings={() => {
-          setShowInvoiceModal(false);
-          if (onNavigateToProfileMyBookings) {
-            onNavigateToProfileMyBookings();
-          } else {
-            window.dispatchEvent(
-              new CustomEvent('tot_switch_to_profile_my_bookings', { detail: { vendorId: venue.id } })
-            );
-          }
-        }}
+        onQuoteSent={() => setShowQuoteModal(false)}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  pageContainer: {
     flex: 1,
     height: '100%',
-    maxHeight: '100%',
     width: '100%',
     backgroundColor: '#FAF7F2',
+    display: 'flex',
+    flexDirection: 'column',
     overflow: 'hidden',
   },
   topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
-    zIndex: 30,
+    zIndex: 10,
   },
-  headerTitleText: {
-    fontSize: 16,
-    fontWeight: '700',
+  iconBtn: {
+    padding: 6,
+  },
+  headerTitle: {
+    fontSize: 15,
+    fontWeight: '600',
     color: '#3B2F2F',
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 10,
   },
-  iconCircleBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: '#F3ECE4',
+  headerRight: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
   },
-  heroWrapper: {
-    position: 'relative',
+  bookNowBtn: {
+    backgroundColor: '#581420',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  bookNowBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  scrollArea: {
+    flex: 1,
     width: '100%',
-    height: 320,
-    backgroundColor: '#1C1917',
+  },
+  heroContainer: {
+    width: '100%',
+    height: 280,
+    position: 'relative',
   },
   heroImage: {
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
   },
-  tierBadge: {
+  bookingBadge: {
     position: 'absolute',
-    top: 14,
-    left: 14,
+    top: 16,
+    right: 16,
+    backgroundColor: '#581420',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  bookingBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  imageCounter: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  tierBadgeText: {
-    fontSize: 12,
+  imageCounterText: {
+    fontSize: 11,
     fontWeight: '700',
-    color: '#581420',
+    color: '#3B2F2F',
   },
-  ratingOverlay: {
+  carouselDots: {
     position: 'absolute',
-    top: 14,
-    right: 14,
+    bottom: 16,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  dotActive: {
+    backgroundColor: '#FFFFFF',
+    width: 7,
+    height: 7,
+  },
+  firstCard: {
+    marginTop: -20,
+    zIndex: 5,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
+    marginBottom: 12,
   },
-  ratingValueText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
+  venueNameText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#3B2F2F',
+    flex: 1,
+    lineHeight: 24,
+  },
+  moreBtn: {
+    padding: 4,
+    marginRight: -4,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 10,
+  },
+  ratingScore: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#3B2F2F',
+    marginRight: 6,
+  },
+  ratingLabel: {
     fontSize: 13,
+    fontWeight: '600',
+    color: '#3B2F2F',
+    marginRight: 6,
   },
-  ratingCountText: {
-    color: '#E7E5E4',
-    fontSize: 11,
-    marginLeft: 3,
-  },
-  thumbRow: {
-    position: 'absolute',
-    bottom: 12,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 12,
-  },
-  thumbBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginRight: 8,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  thumbBoxActive: {
-    borderColor: '#581420',
-  },
-  thumbImage: {
-    width: '100%',
-    height: '100%',
-  },
-  detailsCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  venueTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#581420',
-    marginBottom: 6,
+  ratingCount: {
+    fontSize: 12,
+    color: '#6B7280',
   },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
   },
   locationText: {
-    fontSize: 13,
-    color: '#6B5E5E',
-    fontWeight: '500',
-  },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#F3ECE4',
-    color: '#581420',
     fontSize: 12,
-    fontWeight: '700',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 14,
+    color: '#6B7280',
   },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  locationSeparator: {
+    marginHorizontal: 8,
+    color: '#D1D5DB',
   },
-  statBox: {
-    width: '48%',
-    backgroundColor: '#FAF7F2',
-    padding: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  statLabel: {
-    fontSize: 11,
-    color: '#7D6E70',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  statValue: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#3B2F2F',
-    marginTop: 2,
-  },
-  sectionCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 18,
-    marginHorizontal: 12,
-    marginTop: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  sectionHeaderTitle: {
+  cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#581420',
-    marginBottom: 10,
-  },
-  descriptionText: {
-    fontSize: 13.5,
-    color: '#524646',
-    lineHeight: 20,
-  },
-  expBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-  },
-  expBadgeText: {
-    fontSize: 12,
-    color: '#92400E',
-    fontWeight: '700',
-  },
-  amenitiesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  amenityChip: {
-    width: '47%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FAF7F2',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  amenityText: {
-    fontSize: 12,
-    fontWeight: '600',
     color: '#3B2F2F',
-  },
-  packageCard: {
-    backgroundColor: '#FAF7F2',
-    padding: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    marginBottom: 10,
-  },
-  packageHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  packageTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#581420',
-  },
-  packagePrice: {
-    fontSize: 13.5,
-    fontWeight: '800',
-    color: '#065F46',
-  },
-  packageDesc: {
-    fontSize: 12.5,
-    color: '#6B5E5E',
-    lineHeight: 18,
-  },
-  mapCard: {
-    backgroundColor: '#FAF7F2',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  mapCardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#3B2F2F',
-  },
-  mapCardSub: {
-    fontSize: 12.5,
-    color: '#7D6E70',
-    marginBottom: 12,
-  },
-  directionsBtn: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  directionsBtnText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 68,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E8DFD5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    zIndex: 40,
-  },
-  bottomPriceCol: {
-    flexDirection: 'column',
-    flexShrink: 1,
-    marginRight: 4,
-  },
-  bottomPriceLabel: {
-    fontSize: 9.5,
-    color: '#7D6E70',
-    fontWeight: '600',
-    textTransform: 'uppercase',
-  },
-  bottomPriceValue: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#581420',
-  },
-  bottomActionsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    flexShrink: 0,
-  },
-  circleCallBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3ECE4',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circleWhatsAppBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#DCFCE7',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circleInstagramBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FCE7F3',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryQuoteBtn: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  primaryQuoteBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  modalBg: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 14,
-  },
-  modalTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#581420',
-  },
-  modalSub: {
-    fontSize: 12,
-    color: '#7D6E70',
-  },
-  modalCloseBtn: {
-    padding: 4,
-  },
-  formGroup: {
-    marginBottom: 12,
-  },
-  formLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#3B2F2F',
-    marginBottom: 5,
-  },
-  formInput: {
-    backgroundColor: '#FAF7F2',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    fontSize: 13,
-    color: '#1C1917',
-  },
-  chipRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
-  selectChip: {
-    backgroundColor: '#FAF7F2',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-  },
-  selectChipActive: {
-    backgroundColor: '#581420',
-    borderColor: '#581420',
-  },
-  selectChipText: {
-    fontSize: 11.5,
-    color: '#524646',
-    fontWeight: '600',
-  },
-  selectChipTextActive: {
-    color: '#FFFFFF',
-  },
-  submitModalBtn: {
-    backgroundColor: '#581420',
-    paddingVertical: 12,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  submitModalBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 13.5,
-  },
-  successContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  successTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#065F46',
     marginBottom: 4,
   },
-  successSub: {
-    fontSize: 12.5,
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginBottom: 14,
+  },
+  metadataRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FAF7F2',
+    padding: 12,
+    borderRadius: 8,
+    gap: 16,
+  },
+  metadataItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  metadataText: {
+    fontSize: 13,
     color: '#4B5563',
-    textAlign: 'center',
+    fontWeight: '500',
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+  },
+  priceLeft: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flex: 1,
+  },
+  vegIcon: {
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderColor: '#16A34A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+    marginRight: 10,
+    borderRadius: 2,
+  },
+  nonVegIcon: {
+    width: 14,
+    height: 14,
+    borderWidth: 1.5,
+    borderColor: '#DC2626',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 2,
+    marginRight: 10,
+    borderRadius: 2,
+  },
+  priceTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#3B2F2F',
+    marginBottom: 2,
+  },
+  priceSub: {
+    fontSize: 11,
+    color: '#6B7280',
+  },
+  priceRight: {
+    alignItems: 'flex-end',
+  },
+  priceValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#3B2F2F',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'transparent',
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  availabilityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    padding: 4,
+  },
+  inputGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  inputText: {
+    flex: 1,
+    fontSize: 13,
+    paddingVertical: 8,
+    outlineStyle: 'none',
+  },
+  inputDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#E5E7EB',
+  },
+  checkDatesBtn: {
+    backgroundColor: '#F3ECE4',
+    borderColor: '#581420',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+    marginLeft: 8,
+  },
+  checkDatesBtnText: {
+    color: '#581420',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  banquetItem: {
+    marginBottom: 20,
+    paddingTop: 10,
+  },
+  banquetHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  banquetThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    marginRight: 12,
+  },
+  banquetInfo: {
+    flex: 1,
+  },
+  banquetName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#3B2F2F',
+    marginBottom: 4,
+  },
+  banquetCapacity: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  banquetCapacityText: {
+    fontSize: 12,
+    color: '#6B7280',
+  },
+  viewAreaText: {
+    fontSize: 12,
+    color: '#16A34A',
+    fontWeight: '600',
+  },
+  banquetImageGrid: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  banquetGridImg: {
+    flex: 1,
+    height: 110,
+    borderRadius: 8,
+    resizeMode: 'cover',
+  },
+  albumCountBadge: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  albumCountText: {
+    color: '#92400E',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  albumGrid: {
+    flexDirection: 'row',
+    gap: 4,
+    height: 200,
+  },
+  albumLarge: {
+    flex: 2,
+    position: 'relative',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  albumLargeImg: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  portfolioOverlay: {
+    position: 'absolute',
+    bottom: 12,
+    left: 12,
+  },
+  portfolioBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 6,
+  },
+  portfolioBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#3B2F2F',
+  },
+  portfolioTitle: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textShadowColor: 'rgba(0,0,0,0.6)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  albumSmallCol: {
+    flex: 1,
+    gap: 4,
+  },
+  albumSmallImg: {
+    width: '100%',
+    flex: 1,
+    borderRadius: 4,
+    resizeMode: 'cover',
   },
 });
-

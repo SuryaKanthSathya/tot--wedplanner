@@ -11,6 +11,8 @@ import { DestinationWeddingFlow } from './DestinationWeddingFlow';
 import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
+import { CollectionsPage } from './CollectionsPage';
+import { EInvitesScreen } from './EInvitesScreen';
 import { RitualsFlow } from './RitualsFlow';
 import { FindVendorsPage } from './FindVendorsPage';
 import { NotificationsModal } from './NotificationsModal';
@@ -145,6 +147,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showMakeupListing, setShowMakeupListing] = useState<boolean>(false);
   const [showDecorListing, setShowDecorListing] = useState<boolean>(false);
   const [showVenueListing, setShowVenueListing] = useState<boolean>(false);
+  const [selectedCollection, setSelectedCollection] = useState<{ title: string; description: string; image: string; } | undefined>(undefined);
   const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
   const [showCarsListing, setShowCarsListing] = useState(false);
   const [showInvitationListing, setShowInvitationListing] = useState<boolean>(false);
@@ -624,6 +627,15 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   }
 
   if (showVenueListing) {
+    if (selectedCollection) {
+      // If a collection is selected, render the specific Collections Page layout
+      return <CollectionsPage collectionData={selectedCollection} onBack={() => {
+        setShowVenueListing(false);
+        setSelectedCollection(undefined);
+      }} />;
+    }
+
+    // Otherwise render standard Venue Listing Page
     return (
       <VenueListingPage
         onBack={() => {
@@ -909,34 +921,96 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           </View>
 
 
-          {/* ================= SECTION 2: Destination Wedding Banner ================= */}
-          <motion.div
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-            className="w-full cursor-pointer"
-            onClick={() => handleOptionPress('Destination Wedding')}
-          >
-            <View style={styles.destinationBanner}>
-              <View style={styles.bannerTextCol}>
-                <Text style={styles.bannerTitle}>Destination Wedding</Text>
-                <Text style={styles.bannerSubtext}>
-                  Plan your dream wedding at exotic locations
-                </Text>
-              </View>
+          {/* ================= SECTION 2: Venues Collections in Chennai ================= */}
+          {(() => {
+            const venueCollections = [
+              {
+                title: 'Beach Wedding\nDestination',
+                vendors: '21 Vendors',
+                image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=300&q=80', // Bali temple style
+              },
+              {
+                title: 'Open Ground\nWedding Destination',
+                vendors: '27 Vendors',
+                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80', // Lawn / Open Ground
+              },
+              {
+                title: 'Mountain Wedding\nDestinations',
+                vendors: '29 Vendors',
+                image: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=300&q=80', // Mountains
+              },
+              {
+                title: 'Resort Wedding\nVenues',
+                vendors: '24 Vendors',
+                image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=300&q=80', // Resort
+              },
+              {
+                title: 'Kerala Wedding\nDestinations',
+                vendors: '15 Vendors',
+                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=300&q=80', // Kerala Backwaters
+              }
+            ];
 
-              {/* Tropical Palm Image Right */}
-              <View style={styles.bannerImageWrapper}>
-                <Image
-                  source={{
-                    uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80',
-                  }}
-                  style={styles.bannerImage}
-                  resizeMode="cover"
-                />
+            return (
+              <View style={{ marginTop: 12, marginBottom: 8 }}>
+                <Text style={[styles.servicesTitle, { marginBottom: 8 }]}>Destination Wedding</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingRight: 16 }}>
+                  {venueCollections.map((item, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSelectedCollection({
+                          title: item.title.replace('\n', ' ') + ' / Banquet Halls in Chennai',
+                          description: "If you're looking for luxury venues in Chennai, then here are some of the most opulent wedding venues in Chennai that are a part of our Luxury Collection.",
+                          image: item.image,
+                        });
+                        setShowVenueListing(true);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        padding: 0,
+                        margin: 0,
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <View style={{
+                        width: 130,
+                        height: 120,
+                        borderRadius: 16,
+                        borderWidth: 1,
+                        borderColor: '#D4C6C9',
+                        backgroundColor: '#F7EFF1',
+                        padding: 10,
+                        justifyContent: 'space-between',
+                      }}>
+                        <View style={{ alignItems: 'flex-start' }}>
+                          <Image source={{ uri: item.image }} style={{ width: 40, height: 40, borderRadius: 20, marginBottom: 4 }} />
+                        </View>
+                        <View>
+                          <Text style={{
+                            color: '#581420',
+                            fontFamily: "'Cormorant Garamond', Georgia, serif",
+                            fontSize: 14,
+                            fontWeight: '700',
+                            marginBottom: 2,
+                            lineHeight: 16,
+                          }}>{item.title}</Text>
+                          <Text style={{
+                            color: '#635B5C',
+                            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                            fontSize: 10,
+                            fontWeight: '500',
+                          }}>{item.vendors}</Text>
+                        </View>
+                      </View>
+                    </button>
+                  ))}
+                </ScrollView>
               </View>
-            </View>
-          </motion.div>
+            );
+          })()}
           <View style={styles.servicesSection}>
             <View style={styles.servicesHeaderRow}>
               <Text style={styles.servicesTitle}>Popular Services</Text>
@@ -1197,7 +1271,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   activeOpacity={0.8}
                 >
                   <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
-                  <HoverMarquee text="Profile" textStyle={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]} />
+                  <Text style={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]}>Profile</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -1209,7 +1283,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   activeOpacity={0.8}
                 >
                   <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
-                  <HoverMarquee text="My Bookings" textStyle={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]} />
+                  <Text style={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]}>My Bookings</Text>
                   {profileBookings.length > 0 && (
                     <View style={styles.profileBadgePill}>
                       <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
@@ -1328,9 +1402,11 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                         <View style={styles.profileBookingTop}>
                           <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
                           <View style={{ flex: 1 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
-                              <View style={styles.profileCategoryBadge}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                              <View style={{ flex: 1, marginRight: 8 }}>
+                                <Text style={styles.profileBookingVendorName} numberOfLines={1}>{b.vendorName}</Text>
+                              </View>
+                              <View style={[styles.profileCategoryBadge, { flexShrink: 0 }]}>
                                 <Text style={styles.profileCategoryText}>{b.category}</Text>
                               </View>
                             </View>
