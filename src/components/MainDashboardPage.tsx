@@ -540,6 +540,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowRitualsFlow(true);
       return;
     }
+    if (fn.includes('find individual') || fn.includes('find vendor')) {
+      setShowFindVendorsPage(true);
+      return;
+    }
     if (fn.includes('entire wedding') || fn.includes('plan my entire')) {
       if (onNavigateToCoupleOnboarding) {
         onNavigateToCoupleOnboarding();
