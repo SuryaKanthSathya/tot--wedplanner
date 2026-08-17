@@ -59,13 +59,20 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
   const [negotiatePrice, setNegotiatePrice] = useState('');
   const [negotiateMessage, setNegotiateMessage] = useState('');
 
-  const showToast = (msg: string, duration = 3000) => {
+  useEffect(() => {
+    if (localToast) {
+      const timer = setTimeout(() => {
+        setLocalToast(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [localToast]);
+
+  const showToast = (msg: string, duration = 1000) => {
     if (onShowToast) {
       onShowToast(msg);
-    } else {
-      setLocalToast(msg);
-      setTimeout(() => setLocalToast(null), duration);
     }
+    setLocalToast(msg);
   };
 
   const [mockQuoteDetails, setMockQuoteDetails] = useState(() => {

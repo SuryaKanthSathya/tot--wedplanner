@@ -72,6 +72,15 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
     'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
@@ -156,7 +165,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
         status: 'response_ready',
       });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
+      setTimeout(() => setToastMessage(null), 5000);
     }, 3000);
   };
 

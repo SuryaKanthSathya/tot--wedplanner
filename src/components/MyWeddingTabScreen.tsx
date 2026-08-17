@@ -658,6 +658,15 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [showInvitationListing, setShowInvitationListing] = useState(false);
   const [addedToast, setAddedToast] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (addedToast) {
+      const timer = setTimeout(() => {
+        setAddedToast(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToast]);
+
   const isAnyListingOpen = Boolean(
     showServicesView ||
     showPhotographyListing ||

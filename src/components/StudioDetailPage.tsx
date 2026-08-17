@@ -75,6 +75,15 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
   // Quote / Booking state from weddingPaymentsManager
   const [quoteStatus, setQuoteStatus] = useState<
     'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
@@ -119,6 +128,7 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
         status: 'response_ready',
       });
       setToastMessage('Quotation Received! Click "View Quote"');
+      setTimeout(() => setToastMessage(null), 5000);
     }, 2500);
   };
 

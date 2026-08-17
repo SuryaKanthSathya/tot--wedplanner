@@ -222,7 +222,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                 {/* Official Invoice Brand Box */}
                 <View style={styles.invoiceHeroCard}>
                   <View style={styles.invoiceBrandRow}>
-                    <View>
+                    <View style={{ flex: 1, marginRight: 8 }}>
                       <Text style={styles.brandTitle}>Tale of Two</Text>
                       <Text style={styles.brandSubtitle}>Wedding Services Official Invoice</Text>
                     </View>
@@ -299,7 +299,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                           ]}
                         >
                           <View style={styles.milestoneTopRow}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1, marginRight: 8 }}>
                               {isPaid ? (
                                 <View style={styles.badgePaidCircle}>
                                   <CheckCircle2 className="w-4 h-4 text-emerald-700" />
@@ -313,7 +313,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                                   <Lock className="w-3.5 h-3.5 text-stone-400" />
                                 </View>
                               )}
-                              <View>
+                              <View style={{ flex: 1 }}>
                                 <Text style={styles.milestoneNumText}>
                                   Milestone {m.milestoneNumber} ({m.percentage}%)
                                 </Text>
@@ -321,7 +321,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                               </View>
                             </View>
 
-                            <View style={{ alignItems: 'flex-end' }}>
+                            <View style={{ alignItems: 'flex-end', flexShrink: 0 }}>
                               <Text style={styles.milestoneAmountText}>
                                 ₹{m.amount.toLocaleString('en-IN')}
                               </Text>
@@ -575,8 +575,8 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
                     onPress={() => setStep('payment_method')}
                     activeOpacity={0.88}
                   >
-                    <CreditCard className="w-4 h-4 text-white" />
-                    <Text style={styles.paymentPrimaryBtnText}>
+                    <CreditCard className="w-4 h-4 text-white shrink-0" />
+                    <Text style={styles.paymentPrimaryBtnText} numberOfLines={1}>
                       Pay Milestone {nextPendingMilestone.milestoneNumber} (₹
                       {nextPendingMilestone.amount.toLocaleString('en-IN')})
                     </Text>
@@ -740,6 +740,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
+    flexShrink: 0,
   },
   invoiceNumberText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
@@ -755,8 +756,10 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
   metaGrid: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 8,
   },
   metaCol: {
+    flex: 1,
     gap: 2,
   },
   metaLabel: {
@@ -767,7 +770,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
   },
   metaValue: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: '#2A2425',
   },
@@ -829,6 +832,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     borderWidth: 1,
     borderColor: '#EFE7DC',
     backgroundColor: '#FAF7F2',
+    overflow: 'hidden',
   },
   milestoneBoxPaid: {
     backgroundColor: '#F0FDF4',
@@ -856,6 +860,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     backgroundColor: '#DCFCE7',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   badgeNextCircle: {
     width: 28,
@@ -864,6 +869,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   badgeLockedCircle: {
     width: 28,
@@ -872,6 +878,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     backgroundColor: '#EAE5DC',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   milestoneNumText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
@@ -881,9 +888,10 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
   },
   milestoneTitleText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '700',
     color: '#2A2425',
+    lineHeight: 15,
   },
   milestoneAmountText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
@@ -927,12 +935,13 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
   serviceItemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   serviceItemText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
     fontSize: 11.5,
     color: '#524345',
+    flex: 1,
   },
   escrowBanner: {
     flexDirection: 'row',
@@ -1165,9 +1174,10 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
   },
   paymentPrimaryBtnText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: '#FFFFFF',
+    flexShrink: 1,
   },
   viewMyWeddingBtn: {
     height: 48,

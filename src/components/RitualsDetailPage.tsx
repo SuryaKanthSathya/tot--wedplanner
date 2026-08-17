@@ -91,6 +91,15 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
   const [quoteStatus, setQuoteStatus] = useState<
     'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
   >(() => {
@@ -189,7 +198,7 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
       updateQuoteStatus('response_ready');
       saveOrUpdateQuote({ id: `quote-${vendor.id}`, status: 'response_ready' });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
-      setTimeout(() => setToastMessage(null), 4000);
+      setTimeout(() => setToastMessage(null), 5000);
     }, 3000);
   };
 
