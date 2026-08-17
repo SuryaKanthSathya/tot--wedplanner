@@ -101,16 +101,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (toastMessage) {
-      const timer = setTimeout(() => {
-        setToastMessage(null);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [toastMessage]);
-=======
+
   const venuePortfolio =
     venue.portfolio && venue.portfolio.length > 0
       ? venue.portfolio
@@ -149,7 +140,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
             description: 'Includes 24 hours full venue access, lawn area, 10 guest rooms, uninterrupted generator and valet parking.',
           },
         ];
->>>>>>> 47a70f21fd0f849dd40737f561662e4f6397301d
+
 
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
