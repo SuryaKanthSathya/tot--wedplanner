@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   Sparkles,
   Clock,
+  Check,
 } from 'lucide-react';
 import { getAllQuotes, saveOrUpdateQuote, QuoteItem } from '../utils/quotesManager';
 import { QuotationScreen } from './QuotationScreen';
@@ -585,7 +586,7 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
         >
           {/* Success Icon */}
           <View style={styles.successIconCircle}>
-            <CheckCircle2 size={48} color="#FFFFFF" />
+            <Check size={40} color="#FFFFFF" strokeWidth={3} />
           </View>
 
           <Text style={styles.successTitle}>✓ Payment Successful</Text>
