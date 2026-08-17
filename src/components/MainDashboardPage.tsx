@@ -397,6 +397,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         setShowCateringListing(false);
         setShowRitualsFlow(false);
         setShowFindVendorsPage(false);
+        setShowDestinationWeddingFlow(false);
       }
     };
     const handleSavedReset = () => {
@@ -423,6 +424,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowMehendiListing(false);
       setShowCateringListing(false);
       setShowRitualsFlow(false);
+      setShowDestinationWeddingFlow(false);
     };
     const handleHideTabBar = (e: Event) => {
       const customEvent = e as CustomEvent;
@@ -445,6 +447,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowMehendiListing(false);
       setShowCateringListing(false);
       setShowRitualsFlow(false);
+      setShowDestinationWeddingFlow(false);
       setActiveTab('profile');
       setShowProfileModal(true);
       setProfileActiveTab('mybooking');
@@ -682,6 +685,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
         }}
+        onComplete={() => {
+          setShowDestinationWeddingFlow(false);
+          setActiveTab('home');
+        }}
       />
     );
   }
@@ -880,6 +887,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             </View>
           </View>
 
+
           {/* ================= SECTION 2: Destination Wedding Banner ================= */}
           <motion.div
             whileHover={{ scale: 1.03, y: -2 }}
@@ -908,8 +916,6 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               </View>
             </View>
           </motion.div>
-
-          {/* ================= SECTION 3: Popular Services ================= */}
           <View style={styles.servicesSection}>
             <View style={styles.servicesHeaderRow}>
               <Text style={styles.servicesTitle}>Popular Services</Text>

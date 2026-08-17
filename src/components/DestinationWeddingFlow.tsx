@@ -442,13 +442,69 @@ const WEDDING_STYLES = [
 ];
 
 const RECOMMENDED_PLAN = [
-  { type: 'Venue', name: 'Mountain Resort', icon: <Building2 className="w-5 h-5 text-[#581420]" />, description: 'Your carefully selected premium venue featuring world-class amenities and breathtaking views.' },
-  { type: 'Photography', name: 'Moments Studio', icon: <Camera className="w-5 h-5 text-[#581420]" />, description: 'Award-winning team specializing in candid moments and cinematic wedding films.' },
-  { type: 'Makeup', name: 'Glow Studio', icon: <Sparkles className="w-5 h-5 text-[#581420]" />, description: 'Expert bridal makeup artists for a flawless, long-lasting look.' },
-  { type: 'Decor', name: 'Dream Designs', icon: <Palette className="w-5 h-5 text-[#581420]" />, description: 'Bespoke floral arrangements and thematic styling for your big day.' },
-  { type: 'Catering', name: 'Flavors Catering', icon: <Utensils className="w-5 h-5 text-[#581420]" />, description: 'A curated multi-cuisine feast prepared by top chefs.' },
-  { type: 'DJ & Music', name: 'Rhythm Entertainment', icon: <Music className="w-5 h-5 text-[#581420]" />, description: 'Top-tier DJs and live bands to keep your guests dancing all night.' },
-  { type: 'Invitations', name: 'Paper & Peonies', icon: <Mail className="w-5 h-5 text-[#581420]" />, description: 'Custom designed, eco-friendly digital and physical invitations.' },
+  { 
+    type: 'Venue', 
+    name: 'Mountain Resort', 
+    icon: <Building2 className="w-5 h-5 text-[#581420]" />, 
+    description: 'Your carefully selected premium venue featuring world-class amenities and breathtaking views.',
+    budget: '₹5 Lakhs - ₹15 Lakhs',
+    packages: ['1-Day Standard', '2-Day All-Inclusive', 'Resort Buyout'],
+    moreInfo: 'Features 50+ rooms, open lawn for 500 guests, and a dedicated events coordinator.'
+  },
+  { 
+    type: 'Photography', 
+    name: 'Moments Studio', 
+    icon: <Camera className="w-5 h-5 text-[#581420]" />, 
+    description: 'Award-winning team specializing in candid moments and cinematic wedding films.',
+    budget: '₹1 Lakh - ₹3 Lakhs',
+    packages: ['Candid + Traditional', 'Cinematic Video', 'Pre-Wedding Shoot'],
+    moreInfo: 'Includes drone coverage, 2 cinematic trailers, and an exclusive photo album.'
+  },
+  { 
+    type: 'Makeup', 
+    name: 'Glow Studio', 
+    icon: <Sparkles className="w-5 h-5 text-[#581420]" />, 
+    description: 'Expert bridal makeup artists for a flawless, long-lasting look.',
+    budget: '₹30k - ₹80k',
+    packages: ['Bridal HD Makeup', 'Airbrush Makeup', 'Bridesmaid Packages'],
+    moreInfo: 'Uses premium international products and includes draping & hairstyling.'
+  },
+  { 
+    type: 'Decor', 
+    name: 'Dream Designs', 
+    icon: <Palette className="w-5 h-5 text-[#581420]" />, 
+    description: 'Bespoke floral arrangements and thematic styling for your big day.',
+    budget: '₹2 Lakhs - ₹6 Lakhs',
+    packages: ['Mandap Styling', 'Haldi/Mehendi Decor', 'Reception Theme'],
+    moreInfo: 'Custom 3D designs provided before execution to ensure your vision is met.'
+  },
+  { 
+    type: 'Catering', 
+    name: 'Flavors Catering', 
+    icon: <Utensils className="w-5 h-5 text-[#581420]" />, 
+    description: 'A curated multi-cuisine feast prepared by top chefs.',
+    budget: '₹1.5 Lakhs - ₹4 Lakhs',
+    packages: ['Traditional Thali', 'Continental Buffet', 'Live Counters'],
+    moreInfo: 'Offers food tasting sessions before the wedding and custom dietary menus.'
+  },
+  { 
+    type: 'DJ & Music', 
+    name: 'Rhythm Entertainment', 
+    icon: <Music className="w-5 h-5 text-[#581420]" />, 
+    description: 'Top-tier DJs and live bands to keep your guests dancing all night.',
+    budget: '₹50k - ₹1.5 Lakhs',
+    packages: ['Sangeet DJ', 'Live Sufi Band', 'Folk Dancers'],
+    moreInfo: 'Includes high-end sound and lighting setup tailored to the venue.'
+  },
+  { 
+    type: 'Invitations', 
+    name: 'Paper & Peonies', 
+    icon: <Mail className="w-5 h-5 text-[#581420]" />, 
+    description: 'Custom designed, eco-friendly digital and physical invitations.',
+    budget: '₹15k - ₹50k',
+    packages: ['E-Invites', 'Boxed Invites', 'Save The Dates'],
+    moreInfo: 'Includes interactive website invites with RSVP tracking and customized monogram design.'
+  },
 ];
 
 export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
@@ -456,10 +512,10 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
   onComplete,
   onExploreVenues,
 }) => {
-  const [step, setStep] = useState<number>(1);
+  const [step, setStep] = useState<number>(6);
 
   // Form selections state
-  const [selectedDestination, setSelectedDestination] = useState<string>('');
+  const [selectedDestination, setSelectedDestination] = useState<string>('Ooty');
   const [selectedExperience, setSelectedExperience] = useState<string>('');
   const [selectedVenue, setSelectedVenue] = useState<string>('');
   
@@ -482,11 +538,7 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
 
   // Handle Back arrow
   const handleBack = () => {
-    if (step === 1) {
-      onBack();
-    } else {
-      setStep((prev) => prev - 1);
-    }
+    onBack();
   };
 
   // Handle final completion in Screen 7
@@ -610,401 +662,6 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
       <div className="flex-1 relative overflow-hidden">
         <AnimatePresence mode="wait">
           
-          {/* ---------------- SCREEN 1: TAMIL NADU DESTINATIONS ---------------- */}
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.22 }}
-              className="absolute inset-0 flex flex-col"
-            >
-              {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-                <h1 className="font-serif-brand font-bold text-[22px] text-[#2B1D1D] leading-snug">
-                  Where would you love to celebrate in Tamil Nadu? ✨
-                </h1>
-                <p className="text-xs text-[#6B5E5E] font-medium mt-0.5 mb-3.5">
-                  Beautiful wedding destinations in Tamil Nadu
-                </p>
-
-                <div className="grid grid-cols-2 gap-3 pb-2">
-                  {DESTINATIONS.map((dest) => {
-                    const isSelected = selectedDestination === dest.name;
-                    return (
-                      <motion.div
-                        key={dest.id}
-                        whileTap={{ scale: 0.97 }}
-                        onClick={() => setSelectedDestination(dest.name)}
-                        className={`relative rounded-2xl bg-white transition-all overflow-hidden cursor-pointer flex flex-col ${
-                          isSelected
-                            ? 'border-2 border-[#581420] shadow-md bg-[#FAF0E6]/30 ring-2 ring-[#581420]/20'
-                            : 'border border-stone-200 hover:border-stone-300 shadow-2xs'
-                        }`}
-                      >
-                        <div className="relative w-full h-[105px] bg-stone-100 overflow-hidden">
-                          <img
-                            src={dest.image}
-                            alt={dest.name}
-                            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          />
-                          <div className="absolute top-2 right-2">
-                            {isSelected ? (
-                              <div className="w-5.5 h-5.5 rounded-full bg-[#581420] border-2 border-white shadow-xs flex items-center justify-center">
-                                <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
-                              </div>
-                            ) : (
-                              <div className="w-5.5 h-5.5 rounded-full bg-white/85 backdrop-blur-xs border border-stone-300 shadow-xs" />
-                            )}
-                          </div>
-                        </div>
-                        <div className="p-2.5 flex items-center gap-2 bg-white flex-1">
-                          <div className="w-6.5 h-6.5 rounded-full bg-[#FAF0E6] flex items-center justify-center flex-shrink-0">
-                            {dest.icon}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-bold text-[12.5px] text-[#2B1D1D] leading-tight break-words">
-                              {dest.name}
-                            </h3>
-                            <p className="text-[10.5px] text-[#7E6E6E] truncate leading-tight mt-0.5 font-medium">
-                              {dest.subtitle}
-                            </p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Fixed Footer */}
-              <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10">
-                <button
-                  type="button"
-                  disabled={!selectedDestination}
-                  onClick={() => setStep(2)}
-                  className={`w-full py-3.5 px-4 bg-[#581420] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${
-                    !selectedDestination ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#420E18] active:scale-[0.99]'
-                  }`}
-                >
-                  <span>Continue</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ---------------- SCREEN 2: DESTINATION DETAILS ---------------- */}
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.22 }}
-              className="absolute inset-0 flex flex-col"
-            >
-              <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-                <h1 className="font-serif-brand font-bold text-[22px] text-[#2B1D1D] leading-snug">
-                  {selectedDestination} Destination Wedding
-                </h1>
-                <p className="text-xs text-[#6B5E5E] font-medium mt-0.5 mb-5">
-                  {getDestinationSubtitle(selectedDestination)}
-                </p>
-
-                <h3 className="font-bold text-[15px] text-[#2B1D1D] mb-3">Popular Experiences</h3>
-                
-                <div className="space-y-3 pb-2">
-                  {getExperiencesForDestination(selectedDestination).map((exp) => {
-                    const isSelected = selectedExperience === exp;
-                    return (
-                      <div 
-                        key={exp}
-                        onClick={() => setSelectedExperience(exp)}
-                        className={`p-4 rounded-xl border flex items-center gap-3 cursor-pointer transition-all ${
-                          isSelected ? 'border-[#581420] bg-[#FAF0E6]/50 shadow-sm' : 'border-stone-200 bg-white hover:border-[#581420]/30'
-                        }`}
-                      >
-                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          isSelected ? 'border-[#581420]' : 'border-stone-300'
-                        }`}>
-                          {isSelected && <div className="w-2.5 h-2.5 bg-[#581420] rounded-full" />}
-                        </div>
-                        <span className={`font-semibold text-sm ${isSelected ? 'text-[#581420]' : 'text-stone-700'}`}>
-                          {exp}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10">
-                <button
-                  type="button"
-                  disabled={!selectedExperience}
-                  onClick={() => setStep(3)}
-                  className={`w-full py-3.5 px-4 bg-[#581420] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${
-                    !selectedExperience ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#420E18] active:scale-[0.99]'
-                  }`}
-                >
-                  <span>View Venues</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ---------------- SCREEN 4: CHOOSE VENUE ---------------- */}
-          {step === 4 && (
-            <motion.div
-              key="step4"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.22 }}
-              className="absolute inset-0 flex flex-col"
-            >
-              <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-                <h1 className="font-serif-brand font-bold text-[22px] text-[#2B1D1D] leading-snug">
-                  Top Venues in {selectedDestination}
-                </h1>
-                <p className="text-xs text-[#6B5E5E] font-medium mt-0.5 mb-5">
-                  Select a venue that fits your dream wedding
-                </p>
-
-                <div className="space-y-4 pb-2">
-                  {(() => {
-                    let filteredVenues = VENUES.filter(v => v.location === selectedDestination || v.location.includes(selectedDestination.split(' ')[0]));
-                    if (filteredVenues.length === 0) {
-                      filteredVenues = VENUES.filter(v => v.location === 'Any').slice(0, 3);
-                    }
-                    return filteredVenues.map((venue) => {
-                      const isSelected = selectedVenue === venue.name;
-                      return (
-                        <motion.div
-                          key={venue.id}
-                          whileTap={{ scale: 0.98 }}
-                          onClick={() => setSelectedVenue(venue.name)}
-                          className={`rounded-2xl overflow-hidden border transition-all cursor-pointer ${
-                            isSelected ? 'border-2 border-[#581420] shadow-md' : 'border-stone-200 shadow-sm hover:shadow-md'
-                          }`}
-                        >
-                          <div className="h-32 w-full bg-stone-100 relative">
-                             <img src={venue.image} alt={venue.name} className="w-full h-full object-cover" />
-                             {isSelected && (
-                               <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[#581420] flex items-center justify-center shadow-md">
-                                 <Check className="w-4 h-4 text-white stroke-[3]" />
-                               </div>
-                             )}
-                          </div>
-                          <div className="p-3 bg-white flex flex-col gap-1">
-                            <h3 className="font-bold text-[15px] text-[#2B1D1D]">{venue.name}</h3>
-                            <div className="flex items-center gap-3 text-xs text-stone-500 font-medium">
-                              <span className="text-[#581420] font-semibold">{venue.price}</span>
-                              <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> {venue.guests}</span>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    });
-                  })()}
-                </div>
-              </div>
-
-              <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10">
-                <button
-                  type="button"
-                  disabled={!selectedVenue}
-                  onClick={() => setStep(5)}
-                  className={`w-full py-3.5 px-4 bg-[#581420] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${
-                    !selectedVenue ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#420E18] active:scale-[0.99]'
-                  }`}
-                >
-                  <span>Continue</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ---------------- SCREEN 5: WEDDING DETAILS ---------------- */}
-          {step === 5 && (
-            <motion.div
-              key="step5"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.22 }}
-              className="absolute inset-0 flex flex-col"
-            >
-              <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-                <h1 className="font-serif-brand font-bold text-[22px] text-[#2B1D1D] leading-snug">
-                  Tell us about your wedding
-                </h1>
-                <p className="text-xs text-[#6B5E5E] font-medium mt-0.5 mb-5">
-                  Provide some details to help us plan better
-                </p>
-
-                <div className="space-y-4 pb-2">
-                  {/* Wedding Date */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-stone-600">Wedding Date</label>
-                    <div className="relative bg-white border border-stone-200 rounded-xl p-3.5 flex items-center justify-between cursor-pointer hover:border-[#581420]/40">
-                      <span className={`text-sm font-semibold ${weddingDate ? 'text-[#2B1D1D]' : 'text-stone-400'}`}>
-                        {weddingDate ? new Date(weddingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Select date'}
-                      </span>
-                      <Calendar className="w-4 h-4 text-stone-400" />
-                      <input
-                        type="date"
-                        value={weddingDate}
-                        min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => setWeddingDate(e.target.value)}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Guests */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-stone-600">Guests</label>
-                    <div className="relative bg-white border border-stone-200 rounded-xl p-3.5 flex items-center justify-between cursor-pointer hover:border-[#581420]/40">
-                      <span className={`text-sm font-semibold ${guestCount ? 'text-[#2B1D1D]' : 'text-stone-400'}`}>
-                        {guestCount || 'Select guests'}
-                      </span>
-                      <Users className="w-4 h-4 text-stone-400" />
-                      <select 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        value={guestCount}
-                        onChange={(e) => setGuestCount(e.target.value)}
-                      >
-                        <option value="" disabled>Select guests</option>
-                        <option value="Up to 100">Up to 100</option>
-                        <option value="100 - 250">100 - 250</option>
-                        <option value="250 - 500">250 - 500</option>
-                        <option value="500+">500+</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Duration */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-stone-600">Duration</label>
-                    <div className="relative bg-white border border-stone-200 rounded-xl p-3.5 flex items-center justify-between cursor-pointer hover:border-[#581420]/40">
-                      <span className={`text-sm font-semibold ${duration ? 'text-[#2B1D1D]' : 'text-stone-400'}`}>
-                        {duration || 'Select duration'}
-                      </span>
-                      <Clock className="w-4 h-4 text-stone-400" />
-                      <select 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        value={duration}
-                        onChange={(e) => setDuration(e.target.value)}
-                      >
-                        <option value="" disabled>Select duration</option>
-                        <option value="1 Day">1 Day</option>
-                        <option value="2 Days">2 Days</option>
-                        <option value="3 Days">3 Days</option>
-                        <option value="4+ Days">4+ Days</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Number of Events */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-stone-600">Number of Events</label>
-                    <div className="relative bg-white border border-stone-200 rounded-xl p-3.5 flex items-center justify-between cursor-pointer hover:border-[#581420]/40">
-                      <span className={`text-sm font-semibold ${events ? 'text-[#2B1D1D]' : 'text-stone-400'}`}>
-                        {events || 'Select events'}
-                      </span>
-                      <ListPlus className="w-4 h-4 text-stone-400" />
-                      <select 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        value={events}
-                        onChange={(e) => setEvents(e.target.value)}
-                      >
-                        <option value="" disabled>Select events</option>
-                        <option value="1-2 Events">1-2 Events</option>
-                        <option value="3-4 Events">3-4 Events</option>
-                        <option value="5+ Events">5+ Events</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10">
-                <button
-                  type="button"
-                  disabled={!weddingDate || !guestCount || !duration || !events}
-                  onClick={() => setStep(6)}
-                  className={`w-full py-3.5 px-4 bg-[#581420] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${
-                    (!weddingDate || !guestCount || !duration || !events) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#420E18] active:scale-[0.99]'
-                  }`}
-                >
-                  <span>Continue</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ---------------- SCREEN 3: BUDGET ---------------- */}
-          {step === 3 && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.22 }}
-              className="absolute inset-0 flex flex-col"
-            >
-              <div className="flex-1 overflow-y-auto px-4 pt-4 pb-6">
-                <h1 className="font-serif-brand font-bold text-[22px] text-[#2B1D1D] leading-snug">
-                  What's your budget?
-                </h1>
-                <p className="text-xs text-[#6B5E5E] font-medium mt-0.5 mb-5">
-                  This helps us curate the best vendors within your range
-                </p>
-
-                <div className="space-y-3 pb-2">
-                  {BUDGET_OPTIONS.map((budget) => {
-                    const isSelected = selectedBudget === budget;
-                    return (
-                      <div 
-                        key={budget}
-                        onClick={() => setSelectedBudget(budget)}
-                        className={`p-4 rounded-xl border flex items-center justify-center cursor-pointer transition-all ${
-                          isSelected ? 'border-[#581420] bg-[#FAF0E6]/50 shadow-sm' : 'border-stone-200 bg-white hover:border-[#581420]/30'
-                        }`}
-                      >
-                        <span className={`font-bold text-sm ${isSelected ? 'text-[#581420]' : 'text-stone-700'}`}>
-                          {budget}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10">
-                <button
-                  type="button"
-                  disabled={!selectedBudget}
-                  onClick={() => setStep(4)}
-                  className={`w-full py-3.5 px-4 bg-[#581420] text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer ${
-                    !selectedBudget ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#420E18] active:scale-[0.99]'
-                  }`}
-                >
-                  <span>Continue</span>
-                  <ArrowRight className="w-4.5 h-4.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* ---------------- SCREEN 6 REMOVED ---------------- */}
-
           {/* ---------------- SCREEN 6: RECOMMENDED PLAN ---------------- */}
           {step === 6 && (
             <motion.div
@@ -1066,10 +723,32 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden px-4 pb-4 pt-0"
                           >
-                            <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-100 shadow-sm">
+                            <div className="bg-[#FAF8F5] p-3 rounded-xl border border-stone-100 shadow-sm flex flex-col gap-2">
                               <p className="text-xs text-stone-600 leading-relaxed font-medium">
                                 {item.description}
                               </p>
+                              {(item.budget || item.packages || item.moreInfo) && (
+                                <div className="mt-1 pt-2 border-t border-stone-200/60 flex flex-col gap-2">
+                                  {item.budget && (
+                                    <div className="flex justify-between items-start">
+                                      <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider w-1/3 mt-0.5">Budget</span>
+                                      <span className="text-xs text-stone-700 font-bold text-right">{item.budget}</span>
+                                    </div>
+                                  )}
+                                  {item.packages && (
+                                    <div className="flex justify-between items-start">
+                                      <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider w-1/3 mt-0.5">Packages</span>
+                                      <span className="text-xs text-stone-600 font-medium text-right w-2/3 leading-snug">{item.packages.join(' • ')}</span>
+                                    </div>
+                                  )}
+                                  {item.moreInfo && (
+                                    <div className="flex justify-between items-start">
+                                      <span className="text-[10px] text-stone-500 font-bold uppercase tracking-wider w-1/3 mt-0.5">More Info</span>
+                                      <span className="text-xs text-stone-600 font-medium text-right w-2/3 leading-snug">{item.moreInfo}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         )}
@@ -1082,7 +761,7 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
               <div className="px-4 py-3 bg-[#FAF8F5] border-t border-stone-200/60 shadow-[0_-4px_15px_rgba(0,0,0,0.03)] z-10 flex flex-row gap-3">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => onBack()}
                   className="flex-1 py-3.5 px-4 bg-white border border-stone-200 text-stone-600 font-bold text-sm rounded-2xl flex items-center justify-center shadow-sm hover:bg-stone-50 transition-all cursor-pointer"
                 >
                   <span>Deny</span>
