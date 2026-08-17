@@ -119,7 +119,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   onLogout,
   onNavigateToCoupleOnboarding,
 }) => {
-  const isPlannerCreated = Boolean(
+  const [forcePlannerCreated, setForcePlannerCreated] = useState(false);
+  const isPlannerCreated = forcePlannerCreated || Boolean(
     weddingProfile && (weddingProfile.brideName || weddingProfile.marriageType)
   );
 
@@ -436,7 +437,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setSavedCateringIds({});
     };
     const handleSwitchToPayments = () => {
-      setIsPlannerCreated(true);
+      setForcePlannerCreated(true);
       setActiveTab('my-wedding');
       setShowPhotographyListing(false);
       setShowMakeupListing(false);
