@@ -9,7 +9,7 @@ import {
   Linking,
   Modal,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import {
   ArrowLeft,
   Star,
@@ -55,16 +55,16 @@ export interface VenueItem {
   priceValue: number;
   tier: 'Signature' | 'Popular' | 'Luxury' | 'Premium';
   capacity: string;
-  capacityValue: number;
+  capacityValue?: number;
   image: string;
-  description: string;
-  experience: string;
-  roomsAvailable: string;
-  parkingSpace: string;
-  cateringPolicy: string;
-  amenities: string[];
-  features: string[];
-  portfolio: string[];
+  description?: string;
+  experience?: string;
+  roomsAvailable?: string;
+  parkingSpace?: string;
+  cateringPolicy?: string;
+  amenities?: string[];
+  features?: string[];
+  portfolio?: string[];
   packages?: {
     title: string;
     price: string;
@@ -101,6 +101,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => {
@@ -109,6 +110,46 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
       return () => clearTimeout(timer);
     }
   }, [toastMessage]);
+=======
+  const venuePortfolio =
+    venue.portfolio && venue.portfolio.length > 0
+      ? venue.portfolio
+      : [
+          venue.image || '/src/assets/images/beach_resort_decor.jpg',
+          '/src/assets/images/royal_mandap_decor.jpg',
+          '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
+          '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+        ];
+
+  const venueAmenities =
+    venue.amenities && venue.amenities.length > 0
+      ? venue.amenities
+      : venue.features && venue.features.length > 0
+        ? venue.features
+        : [
+            'Centrally AC Banquet Hall Hire',
+            'Grand Stage & Mandap Setup',
+            'AC Bridal & Groom Changing Rooms',
+            'Valet Parking for 150+ Vehicles',
+            '100% Uninterrupted Power Backup Generator',
+          ];
+
+  const venuePackages =
+    venue.packages && venue.packages.length > 0
+      ? venue.packages
+      : [
+          {
+            title: 'Grand Mandapam & Reception Package',
+            price: venue.startingPrice || '₹2,50,000',
+            description: 'Includes 12 hours hall rental, AC dining hall, 2 deluxe green rooms & basic stage lighting setup.',
+          },
+          {
+            title: 'Full Day Premium Wedding & Muhurtham',
+            price: '₹4,00,000',
+            description: 'Includes 24 hours full venue access, lawn area, 10 guest rooms, uninterrupted generator and valet parking.',
+          },
+        ];
+>>>>>>> 47a70f21fd0f849dd40737f561662e4f6397301d
 
   // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
@@ -174,13 +215,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
       remainingAmount: basePrice - Math.round(basePrice * 0.3),
       weddingDate: '24 Oct 2026',
       location: venue.location || venue.city,
-      includedServices: venue.amenities && venue.amenities.length > 0 ? venue.amenities : [
-        'Centrally AC Banquet Hall Hire (12 Hours)',
-        'Traditional Grand Stage & Buffet Canopy Setup',
-        '2 AC Deluxe Bridal & Groom Changing Rooms',
-        'Valet Parking Service for up to 150 Vehicles',
-        '100% Uninterrupted Power Backup Generator',
-      ],
+      includedServices: venueAmenities,
       image: venue.image,
     });
     setToastMessage('Quote Request Sent! Added to My Quotes');
@@ -229,7 +264,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
     Linking.openURL(`https://instagram.com/${username}`);
   };
 
-    const handleSubmitQuote = (e: React.FormEvent) => {
+  const handleSubmitQuote = (e: React.FormEvent) => {
     e.preventDefault();
     if (!guestName.trim() || !guestPhone.trim() || !eventDate.trim()) {
       alert('Please fill in your name, phone number, and event date.');
@@ -283,14 +318,14 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
       {/* SCROLLABLE MAIN BODY */}
       <ScrollView
-        style={{ flex: 1, overflowY: 'auto' } as any}
+        style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
       >
         {/* HERO IMAGE & CAROUSEL PREVIEW */}
         <View style={styles.heroWrapper}>
           <Image
-            source={{ uri: venue.portfolio[activeImageIndex] || venue.image }}
+            source={{ uri: venuePortfolio[activeImageIndex] || venue.image }}
             style={styles.heroImage}
             resizeMode="cover"
           />
@@ -298,20 +333,20 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
           {/* Tier Badge */}
           <View style={styles.tierBadge}>
             <Sparkles className="w-3.5 h-3.5 text-amber-600 mr-1" />
-            <Text style={styles.tierBadgeText}>{venue.tier} Venue</Text>
+            <Text style={styles.tierBadgeText}>{venue.tier || 'Signature'} Venue</Text>
           </View>
 
           {/* Rating Overlay */}
           <View style={styles.ratingOverlay}>
             <Star className="w-4 h-4 text-amber-400 fill-amber-400 mr-1" />
-            <Text style={styles.ratingValueText}>{venue.rating}</Text>
-            <Text style={styles.ratingCountText}>({venue.reviewsCount} reviews)</Text>
+            <Text style={styles.ratingValueText}>{venue.rating || 4.8}</Text>
+            <Text style={styles.ratingCountText}>({venue.reviewsCount || 100} reviews)</Text>
           </View>
 
           {/* Thumbnail Gallery Row */}
           <View style={styles.thumbRow}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {venue.portfolio.map((imgUrl, idx) => (
+              {venuePortfolio.map((imgUrl, idx) => (
                 <TouchableOpacity
                   key={idx}
                   onPress={() => setActiveImageIndex(idx)}
@@ -339,36 +374,36 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
           <View style={styles.locationRow}>
             <MapPin className="w-4 h-4 text-[#581420] mr-1" />
             <Text style={styles.locationText}>
-              {venue.location}, {venue.city}
+              {venue.location || venue.city}, {venue.city}
             </Text>
           </View>
 
-          <Text style={styles.categoryBadge}>{venue.category}</Text>
+          <Text style={styles.categoryBadge}>{venue.category || 'Luxury Wedding Venue'}</Text>
 
           {/* QUICK HIGHLIGHT STATS GRID */}
           <View style={styles.statsGrid}>
             <View style={styles.statBox}>
               <Users className="w-5 h-5 text-[#581420] mb-1" />
               <Text style={styles.statLabel}>Capacity</Text>
-              <Text style={styles.statValue}>{venue.capacity}</Text>
+              <Text style={styles.statValue}>{venue.capacity || '200-1000 Guests'}</Text>
             </View>
 
             <View style={styles.statBox}>
               <Home className="w-5 h-5 text-[#581420] mb-1" />
               <Text style={styles.statLabel}>AC Rooms</Text>
-              <Text style={styles.statValue}>{venue.roomsAvailable}</Text>
+              <Text style={styles.statValue}>{venue.roomsAvailable || '8-15 Rooms'}</Text>
             </View>
 
             <View style={styles.statBox}>
               <Car className="w-5 h-5 text-[#581420] mb-1" />
               <Text style={styles.statLabel}>Parking</Text>
-              <Text style={styles.statValue}>{venue.parkingSpace}</Text>
+              <Text style={styles.statValue}>{venue.parkingSpace || '100+ Cars'}</Text>
             </View>
 
             <View style={styles.statBox}>
               <Utensils className="w-5 h-5 text-[#581420] mb-1" />
               <Text style={styles.statLabel}>Catering Policy</Text>
-              <Text style={styles.statValue}>{venue.cateringPolicy}</Text>
+              <Text style={styles.statValue}>{venue.cateringPolicy || 'Veg & Non-Veg'}</Text>
             </View>
           </View>
         </View>
@@ -376,10 +411,13 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         {/* DESCRIPTION */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionHeaderTitle}>About the Venue</Text>
-          <Text style={styles.descriptionText}>{venue.description}</Text>
+          <Text style={styles.descriptionText}>
+            {venue.description ||
+              `${venue.name} is a premier luxury wedding venue in ${venue.city}, offering grand air-conditioned banquet halls, lush green lawns, and state-of-the-art facilities for traditional and contemporary weddings.`}
+          </Text>
           <View style={styles.expBadgeRow}>
             <Award className="w-4 h-4 text-amber-700 mr-1.5" />
-            <Text style={styles.expBadgeText}>{venue.experience} Hosting Weddings</Text>
+            <Text style={styles.expBadgeText}>{venue.experience || '10+ Years'} Hosting Weddings</Text>
           </View>
         </View>
 
@@ -387,7 +425,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         <View style={styles.sectionCard}>
           <Text style={styles.sectionHeaderTitle}>Key Amenities & Facilities</Text>
           <View style={styles.amenitiesGrid}>
-            {venue.amenities.map((item, idx) => (
+            {venueAmenities.map((item, idx) => (
               <View key={idx} style={styles.amenityChip}>
                 <CheckCircle2 className="w-4 h-4 text-[#581420] mr-2" />
                 <Text style={styles.amenityText}>{item}</Text>
@@ -397,10 +435,10 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         </View>
 
         {/* PACKAGES / RENTAL PRICING */}
-        {venue.packages && venue.packages.length > 0 && (
+        {venuePackages.length > 0 && (
           <View style={styles.sectionCard}>
             <Text style={styles.sectionHeaderTitle}>Rental Packages & Pricing</Text>
-            {venue.packages.map((pkg, idx) => (
+            {venuePackages.map((pkg, idx) => (
               <View key={idx} style={styles.packageCard}>
                 <View style={styles.packageHeader}>
                   <Text style={styles.packageTitle}>{pkg.title}</Text>
