@@ -9,7 +9,7 @@ import {
   Modal,
   TextInput,
   Linking,
-} from 'react-native-web';
+} from 'react-native';
 import {
   ChevronLeft,
   Heart,

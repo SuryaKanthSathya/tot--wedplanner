@@ -6,7 +6,7 @@ import {
   ScrollView,
   Image,
   StyleSheet,
-} from 'react-native-web';
+} from 'react-native';
 import { Bookmark, Star, MapPin, Heart, Camera, Sparkles, Flower2, Building2, Music, Mail, Palette, Utensils, Scissors, ArrowLeft, Scale, ChevronRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { PhotographyStudio, STUDIOS_DATA } from './PhotographyListingPage';

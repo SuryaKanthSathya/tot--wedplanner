@@ -794,6 +794,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           onToggleSavedCar={toggleSavedCar}
           savedInviteIds={savedInviteIds}
           onToggleSavedInvite={toggleSavedInvite}
+          savedRitualsIds={savedRitualsIds}
+          onToggleSavedRitual={toggleSavedRitual}
           onNavigateToHome={() => setActiveTab('home')}
         />
       ) : activeTab === 'quotes' ? (

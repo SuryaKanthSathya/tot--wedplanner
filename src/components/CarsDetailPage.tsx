@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Modal,
   TextInput,
   Linking,
-} from 'react-native-web';
+} from 'react-native';
 import {
   ChevronLeft,
   Heart,

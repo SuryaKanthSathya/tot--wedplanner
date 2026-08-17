@@ -7,7 +7,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,

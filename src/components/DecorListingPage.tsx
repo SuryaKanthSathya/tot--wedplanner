@@ -8,7 +8,7 @@ import {
   Image,
   TextInput,
   Modal,
-} from 'react-native-web';
+} from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { DecorDetailPage, DecorStudio } from './DecorDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';

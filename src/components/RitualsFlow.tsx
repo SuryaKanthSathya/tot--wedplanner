@@ -7,7 +7,7 @@ import {
   ScrollView,
   Image,
   TextInput,
-} from 'react-native-web';
+} from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronLeft,
@@ -419,7 +419,7 @@ const ReligionSelectionScreen: React.FC<ReligionSelectionScreenProps> = ({ onBac
       >
         {/* Hero Text */}
         <View style={selStyles.heroSection}>
-          <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}&amp; Ceremony</Text>
+          <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}& Ceremony</Text>
           <Text style={selStyles.heroSubtitle}>
             Choose your wedding tradition to find the right ceremony services and vendors.
           </Text>
@@ -714,6 +714,7 @@ interface RitualsFlowProps {
   onNavigateToQuotesTab?: () => void;
   savedRitualsIds?: Record<string, boolean>;
   onToggleSavedRitual?: (id: string) => void;
+  initialReligion?: ReligionType | null;
 }
 
 export const RitualsFlow: React.FC<RitualsFlowProps> = ({
@@ -721,14 +722,21 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
   onNavigateToQuotesTab,
   savedRitualsIds = {},
   onToggleSavedRitual = () => {},
+  initialReligion = null,
 }) => {
-  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(null);
+  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(initialReligion);
 
   if (selectedReligion) {
     return (
       <RitualsListingPage
         religion={selectedReligion}
-        onBack={() => setSelectedReligion(null)}
+        onBack={() => {
+          if (initialReligion) {
+            onBack();
+          } else {
+            setSelectedReligion(null);
+          }
+        }}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={onToggleSavedRitual}
