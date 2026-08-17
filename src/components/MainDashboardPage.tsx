@@ -132,6 +132,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
   const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
   const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
+  const [vendorNavSource, setVendorNavSource] = useState<'home' | 'find_vendors'>('home');
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
   const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
@@ -467,59 +468,64 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     };
   }, []);
 
-  const handleOptionPress = (featureName: string) => {
-    if (featureName === 'Photography') {
+  const handleOptionPress = (featureName: string, source: 'home' | 'find_vendors' = 'home') => {
+    setVendorNavSource(source);
+    const fn = (featureName || '').toLowerCase().trim();
+
+    if (fn.includes('photo')) {
       setShowPhotographyListing(true);
       return;
     }
-    if (featureName === 'Makeup' || featureName === 'Bridal & Groom Makeup') {
+    if (fn.includes('makeup') || fn.includes('beauty')) {
       setShowMakeupListing(true);
       return;
     }
-    if (featureName === 'Decor' || featureName === 'Stage & Mandap Decor') {
+    if (fn.includes('decor') || fn.includes('stage')) {
       setShowDecorListing(true);
       return;
     }
-    if (featureName === 'Venue' || featureName === 'Mandapams & Venues') {
+    if (fn.includes('venue') || fn.includes('mandapam') || fn.includes('hall') || fn.includes('resort') || fn.includes('palace')) {
       setShowVenueListing(true);
       return;
     }
-    if (featureName === 'Entertainment' || featureName === 'DJs & Music') {
+    if (fn.includes('entertain') || fn.includes('music') || fn.includes('dj')) {
       setShowEntertainmentListing(true);
       return;
     }
-    if (featureName === 'Invitations' || featureName === 'Wedding Cards & Invites') {
+    if (fn.includes('invit') || fn.includes('card') || fn.includes('myinvitation')) {
       setShowInvitationListing(true);
       return;
     }
-    if (featureName === 'Cars') {
+    if (fn.includes('car') || fn.includes('transport') || fn.includes('travel')) {
       setShowCarsListing(true);
       return;
     }
-    if (featureName === 'Destination Wedding') {
+    if (fn.includes('destination')) {
       setShowDestinationWeddingFlow(true);
       return;
     }
-    if (featureName === 'Plan My Entire Wedding') {
+    if (fn.includes('entire wedding') || fn.includes('plan my entire')) {
       window.scrollTo(0, 0);
       setShowDestinationWeddingFlow(true);
+      return;
     }
-    if (featureName === 'Mehendi') {
+    if (fn.includes('mehendi')) {
       setShowMehendiListing(true);
       return;
     }
-    if (featureName === 'Catering') {
+    if (fn.includes('cater') || fn.includes('food')) {
       setShowCateringListing(true);
       return;
     }
-    if (featureName === 'Rituals') {
+    if (fn.includes('ritual') || fn.includes('pooja') || fn.includes('iyer') || fn.includes('pastor') || fn.includes('imam')) {
       setShowRitualsFlow(true);
       return;
     }
-    if (featureName === 'Find Individual Vendors') {
+    if (fn.includes('find individual') || fn.includes('find vendor')) {
       setShowFindVendorsPage(true);
       return;
     }
+
     if (featureName === 'Plan My Entire Wedding') {
       if (onNavigateToCoupleOnboarding) {
         onNavigateToCoupleOnboarding();
@@ -543,15 +549,30 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     setShowProfileModal(true);
   };
 
+  const handleListingBack = () => {
+    setShowPhotographyListing(false);
+    setShowMakeupListing(false);
+    setShowDecorListing(false);
+    setShowVenueListing(false);
+    setShowEntertainmentListing(false);
+    setShowCarsListing(false);
+    setShowInvitationListing(false);
+    setShowMehendiListing(false);
+    setShowCateringListing(false);
+    setShowDestinationWeddingFlow(false);
+    setShowRitualsFlow(false);
 
+    if (vendorNavSource === 'find_vendors') {
+      setShowFindVendorsPage(true);
+    } else {
+      setShowFindVendorsPage(false);
+    }
+  };
 
   if (showPhotographyListing) {
     return (
       <PhotographyListingPage
-        onBack={() => {
-          setShowPhotographyListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
         onNavigateToQuotesTab={() => {
@@ -566,10 +587,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMakeupListing) {
     return (
       <MakeupListingPage
-        onBack={() => {
-          setShowMakeupListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
         onNavigateToQuotesTab={() => {
@@ -584,10 +602,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDecorListing) {
     return (
       <DecorListingPage
-        onBack={() => {
-          setShowDecorListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
         onNavigateToQuotesTab={() => {
@@ -602,10 +617,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showVenueListing) {
     return (
       <VenueListingPage
-        onBack={() => {
-          setShowVenueListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
         onNavigateToQuotesTab={() => {
@@ -620,10 +632,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showEntertainmentListing) {
     return (
       <EntertainmentListingPage
-        onBack={() => {
-          setShowEntertainmentListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
         onNavigateToQuotesTab={() => {
@@ -638,10 +647,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCarsListing) {
     return (
       <CarsListingPage
-        onBack={() => {
-          setShowCarsListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
         onNavigateToQuotesTab={() => {
@@ -656,10 +662,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showInvitationListing) {
     return (
       <InvitationListingPage
-        onBack={() => {
-          setShowInvitationListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
         onNavigateToQuotesTab={() => {
@@ -674,10 +677,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showDestinationWeddingFlow) {
     return (
       <DestinationWeddingFlow
-        onBack={() => {
-          setShowDestinationWeddingFlow(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
@@ -689,10 +689,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showMehendiListing) {
     return (
       <MehendiListingPage
-        onBack={() => {
-          setShowMehendiListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
         onNavigateToQuotesTab={() => {
@@ -707,10 +704,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showCateringListing) {
     return (
       <CateringListingPage
-        onBack={() => {
-          setShowCateringListing(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
         onNavigateToQuotesTab={() => {
@@ -725,10 +719,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showRitualsFlow) {
     return (
       <RitualsFlow
-        onBack={() => {
-          setShowRitualsFlow(false);
-          setShowFindVendorsPage(true);
-        }}
+        onBack={handleListingBack}
         onNavigateToQuotesTab={() => {
           setShowRitualsFlow(false);
           setActiveTab('quotes');
@@ -744,7 +735,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <FindVendorsPage
         onBack={() => setShowFindVendorsPage(false)}
         onSelectCategory={(category) => {
-          handleOptionPress(category);
+          handleOptionPress(category, 'find_vendors');
         }}
       />
     );
