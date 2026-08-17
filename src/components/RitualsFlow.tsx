@@ -465,6 +465,7 @@ interface RitualsListingPageProps {
   onNavigateToQuotesTab?: () => void;
   savedRitualsIds: Record<string, boolean>;
   onToggleSavedRitual: (id: string) => void;
+  bookingSource?: 'entire_wedding' | 'individual';
 }
 
 const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
@@ -473,6 +474,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
   onNavigateToQuotesTab,
   savedRitualsIds,
   onToggleSavedRitual,
+  bookingSource = 'entire_wedding',
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('All Cities');
@@ -529,6 +531,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
         onBack={() => setSelectedVendor(null)}
         isBookmarked={Boolean(savedRitualsIds[selectedVendor.id])}
         onToggleBookmark={onToggleSavedRitual}
+        bookingSource={bookingSource}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
       />
     );
@@ -715,6 +718,7 @@ interface RitualsFlowProps {
   savedRitualsIds?: Record<string, boolean>;
   onToggleSavedRitual?: (id: string) => void;
   initialReligion?: ReligionType | null;
+  bookingSource?: 'entire_wedding' | 'individual';
 }
 
 export const RitualsFlow: React.FC<RitualsFlowProps> = ({
@@ -723,6 +727,7 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
   savedRitualsIds = {},
   onToggleSavedRitual = () => {},
   initialReligion = null,
+  bookingSource = 'entire_wedding',
 }) => {
   const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(initialReligion);
 
@@ -740,6 +745,7 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={onToggleSavedRitual}
+        bookingSource={bookingSource}
       />
     );
   }
