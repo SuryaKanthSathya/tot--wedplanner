@@ -843,6 +843,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
         onToggleSavedRitual={onToggleSavedRitual}
         onNavigateToQuotesTab={onOpenQuotesTab}
         initialReligion={userReligion}
+        bookingSource="entire_wedding"
       />
     );
   }
