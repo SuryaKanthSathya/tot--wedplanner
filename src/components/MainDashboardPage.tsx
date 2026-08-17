@@ -888,34 +888,134 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           </View>
 
 
-          {/* ================= SECTION 2: Destination Wedding Banner ================= */}
-          <motion.div
-            whileHover={{ scale: 1.03, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-            className="w-full cursor-pointer"
-            onClick={() => handleOptionPress('Destination Wedding')}
-          >
-            <View style={styles.destinationBanner}>
-              <View style={styles.bannerTextCol}>
-                <Text style={styles.bannerTitle}>Destination Wedding</Text>
-                <Text style={styles.bannerSubtext}>
-                  Plan your dream wedding at exotic locations
-                </Text>
-              </View>
+          {/* ================= SECTION 2: Venues Collections in Chennai ================= */}
+          {(() => {
+            const venueCollections = [
+              {
+                title: 'Luxury Wedding\nVenues',
+                vendors: '14 Vendors',
+                image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=300&q=80',
+                topColor: '#DB7A0F',
+                bottomColor: '#580511',
+              },
+              {
+                title: 'Budget Wedding\nVenues',
+                vendors: '15 Vendors',
+                image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=300&q=80',
+                topColor: '#D89CA8',
+                bottomColor: '#723847',
+              },
+              {
+                title: 'Beach Wedding\nDestination',
+                vendors: '21 Vendors',
+                image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=300&q=80',
+                topColor: '#A1CEE0',
+                bottomColor: '#053B47',
+              },
+              {
+                title: 'Palace Wedding\nDestinations',
+                vendors: '27 Vendors',
+                image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=300&q=80',
+                topColor: '#B0694B',
+                bottomColor: '#2B160F',
+              },
+              {
+                title: 'Mountain Wedding\nDestinations',
+                vendors: '29 Vendors',
+                image: 'https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=300&q=80',
+                topColor: '#A9B08B',
+                bottomColor: '#22280A',
+              },
+              {
+                title: 'Destination Wedding\nVenues In Rajasthan',
+                vendors: '24 Vendors',
+                image: 'https://images.unsplash.com/photo-1590766258055-14f77c867b14?auto=format&fit=crop&w=300&q=80',
+                topColor: '#DE6F0A',
+                bottomColor: '#421804',
+              },
+              {
+                title: 'Kerala Wedding\nDestinations',
+                vendors: '15 Vendors',
+                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=300&q=80',
+                topColor: '#9C5474',
+                bottomColor: '#36011B',
+              }
+            ];
 
-              {/* Tropical Palm Image Right */}
-              <View style={styles.bannerImageWrapper}>
-                <Image
-                  source={{
-                    uri: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80',
-                  }}
-                  style={styles.bannerImage}
-                  resizeMode="cover"
-                />
+            return (
+              <View style={{ marginTop: 24, marginBottom: 8 }}>
+                <Text style={[styles.servicesTitle, { marginBottom: 12 }]}>Venues Collections in Chennai</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
+                  {venueCollections.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                      className="cursor-pointer"
+                      onClick={() => handleOptionPress('Destination Wedding')}
+                    >
+                      <View style={{
+                        width: 150,
+                        height: 190,
+                        borderRadius: 16,
+                        overflow: 'hidden',
+                        position: 'relative',
+                        backgroundColor: item.topColor
+                      }}>
+                        {/* SVG Curve for the bottom color */}
+                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '70%' }}>
+                          <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
+                            <path d="M0,50 Q50,25 100,75 L100,100 L0,100 Z" fill={item.bottomColor} />
+                          </svg>
+                        </div>
+
+                        {/* Circular Image */}
+                        <View style={{
+                          position: 'absolute',
+                          top: 16,
+                          right: 8,
+                          width: 86,
+                          height: 86,
+                          borderRadius: 43,
+                          borderWidth: 2,
+                          borderColor: 'rgba(255,255,255,0.9)',
+                          overflow: 'hidden',
+                          zIndex: 2,
+                        }}>
+                          <Image source={{ uri: item.image }} style={{ width: '100%', height: '100%' }} />
+                        </View>
+
+                        {/* Text Container at bottom */}
+                        <View style={{
+                          position: 'absolute',
+                          bottom: 16,
+                          left: 12,
+                          right: 12,
+                          zIndex: 3,
+                        }}>
+                          <Text style={{
+                            color: '#FFFFFF',
+                            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                            fontSize: 13,
+                            fontWeight: '600',
+                            marginBottom: 6,
+                            lineHeight: 18,
+                          }}>{item.title}</Text>
+                          <Text style={{
+                            color: 'rgba(255,255,255,0.9)',
+                            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                            fontSize: 11,
+                            fontWeight: '500',
+                          }}>{item.vendors}</Text>
+                        </View>
+                      </View>
+                    </motion.div>
+                  ))}
+                </ScrollView>
               </View>
-            </View>
-          </motion.div>
+            );
+          })()}
           <View style={styles.servicesSection}>
             <View style={styles.servicesHeaderRow}>
               <Text style={styles.servicesTitle}>Popular Services</Text>
