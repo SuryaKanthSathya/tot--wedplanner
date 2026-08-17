@@ -530,7 +530,12 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
     if (fn.includes('entire wedding') || fn.includes('plan my entire')) {
       window.scrollTo(0, 0);
-      setShowDestinationWeddingFlow(true);
+      if (onNavigateToCoupleOnboarding) {
+        onNavigateToCoupleOnboarding();
+      } else {
+        setSelectedFeatureName(featureName);
+        setShowExploreModal(true);
+      }
       return;
     }
     if (fn.includes('mehendi')) {
