@@ -58,6 +58,10 @@ import {
   getIndividualBookings,
   saveOrUpdateWeddingBooking,
 } from '../utils/weddingPaymentsManager';
+import {
+  QuoteItem,
+  getAllQuotes,
+} from '../utils/quotesManager';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
 import stageEntertainmentImg from '../assets/images/guest_banquet_hall_stage_1786471284070.jpg';
@@ -253,6 +257,62 @@ function calculateDaysLeft(dateString?: string): number {
   return 126;
 }
 
+const matchServiceCategory = (targetCat: string, itemCategory: string, itemTitle: string) => {
+  const normCat = (itemCategory || '').toLowerCase();
+  const normTitle = (itemTitle || '').toLowerCase();
+  const t = (targetCat || '').toLowerCase();
+
+  if (t.includes('photo') && (normCat.includes('photo') || normCat.includes('media') || normTitle.includes('photo') || normTitle.includes('videograph'))) return true;
+  if (t.includes('makeup') && (normCat.includes('makeup') || normCat.includes('beauty') || normTitle.includes('makeup') || normTitle.includes('bridal'))) return true;
+  if (t.includes('decor') && (normCat.includes('decor') || normTitle.includes('decor') || normTitle.includes('theme') || normTitle.includes('mandap'))) return true;
+  if ((t.includes('cater') || t.includes('food')) && (normCat.includes('cater') || normCat.includes('food') || normTitle.includes('cater') || normTitle.includes('food') || normTitle.includes('menu'))) return true;
+  if (t.includes('venue') && (normCat.includes('venue') || normTitle.includes('venue') || normTitle.includes('mandapam') || normTitle.includes('hall') || normTitle.includes('palace') || normTitle.includes('resort'))) return true;
+  if ((t.includes('entertain') || t.includes('music') || t.includes('dj')) && (normCat.includes('entertain') || normCat.includes('music') || normTitle.includes('music') || normTitle.includes('dj') || normTitle.includes('entertain') || normTitle.includes('band'))) return true;
+  if ((t.includes('invit') || t.includes('card')) && (normCat.includes('invit') || normCat.includes('card') || normTitle.includes('invit') || normTitle.includes('card'))) return true;
+  if ((t.includes('car') || t.includes('travel') || t.includes('transport') || t.includes('bus')) && (normCat.includes('car') || normCat.includes('travel') || normTitle.includes('travel') || normTitle.includes('car') || normTitle.includes('transport') || normTitle.includes('stay') || normTitle.includes('guest'))) return true;
+  if (t.includes('mehendi') && (normCat.includes('mehendi') || normTitle.includes('mehendi'))) return true;
+  if ((t.includes('pooja') || t.includes('ritual') || t.includes('iyer') || t.includes('pastor') || t.includes('imam') || t.includes('pandit')) && (normCat.includes('pooja') || normCat.includes('ritual') || normTitle.includes('pooja') || normTitle.includes('ritual') || normTitle.includes('iyer') || normTitle.includes('pastor') || normTitle.includes('imam') || normTitle.includes('pandit'))) return true;
+
+  return normCat === t || normTitle.includes(t) || (t.length > 3 && normTitle.includes(t));
+};
+
+export const getCategoryQuoteStatus = (
+  itemCategory: string,
+  itemTitle: string,
+  quotesList: QuoteItem[],
+  bookingsList: WeddingVendorBooking[]
+): { isConfirmed: boolean; vendorName?: string } => {
+  // 1. Check confirmed quotes from quotesManager
+  const confirmedQuote = quotesList.find((q) => {
+    const isStatusConfirmed = q.status === 'confirmed' || q.paymentStatus === 'partially_paid' || q.paymentStatus === 'fully_paid';
+    return isStatusConfirmed && (
+      matchServiceCategory(q.category, itemCategory, itemTitle) ||
+      matchServiceCategory(q.packageName, itemCategory, itemTitle) ||
+      matchServiceCategory(q.vendorName, itemCategory, itemTitle)
+    );
+  });
+
+  if (confirmedQuote) {
+    return { isConfirmed: true, vendorName: confirmedQuote.vendorName };
+  }
+
+  // 2. Check bookings from weddingPaymentsManager
+  const confirmedBooking = bookingsList.find((b) => {
+    const isBookingConfirmed = b.status === 'confirmed' || b.status === 'partially_paid' || b.status === 'fully_paid' || (b.paidAmount && b.paidAmount > 0);
+    return isBookingConfirmed && (
+      matchServiceCategory(b.category, itemCategory, itemTitle) ||
+      matchServiceCategory(b.serviceType, itemCategory, itemTitle) ||
+      matchServiceCategory(b.vendorName, itemCategory, itemTitle)
+    );
+  });
+
+  if (confirmedBooking) {
+    return { isConfirmed: true, vendorName: confirmedBooking.vendorName };
+  }
+
+  return { isConfirmed: false };
+};
+
 const FloralSideIllustration: React.FC<{ side: 'left' | 'right' }> = ({ side }) => {
   const isLeft = side === 'left';
   const prefix = isLeft ? 'rhl' : 'rhr';
@@ -416,25 +476,9 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
 }) => {
   const [activeSegment, setActiveSegment] = useState<'overview' | 'payment'>('overview');
   const [weddingBookings, setWeddingBookings] = useState<WeddingVendorBooking[]>(() => {
-    const list = getEntireWeddingBookings();
-    if (list.length === 0) {
-      return [
-        saveOrUpdateWeddingBooking({
-          vendorId: 'studio-1',
-          vendorName: 'Memories Studio',
-          category: 'Photography',
-          serviceType: 'Wedding Photography',
-          image: exactWeddingCoupleImg,
-          location: 'Chennai, Tamil Nadu',
-          weddingDate: '15 Dec 2026',
-          totalAmount: 90000,
-          status: 'confirmed',
-          bookingSource: 'entire_wedding',
-        }),
-      ];
-    }
-    return list;
+    return getEntireWeddingBookings();
   });
+  const [quotes, setQuotes] = useState<QuoteItem[]>(() => getAllQuotes());
 
   const [selectedInvoiceVendor, setSelectedInvoiceVendor] = useState<{
     vendorId: string;
@@ -451,6 +495,9 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   useEffect(() => {
     const handleUpdate = () => {
       setWeddingBookings(getEntireWeddingBookings());
+    };
+    const handleQuotesUpdate = () => {
+      setQuotes(getAllQuotes());
     };
     const handleNotifUpdate = () => {
       setNotifications(getNotifications());
@@ -470,10 +517,12 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       setActiveSegment('payment');
     };
     window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    window.addEventListener('tot_quotes_updated', handleQuotesUpdate);
     window.addEventListener('tot_notifications_updated', handleNotifUpdate);
     window.addEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
     return () => {
       window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+      window.removeEventListener('tot_quotes_updated', handleQuotesUpdate);
       window.removeEventListener('tot_notifications_updated', handleNotifUpdate);
       window.removeEventListener('tot_switch_to_my_wedding_payments', handleSwitchToPayments);
     };
@@ -552,18 +601,47 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const poojaService = getPoojaServiceData();
   const isIntercaste = (weddingProfile?.marriageType || 'Hindu').includes('Intercaste');
 
-  // Initial services checklist items
-  const [checklist, setChecklist] = useState<ChecklistItem[]>([
+  const CHECKLIST_STORAGE_KEY = 'tot_wedding_checklist_items';
+
+  const defaultChecklistItems: ChecklistItem[] = [
     { id: '1', title: 'Wedding Date Fixed', category: 'General', completed: true },
-    { id: '2', title: 'Venue Booking', category: 'Venue', completed: true },
-    { id: '3', title: 'Photography & Videography', category: 'Media', completed: true },
-    { id: '4', title: 'Bridal & Groom Makeup', category: 'Beauty', completed: false },
+    { id: '2', title: 'Venue Booking', category: 'Venue', completed: false },
+    { id: '3', title: 'Photography & Videography', category: 'Photography', completed: false },
+    { id: '4', title: 'Bridal & Groom Makeup', category: 'Makeup', completed: false },
     { id: '5', title: 'Decor & Theme Design', category: 'Decor', completed: false },
-    { id: '6', title: 'Catering & Food Menu', category: 'Food', completed: false },
-    { id: '7', title: 'Wedding Invitations', category: 'Cards', completed: false },
-    { id: '8', title: 'Music & DJ Entertainment', category: 'Music', completed: false },
-    { id: '9', title: 'Guest Travel & Stay Arrangements', category: 'Travel', completed: false },
-  ]);
+    { id: '6', title: 'Catering & Food Menu', category: 'Catering', completed: false },
+    { id: '7', title: 'Wedding Invitations', category: 'Invitation', completed: false },
+    { id: '8', title: 'Music & DJ Entertainment', category: 'Entertainment', completed: false },
+    { id: '9', title: 'Guest Travel & Stay Arrangements', category: 'Cars', completed: false },
+  ];
+
+  // Services checklist items
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading checklist from storage:', e);
+    }
+    return defaultChecklistItems;
+  });
+
+  const updateChecklist = (newListOrFn: ChecklistItem[] | ((prev: ChecklistItem[]) => ChecklistItem[])) => {
+    setChecklist((prev) => {
+      const next = typeof newListOrFn === 'function' ? newListOrFn(prev) : newListOrFn;
+      try {
+        localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(next));
+      } catch (e) {
+        console.warn('Error saving checklist:', e);
+      }
+      return next;
+    });
+  };
 
   const [newServiceInput, setNewServiceInput] = useState('');
   const [showAddInput, setShowAddInput] = useState(false);
@@ -738,7 +816,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
 
 
   const toggleChecklist = (id: string) => {
-    setChecklist((prev) =>
+    updateChecklist((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, completed: !item.completed } : item
       )
@@ -746,18 +824,19 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   };
 
   const removeChecklist = (id: string) => {
-    setChecklist((prev) => prev.filter((item) => item.id !== id));
+    updateChecklist((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleAddService = () => {
     if (!newServiceInput.trim()) return;
+    const trimmed = newServiceInput.trim();
     const newItem: ChecklistItem = {
       id: Date.now().toString(),
-      title: newServiceInput.trim(),
-      category: 'Custom',
+      title: trimmed,
+      category: trimmed,
       completed: false,
     };
-    setChecklist((prev) => [...prev, newItem]);
+    updateChecklist((prev) => [...prev, newItem]);
     setNewServiceInput('');
     setShowAddInput(false);
   };
@@ -863,7 +942,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                   }
 
                   if (!checklist.some((c) => c.title.toLowerCase().includes(service.name.toLowerCase()))) {
-                    setChecklist((prev) => [
+                    updateChecklist((prev) => [
                       ...prev,
                       { id: Date.now().toString(), title: service.name, category: service.name, completed: false },
                     ]);
@@ -896,7 +975,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                 style={{ width: '64%', alignItems: 'center' }}
                 onClick={() => {
                   if (!checklist.some((c) => c.title.toLowerCase().includes(poojaService.name.toLowerCase()))) {
-                    setChecklist((prev) => [
+                    updateChecklist((prev) => [
                       ...prev,
                       { id: Date.now().toString(), title: poojaService.name, category: poojaService.name, completed: false },
                     ]);
@@ -1250,75 +1329,115 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                       No services in checklist. Tap "+ Add Service" to add one.
                     </Text>
                   ) : (
-                    checklist.map((item) => (
-                      <div key={item.id}>
-                        <View style={[
-                          styles.checklistItemRow,
-                          item.completed && { backgroundColor: '#F0F7EC', borderColor: '#D4E5CD' }
-                        ]}>
-                          <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => {
-                              setChecklist((prev) =>
-                                prev.map((c) =>
-                                  c.id === item.id ? { ...c, completed: true } : c
-                                )
-                              );
+                    checklist.map((item) => {
+                      const quoteStatus = getCategoryQuoteStatus(item.category, item.title, quotes, weddingBookings);
+                      const isItemCompleted = item.completed || quoteStatus.isConfirmed;
 
-                              const t = item.title.toLowerCase();
-                              if (t.includes('photo')) {
-                                setShowPhotographyListing(true);
-                                return;
-                              }
-                              if (t.includes('makeup') || t.includes('beauty')) {
-                                setShowMakeupListing(true);
-                                return;
-                              }
-                              if (t.includes('decor')) {
-                                setShowDecorListing(true);
-                                return;
-                              }
-                              if (t.includes('venue')) {
-                                setShowVenueListing(true);
-                                return;
-                              }
-                              if (t.includes('music') || t.includes('dj') || t.includes('entertainment')) {
-                                setShowEntertainmentListing(true);
-                                return;
-                              }
-                              if (t.includes('invitat') || t.includes('card')) {
-                                setShowInvitationListing(true);
-                                return;
-                              }
-                              if (t.includes('car') || t.includes('bus') || t.includes('transport')) {
-                                setShowCarsListing(true);
-                                return;
-                              }
-                            }}
-                            style={{ flex: 1, paddingVertical: 2 }}
+                      return (
+                        <div key={item.id}>
+                          <View
+                            style={[
+                              styles.checklistItemRow,
+                              isItemCompleted && {
+                                backgroundColor: '#F0F7EC',
+                                borderColor: '#D4E5CD',
+                              },
+                            ]}
                           >
-                            <Text
-                              style={[
-                                styles.checklistItemText,
-                                { marginLeft: 0 },
-                                item.completed && styles.checklistItemTextCompleted,
-                              ]}
+                            {/* Toggle Checkbox Icon */}
+                            <TouchableOpacity
+                              activeOpacity={0.7}
+                              onPress={() => toggleChecklist(item.id)}
+                              style={{ paddingRight: 8, paddingVertical: 2 }}
+                              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                             >
-                              {item.title}
-                            </Text>
-                          </TouchableOpacity>
+                              {isItemCompleted ? (
+                                <CheckCircle2 className="w-4 h-4 text-[#2E7D32]" />
+                              ) : (
+                                <Circle className="w-4 h-4 text-[#C4B4B6]" />
+                              )}
+                            </TouchableOpacity>
 
-                          <TouchableOpacity
-                            activeOpacity={0.7}
-                            onPress={() => removeChecklist(item.id)}
-                            style={styles.deleteBtn}
-                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                          >
-                            <Trash2 className="w-4 h-4 text-[#A1999A]" />
-                          </TouchableOpacity>
-                        </View>
-                      </div>
-                    ))
+                            {/* Service Content & Listing Navigation */}
+                            <TouchableOpacity
+                              activeOpacity={0.7}
+                              onPress={() => {
+                                const t = item.title.toLowerCase();
+                                const c = (item.category || '').toLowerCase();
+                                if (t.includes('photo') || c.includes('photo')) {
+                                  setShowPhotographyListing(true);
+                                  return;
+                                }
+                                if (t.includes('makeup') || t.includes('beauty') || c.includes('makeup')) {
+                                  setShowMakeupListing(true);
+                                  return;
+                                }
+                                if (t.includes('decor') || c.includes('decor')) {
+                                  setShowDecorListing(true);
+                                  return;
+                                }
+                                if (t.includes('cater') || t.includes('food') || c.includes('cater')) {
+                                  setShowCateringListing(true);
+                                  return;
+                                }
+                                if (t.includes('mehendi') || c.includes('mehendi')) {
+                                  setShowMehendiListing(true);
+                                  return;
+                                }
+                                if (t.includes('venue') || c.includes('venue')) {
+                                  setShowVenueListing(true);
+                                  return;
+                                }
+                                if (t.includes('music') || t.includes('dj') || t.includes('entertainment') || c.includes('entertain')) {
+                                  setShowEntertainmentListing(true);
+                                  return;
+                                }
+                                if (t.includes('invitat') || t.includes('card') || c.includes('invitat')) {
+                                  setShowInvitationListing(true);
+                                  return;
+                                }
+                                if (t.includes('car') || t.includes('bus') || t.includes('transport') || c.includes('car')) {
+                                  setShowCarsListing(true);
+                                  return;
+                                }
+                                toggleChecklist(item.id);
+                              }}
+                              style={{ flex: 1, paddingVertical: 2 }}
+                            >
+                              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
+                                <Text
+                                  style={[
+                                    styles.checklistItemText,
+                                    { marginLeft: 0 },
+                                    isItemCompleted && styles.checklistItemTextCompleted,
+                                  ]}
+                                >
+                                  {item.title}
+                                </Text>
+
+                                {quoteStatus.isConfirmed && (
+                                  <View style={styles.quoteConfirmedBadge}>
+                                    <Sparkles className="w-3 h-3 text-[#2E7D32]" />
+                                    <Text style={styles.quoteConfirmedBadgeText}>
+                                      {quoteStatus.vendorName ? `Quote Confirmed: ${quoteStatus.vendorName}` : 'Quote Confirmed'}
+                                    </Text>
+                                  </View>
+                                )}
+                              </View>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                              activeOpacity={0.7}
+                              onPress={() => removeChecklist(item.id)}
+                              style={styles.deleteBtn}
+                              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                            >
+                              <Trash2 className="w-4 h-4 text-[#A1999A]" />
+                            </TouchableOpacity>
+                          </View>
+                        </div>
+                      );
+                    })
                   )}
                 </View>
               </View>
@@ -1846,7 +1965,24 @@ const styles: any = StyleSheet.create({
     flex: 1,
   },
   checklistItemTextCompleted: {
-    color: '#557A46',
+    color: '#2E7D32',
+  },
+  quoteConfirmedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 0.5,
+    borderColor: '#C8E6C9',
+  },
+  quoteConfirmedBadgeText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#2E7D32',
   },
   deleteBtn: {
     padding: 6,
