@@ -710,11 +710,12 @@ const styles = StyleSheet.create({
   mainContentCard: {
     marginTop: -28,
     backgroundColor: '#FAF7F2',
-    borderRadius: 20,
-    width: '90%',
-    maxWidth: 450,
-    
-    paddingHorizontal: 16,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+paddingHorizontal: 16,
     paddingTop: 18,
   },
   studioHeaderRow: {
@@ -1229,7 +1230,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: '90%',
     maxWidth: 450,
-    
     paddingHorizontal: 18,
     paddingTop: 16,
     paddingBottom: 24,

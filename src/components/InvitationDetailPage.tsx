@@ -770,11 +770,12 @@ const styles = StyleSheet.create({
   mainCard: {
     marginTop: 220,
     backgroundColor: '#FAF7F2',
-    borderRadius: 20,
-    width: '90%',
-    maxWidth: 450,
-    
-    minHeight: 800,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+minHeight: 800,
     paddingHorizontal: 16,
     paddingTop: 24,
     zIndex: 10,
