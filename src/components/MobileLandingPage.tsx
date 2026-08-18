@@ -382,6 +382,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '75%',
+    maxWidth: 280,
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 14,

@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   mainCanvasDesktop: {
     width: '100%',
     height: '100vh' as any,
-    maxWidth: 1200,
     marginHorizontal: 'auto',
     backgroundColor: '#FAF6EE',
   },

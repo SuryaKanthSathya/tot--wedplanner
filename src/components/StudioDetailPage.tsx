@@ -710,8 +710,10 @@ const styles = StyleSheet.create({
   mainContentCard: {
     marginTop: -28,
     backgroundColor: '#FAF7F2',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderRadius: 20,
+    width: '90%',
+    maxWidth: 450,
+    
     paddingHorizontal: 16,
     paddingTop: 18,
   },
@@ -1218,12 +1220,16 @@ const styles = StyleSheet.create({
   quoteBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
   },
   quoteModalSheet: {
     backgroundColor: '#FAF7F2',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 20,
+    width: '90%',
+    maxWidth: 450,
+    
     paddingHorizontal: 18,
     paddingTop: 16,
     paddingBottom: 24,

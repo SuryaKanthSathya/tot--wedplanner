@@ -113,7 +113,7 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
 
   return (
     <View style={[{ flex: 1, backgroundColor: '#FAF6EE' }]}>
-      <View style={[styles.container, isDesktop && { maxWidth: 1000, marginHorizontal: 'auto', borderWidth: 1, borderColor: '#EBE2D7', borderRadius: 24, overflow: 'hidden', marginVertical: 16 }]}>
+      <View style={[styles.container]}>
         {/* ================= HEADER ================= */}
       <View style={styles.headerRow}>
         <TouchableOpacity
@@ -213,12 +213,12 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full"
+            className="w-full max-w-3xl mx-auto"
           >
             <Text style={styles.sectionTitle}>Categories</Text>
 
-        <div className="grid grid-cols-3 gap-x-3 gap-y-6 w-full">
-          {categories.map((category) => (
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-x-4 gap-y-6 w-full px-4">
+          {[...categories, ritualCategory].map((category) => (
             <motion.div
               key={category.id}
               whileHover={{ scale: 1.05 }}
@@ -238,26 +238,6 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
             </motion.div>
           ))}
         </div>
-
-        {/* Wide Ritual Category */}
-        <View style={styles.wideCategoryWrapper}>
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex flex-col items-center cursor-pointer w-full"
-            onClick={() => onSelectCategory(ritualCategory.id)}
-          >
-            <View style={styles.wideImageContainer}>
-              <Image
-                source={{ uri: ritualCategory.image }}
-                style={styles.wideCategoryImage}
-                resizeMode="cover"
-              />
-            </View>
-            <Text style={styles.categoryName}>{ritualCategory.name}</Text>
-            <Text style={styles.vendorsCount}>{ritualCategory.vendorsCount}</Text>
-          </motion.div>
-        </View>
           </motion.div>
         )}
       </ScrollView>

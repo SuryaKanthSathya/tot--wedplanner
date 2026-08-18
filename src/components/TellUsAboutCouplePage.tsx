@@ -1531,6 +1531,9 @@ const styles: any = StyleSheet.create({
   scrollContent: {
     gap: 16,
     paddingBottom: 12,
+    width: '100%',
+    maxWidth: 640,
+    alignSelf: 'center',
   },
   titleContainer: {
     alignItems: 'flex-start',
@@ -1898,6 +1901,8 @@ const styles: any = StyleSheet.create({
   },
   primaryButton: {
     width: '100%',
+    maxWidth: 360,
+    alignSelf: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 14,

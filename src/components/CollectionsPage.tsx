@@ -347,7 +347,10 @@ const VenueActions = ({ venue }) => {
       </TouchableOpacity>
       
       <TouchableOpacity style={styles.iconBtn} onPress={handleWhatsApp}>
-        <Text style={{ color: '#25D366', fontSize: 16, fontWeight: '800' }}>WA</Text>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#25D366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+          <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
+        </svg>
       </TouchableOpacity>
       
       <TouchableOpacity style={styles.iconBtn} onPress={handleCall}>
@@ -522,16 +525,17 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
         )}
         
         {/* CARDS */}
-        {displayData.map(venue => (
-          <View style={{ paddingHorizontal: 14 }} key={venue.id}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 px-4">
+          {displayData.map(venue => (
             <VenueCard 
+              key={venue.id}
               venue={venue} 
               isSaved={savedVenues[venue.id]} 
               onToggleSave={handleToggleSave}
               onPressCard={() => setSelectedVenue(venue)}
             />
-          </View>
-        ))}
+          ))}
+        </div>
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
@@ -543,7 +547,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FAF7F2',
     width: '100%',
-    maxWidth: 768,
     marginHorizontal: 'auto',
     height: '100vh',
     display: 'flex',

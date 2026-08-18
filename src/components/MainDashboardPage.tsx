@@ -557,7 +557,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setOpenedFromFindVendors(true);
       return;
     }
-    
+
     setSelectedFeatureName(featureName);
     setShowExploreModal(true);
   };
@@ -842,7 +842,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       {isDesktop && !hideTabBar && (
         <View style={styles.desktopSidebar}>
           <Text style={styles.sidebarLogoText}>Tale of Two</Text>
-          
+
           <TouchableOpacity style={styles.sidebarItem} onPress={() => setActiveTab('home')}>
             <Home className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-500'}`} />
             <Text style={[styles.sidebarItemText, activeTab === 'home' && styles.sidebarItemTextActive]}>Home</Text>
@@ -867,684 +867,684 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         </View>
       )}
 
-      <View style={[{ flex: 1, backgroundColor: '#FAF6EE' }, isDesktop && { maxWidth: 1000, marginHorizontal: 'auto', width: '100%', borderWidth: 1, borderColor: '#EBE2D7', borderRadius: 24, marginVertical: 16, overflow: 'hidden' }]}>
+      <View style={[{ flex: 1, backgroundColor: '#FAF6EE' }, isDesktop && { width: '100%', borderWidth: 1, borderColor: '#EBE2D7', borderRadius: 24, margin: 16, overflow: 'hidden' }]}>
         {activeTab === 'my-wedding' ? (
-        <MyWeddingTabScreen
-          userName={userName}
-          weddingProfile={weddingProfile}
-          savedStudioIds={savedStudioIds}
-          onToggleSavedStudio={toggleSavedStudio}
-          savedMakeupIds={savedMakeupIds}
-          onToggleSavedMakeup={toggleSavedMakeup}
-          savedDecorIds={savedDecorIds}
-          onToggleSavedDecor={toggleSavedDecor}
-          savedVenueIds={savedVenueIds}
-          onToggleSavedVenue={toggleSavedVenue}
-          savedEntIds={savedEntIds}
-          onToggleSavedEnt={toggleSavedEnt}
-          savedCarIds={savedCarIds}
-          onToggleSavedCar={toggleSavedCar}
-          savedInviteIds={savedInviteIds}
-          onToggleSavedInvite={toggleSavedInvite}
-          onNavigateToHome={() => setActiveTab('home')}
-        />
-      ) : activeTab === 'quotes' ? (
-        <MyQuotesTabScreen
-          onHideTabBar={setHideTabBar}
-          onExploreVendors={() => setActiveTab('home')}
-        />
-      ) : activeTab === 'profile' ? (
-        <View style={{ flex: 1, backgroundColor: '#FAF6EE' }}>
-          {/* Full Page Header */}
-          <View
-            style={{
-              paddingTop: 48,
-              paddingBottom: 16,
-              alignItems: 'center',
-              backgroundColor: '#F8F4EE',
-              borderBottomWidth: 1,
-              borderBottomColor: '#EFE7DC',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              position: 'relative',
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => setActiveTab('home')}
+          <MyWeddingTabScreen
+            userName={userName}
+            weddingProfile={weddingProfile}
+            savedStudioIds={savedStudioIds}
+            onToggleSavedStudio={toggleSavedStudio}
+            savedMakeupIds={savedMakeupIds}
+            onToggleSavedMakeup={toggleSavedMakeup}
+            savedDecorIds={savedDecorIds}
+            onToggleSavedDecor={toggleSavedDecor}
+            savedVenueIds={savedVenueIds}
+            onToggleSavedVenue={toggleSavedVenue}
+            savedEntIds={savedEntIds}
+            onToggleSavedEnt={toggleSavedEnt}
+            savedCarIds={savedCarIds}
+            onToggleSavedCar={toggleSavedCar}
+            savedInviteIds={savedInviteIds}
+            onToggleSavedInvite={toggleSavedInvite}
+            onNavigateToHome={() => setActiveTab('home')}
+          />
+        ) : activeTab === 'quotes' ? (
+          <MyQuotesTabScreen
+            onHideTabBar={setHideTabBar}
+            onExploreVendors={() => setActiveTab('home')}
+          />
+        ) : activeTab === 'profile' ? (
+          <View style={{ flex: 1, backgroundColor: '#FAF6EE' }}>
+            {/* Full Page Header */}
+            <View
               style={{
-                position: 'absolute',
-                left: 16,
-                top: 48,
-                padding: 4,
-                zIndex: 10,
-              }}
-              activeOpacity={0.7}
-            >
-              <ChevronLeft size={28} color="#581420" />
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                fontSize: 20,
-                fontWeight: '700',
-                color: '#581420',
+                paddingTop: 48,
+                paddingBottom: 16,
+                alignItems: 'center',
+                backgroundColor: '#F8F4EE',
+                borderBottomWidth: 1,
+                borderBottomColor: '#EFE7DC',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                position: 'relative',
               }}
             >
-              {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
-            </Text>
-          </View>
-
-          {/* Profile Segment Tab Bar */}
-          <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6 }}>
-            <View style={styles.profileTabBar}>
               <TouchableOpacity
-                style={[
-                  styles.profileTabItem,
-                  profileActiveTab === 'profile' && styles.profileTabItemActive,
-                ]}
-                onPress={() => setProfileActiveTab('profile')}
-                activeOpacity={0.8}
+                onPress={() => setActiveTab('home')}
+                style={{
+                  position: 'absolute',
+                  left: 16,
+                  top: 48,
+                  padding: 4,
+                  zIndex: 10,
+                }}
+                activeOpacity={0.7}
               >
-                <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
-                <HoverMarquee text="Profile" textStyle={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]} />
+                <ChevronLeft size={28} color="#581420" />
               </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[
-                  styles.profileTabItem,
-                  profileActiveTab === 'mybooking' && styles.profileTabItemActive,
-                ]}
-                onPress={() => setProfileActiveTab('mybooking')}
-                activeOpacity={0.8}
+              <Text
+                style={{
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontSize: 20,
+                  fontWeight: '700',
+                  color: '#581420',
+                }}
               >
-                <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
-                <HoverMarquee text="My Bookings" textStyle={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]} />
-                {profileBookings.length > 0 && (
-                  <View style={styles.profileBadgePill}>
-                    <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+                {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
+              </Text>
             </View>
-          </View>
 
-          {/* Scrollable Content */}
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 14, paddingTop: 8 }}
-          >
-            {profileActiveTab === 'profile' && (
-              <>
-                {/* Avatar & Greeting */}
-                <View style={styles.modalAvatarContainer}>
-                  <View style={styles.modalAvatarCircle}>
-                    <User className="w-10 h-10 text-[#581420]" />
-                  </View>
-                  <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
-                  {userId ? (
-                    <Text
-                      style={{
-                        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                        fontSize: 12,
-                        fontWeight: '600',
-                        color: '#8C8283',
-                        marginTop: -2,
-                      }}
-                    >
-                      ID: {userId}
-                    </Text>
-                  ) : null}
-                  <View style={styles.verifiedBadge}>
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                    <Text style={styles.verifiedBadgeText}>Verified Account</Text>
-                  </View>
-                </View>
-
-                {/* User Details Cards */}
-                <View style={styles.modalDetailsList}>
-                  {/* 1. Full Name */}
-                  <View style={styles.modalDetailRow}>
-                    <View style={styles.modalIconBox}>
-                      <User className="w-4 h-4 text-stone-600" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.modalDetailLabel}>Full Name</Text>
-                      <Text style={styles.modalDetailValue}>{rawName || 'Not Set'}</Text>
-                    </View>
-                  </View>
-
-                  {/* 2. Mobile Number */}
-                  <View style={styles.modalDetailRow}>
-                    <View style={styles.modalIconBox}>
-                      <Phone className="w-4 h-4 text-stone-600" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.modalDetailLabel}>Mobile Number</Text>
-                      <Text style={styles.modalDetailValue}>{displayMobile || 'Not Set'}</Text>
-                    </View>
-                  </View>
-
-                  {/* 3. Email Address */}
-                  <View style={styles.modalDetailRow}>
-                    <View style={styles.modalIconBox}>
-                      <Mail className="w-4 h-4 text-stone-600" />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.modalDetailLabel}>Email Address</Text>
-                      <Text style={styles.modalDetailValue}>{displayEmail || 'Not Set'}</Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Sign Out Button */}
+            {/* Profile Segment Tab Bar */}
+            <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6, width: '100%', maxWidth: 640, alignSelf: 'center' }}>
+              <View style={styles.profileTabBar}>
                 <TouchableOpacity
+                  style={[
+                    styles.profileTabItem,
+                    profileActiveTab === 'profile' && styles.profileTabItemActive,
+                  ]}
+                  onPress={() => setProfileActiveTab('profile')}
                   activeOpacity={0.8}
-                  onPress={() => {
-                    if (onLogout) onLogout();
-                  }}
-                  style={styles.modalLogoutButton}
                 >
-                  <LogOut className="w-4 h-4 text-rose-700" />
-                  <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
+                  <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                  <HoverMarquee text="Profile" textStyle={[styles.profileTabText, profileActiveTab === 'profile' && styles.profileTabTextActive]} />
                 </TouchableOpacity>
-              </>
-            )}
 
-            {profileActiveTab === 'mybooking' && (
-              <>
-                {profileBookings.length === 0 ? (
-                  <View style={styles.emptyBookingsBox}>
-                    <Briefcase className="w-10 h-10 text-[#C2A6A9]" />
-                    <Text style={styles.emptyBookingsTitle}>No Bookings Yet</Text>
-                    <Text style={styles.emptyBookingsSubtitle}>
-                      You have not confirmed any vendor bookings yet. Browse our wedding services to get started!
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.browseServicesBtn}
-                      onPress={() => {
-                        setShowPhotographyListing(true);
-                      }}
-                      activeOpacity={0.85}
-                    >
-                      <Sparkles className="w-4 h-4 text-white" />
-                      <Text style={styles.browseServicesBtnText}>Browse Vendors</Text>
-                    </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.profileTabItem,
+                    profileActiveTab === 'mybooking' && styles.profileTabItemActive,
+                  ]}
+                  onPress={() => setProfileActiveTab('mybooking')}
+                  activeOpacity={0.8}
+                >
+                  <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
+                  <HoverMarquee text="My Bookings" textStyle={[styles.profileTabText, profileActiveTab === 'mybooking' && styles.profileTabTextActive]} />
+                  {profileBookings.length > 0 && (
+                    <View style={styles.profileBadgePill}>
+                      <Text style={styles.profileBadgePillText}>{profileBookings.length}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Scrollable Content */}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 14, paddingTop: 8, width: '100%', maxWidth: 640, alignSelf: 'center' }}
+            >
+              {profileActiveTab === 'profile' && (
+                <>
+                  {/* Avatar & Greeting */}
+                  <View style={styles.modalAvatarContainer}>
+                    <View style={styles.modalAvatarCircle}>
+                      <User className="w-10 h-10 text-[#581420]" />
+                    </View>
+                    <Text style={styles.modalUserName}>{rawName || 'Guest'}</Text>
+                    {userId ? (
+                      <Text
+                        style={{
+                          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                          fontSize: 12,
+                          fontWeight: '600',
+                          color: '#8C8283',
+                          marginTop: -2,
+                        }}
+                      >
+                        ID: {userId}
+                      </Text>
+                    ) : null}
+                    <View style={styles.verifiedBadge}>
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                      <Text style={styles.verifiedBadgeText}>Verified Account</Text>
+                    </View>
                   </View>
-                ) : (
-                  profileBookings.map((b) => (
-                    <View key={b.id} style={styles.profileBookingCard}>
-                      <View style={styles.profileBookingTop}>
-                        <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
-                        <View style={{ flex: 1 }}>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
-                            <View style={styles.profileCategoryBadge}>
-                              <Text style={styles.profileCategoryText}>{b.category}</Text>
-                            </View>
-                          </View>
-                          <Text style={styles.profileBookingPkg} numberOfLines={1}>{b.packageName}</Text>
-                          <Text style={styles.profileBookingDate}>Event: {b.weddingDate}</Text>
-                        </View>
-                      </View>
 
-                      {/* Amount & Status Summary */}
-                      <View style={styles.profileBookingFinanceRow}>
-                        <View>
-                          <Text style={styles.profileFinanceLabel}>Total Amount</Text>
-                          <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
-                        </View>
-                        <View>
-                          <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
-                          <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
-                            ₹{b.paidAmount.toLocaleString('en-IN')}
-                          </Text>
-                        </View>
-                        <View>
-                          <Text style={styles.profileFinanceLabel}>Remaining</Text>
-                          <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
-                            ₹{b.remainingAmount.toLocaleString('en-IN')}
-                          </Text>
-                        </View>
+                  {/* User Details Cards */}
+                  <View style={styles.modalDetailsList}>
+                    {/* 1. Full Name */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <User className="w-4 h-4 text-stone-600" />
                       </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Full Name</Text>
+                        <Text style={styles.modalDetailValue}>{rawName || 'Not Set'}</Text>
+                      </View>
+                    </View>
 
-                      {/* Action CTA */}
+                    {/* 2. Mobile Number */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <Phone className="w-4 h-4 text-stone-600" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Mobile Number</Text>
+                        <Text style={styles.modalDetailValue}>{displayMobile || 'Not Set'}</Text>
+                      </View>
+                    </View>
+
+                    {/* 3. Email Address */}
+                    <View style={styles.modalDetailRow}>
+                      <View style={styles.modalIconBox}>
+                        <Mail className="w-4 h-4 text-stone-600" />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.modalDetailLabel}>Email Address</Text>
+                        <Text style={styles.modalDetailValue}>{displayEmail || 'Not Set'}</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {/* Sign Out Button */}
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      if (onLogout) onLogout();
+                    }}
+                    style={styles.modalLogoutButton}
+                  >
+                    <LogOut className="w-4 h-4 text-rose-700" />
+                    <Text style={styles.modalLogoutText}>Sign Out / Change Account</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              {profileActiveTab === 'mybooking' && (
+                <>
+                  {profileBookings.length === 0 ? (
+                    <View style={styles.emptyBookingsBox}>
+                      <Briefcase className="w-10 h-10 text-[#C2A6A9]" />
+                      <Text style={styles.emptyBookingsTitle}>No Bookings Yet</Text>
+                      <Text style={styles.emptyBookingsSubtitle}>
+                        You have not confirmed any vendor bookings yet. Browse our wedding services to get started!
+                      </Text>
                       <TouchableOpacity
-                        style={styles.profileInvoiceBtn}
+                        style={styles.browseServicesBtn}
                         onPress={() => {
-                          setProfileSelectedBookingVendor({
-                            vendorId: b.vendorId,
-                            vendorName: b.vendorName,
-                            vendorImage: b.image,
-                            vendorLocation: b.location,
-                            category: b.category,
-                            startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
-                          });
+                          setShowPhotographyListing(true);
                         }}
                         activeOpacity={0.85}
                       >
-                        <FileText className="w-4 h-4 text-white" />
-                        <Text style={styles.profileInvoiceBtnText}>View Invoice & Pay</Text>
-                        <ChevronRight className="w-3.5 h-3.5 text-white" />
+                        <Sparkles className="w-4 h-4 text-white" />
+                        <Text style={styles.browseServicesBtnText}>Browse Vendors</Text>
                       </TouchableOpacity>
                     </View>
-                  ))
-                )}
-              </>
-            )}
-          </ScrollView>
-        </View>
-      ) : (
-        /* Scrollable Main Content */
-        <ScrollView
-          style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* ================= HEADER SECTION ================= */}
-          <View style={styles.headerRow}>
-            {/* Left Greeting */}
-            <View style={styles.greetingContainer}>
-              <Text style={styles.greetingTitle}>
-                Hi, {firstName} <Text style={{ fontSize: 18 }}>👋</Text>
-              </Text>
-              <Text style={styles.greetingSubtitle}>
-                Let's plan your perfect wedding
-              </Text>
+                  ) : (
+                    profileBookings.map((b) => (
+                      <View key={b.id} style={styles.profileBookingCard}>
+                        <View style={styles.profileBookingTop}>
+                          <Image source={{ uri: b.image }} style={styles.profileBookingThumb} />
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Text style={styles.profileBookingVendorName}>{b.vendorName}</Text>
+                              <View style={styles.profileCategoryBadge}>
+                                <Text style={styles.profileCategoryText}>{b.category}</Text>
+                              </View>
+                            </View>
+                            <Text style={styles.profileBookingPkg} numberOfLines={1}>{b.packageName}</Text>
+                            <Text style={styles.profileBookingDate}>Event: {b.weddingDate}</Text>
+                          </View>
+                        </View>
+
+                        {/* Amount & Status Summary */}
+                        <View style={styles.profileBookingFinanceRow}>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Total Amount</Text>
+                            <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
+                          </View>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
+                            <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
+                              ₹{b.paidAmount.toLocaleString('en-IN')}
+                            </Text>
+                          </View>
+                          <View>
+                            <Text style={styles.profileFinanceLabel}>Remaining</Text>
+                            <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
+                              ₹{b.remainingAmount.toLocaleString('en-IN')}
+                            </Text>
+                          </View>
+                        </View>
+
+                        {/* Action CTA */}
+                        <TouchableOpacity
+                          style={styles.profileInvoiceBtn}
+                          onPress={() => {
+                            setProfileSelectedBookingVendor({
+                              vendorId: b.vendorId,
+                              vendorName: b.vendorName,
+                              vendorImage: b.image,
+                              vendorLocation: b.location,
+                              category: b.category,
+                              startingPrice: `₹${b.totalAmount.toLocaleString('en-IN')}`,
+                            });
+                          }}
+                          activeOpacity={0.85}
+                        >
+                          <FileText className="w-4 h-4 text-white" />
+                          <Text style={styles.profileInvoiceBtnText}>View Invoice & Pay</Text>
+                          <ChevronRight className="w-3.5 h-3.5 text-white" />
+                        </TouchableOpacity>
+                      </View>
+                    ))
+                  )}
+                </>
+              )}
+            </ScrollView>
+          </View>
+        ) : (
+          /* Scrollable Main Content */
+          <ScrollView
+            style={styles.scrollContainer}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* ================= HEADER SECTION ================= */}
+            <View style={styles.headerRow}>
+              {/* Left Greeting */}
+              <View style={styles.greetingContainer}>
+                <Text style={styles.greetingTitle}>
+                  Hi, {firstName} <Text style={{ fontSize: 18 }}>👋</Text>
+                </Text>
+                <Text style={styles.greetingSubtitle}>
+                  Let's plan your perfect wedding
+                </Text>
+              </View>
+
+              {/* Right Header Icons */}
+              <View style={styles.headerRightActions}>
+                {/* Notification Bell */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.bellButton}
+                  onPress={() => setShowNotificationsModal(true)}
+                >
+                  <Bell className="w-5 h-5 text-stone-700" />
+                  {unreadNotifCount > 0 && (
+                    <View style={styles.bellBadge}>
+                      <Text style={styles.bellBadgeText}>
+                        {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+
+                {/* Neutral Gender-Free Profile Avatar Button */}
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={handleProfilePress}
+                  style={styles.profileAvatarButton}
+                >
+                  {/* Simple neutral minimal icon avatar */}
+                  <View style={styles.avatarInnerCircle}>
+                    <User className="w-5 h-5 text-stone-600" />
+                  </View>
+                </TouchableOpacity>
+              </View>
             </View>
 
-            {/* Right Header Icons */}
-            <View style={styles.headerRightActions}>
-              {/* Notification Bell */}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.bellButton}
-                onPress={() => setShowNotificationsModal(true)}
-              >
-                <Bell className="w-5 h-5 text-stone-700" />
-                {unreadNotifCount > 0 && (
-                  <View style={styles.bellBadge}>
-                    <Text style={styles.bellBadgeText}>
-                      {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+            {/* ================= SECTION 1: "How can Tale of Two help you?" ================= */}
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>
+                How can Tale of Two{'\n'}help you?
+              </Text>
+
+              {/* 2 Side-by-side Cards */}
+              <View style={[styles.helpCardsRow, { gap: 0, justifyContent: 'space-between' }]}>
+                {/* Card 1: Plan My Entire Wedding */}
+                <motion.div
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="cursor-pointer"
+                  style={{ width: '48%' }}
+                  onClick={() => handleOptionPress('Plan My Entire Wedding')}
+                >
+                  <View style={[styles.helpCard, { width: '100%' }]}>
+                    <View style={styles.iconCircle}>
+                      <Building2 className="w-5 h-5 text-white" />
+                    </View>
+                    <Text style={styles.helpCardTitle}>
+                      Plan My Entire{'\n'}Wedding
+                    </Text>
+                    <Text style={styles.helpCardSubtext}>
+                      AI-powered complete wedding planning
                     </Text>
                   </View>
-                )}
-              </TouchableOpacity>
+                </motion.div>
 
-              {/* Neutral Gender-Free Profile Avatar Button */}
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={handleProfilePress}
-                style={styles.profileAvatarButton}
-              >
-                {/* Simple neutral minimal icon avatar */}
-                <View style={styles.avatarInnerCircle}>
-                  <User className="w-5 h-5 text-stone-600" />
-                </View>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* ================= SECTION 1: "How can Tale of Two help you?" ================= */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>
-              How can Tale of Two{'\n'}help you?
-            </Text>
-
-            {/* 2 Side-by-side Cards */}
-            <View style={[styles.helpCardsRow, { gap: 0, justifyContent: 'space-between' }]}>
-              {/* Card 1: Plan My Entire Wedding */}
-              <motion.div
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="cursor-pointer"
-                style={{ width: '48%' }}
-                onClick={() => handleOptionPress('Plan My Entire Wedding')}
-              >
-                <View style={[styles.helpCard, { width: '100%' }]}>
-                  <View style={styles.iconCircle}>
-                    <Building2 className="w-5 h-5 text-white" />
+                {/* Card 2: Find Individual Vendors */}
+                <motion.div
+                  whileHover={{ scale: 1.04, y: -2 }}
+                  whileTap={{ scale: 0.94 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                  className="cursor-pointer"
+                  style={{ width: '48%' }}
+                  onClick={() => handleOptionPress('Find Individual Vendors')}
+                >
+                  <View style={[styles.helpCard, { width: '100%' }]}>
+                    <View style={styles.iconCircle}>
+                      <Store className="w-5 h-5 text-white" />
+                    </View>
+                    <Text style={styles.helpCardTitle}>
+                      Find Individual{'\n'}Vendors
+                    </Text>
+                    <Text style={styles.helpCardSubtext}>
+                      Explore and book best vendors
+                    </Text>
                   </View>
-                  <Text style={styles.helpCardTitle}>
-                    Plan My Entire{'\n'}Wedding
-                  </Text>
-                  <Text style={styles.helpCardSubtext}>
-                    AI-powered complete wedding planning
-                  </Text>
-                </View>
-              </motion.div>
-
-              {/* Card 2: Find Individual Vendors */}
-              <motion.div
-                whileHover={{ scale: 1.04, y: -2 }}
-                whileTap={{ scale: 0.94 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="cursor-pointer"
-                style={{ width: '48%' }}
-                onClick={() => handleOptionPress('Find Individual Vendors')}
-              >
-                <View style={[styles.helpCard, { width: '100%' }]}>
-                  <View style={styles.iconCircle}>
-                    <Store className="w-5 h-5 text-white" />
-                  </View>
-                  <Text style={styles.helpCardTitle}>
-                    Find Individual{'\n'}Vendors
-                  </Text>
-                  <Text style={styles.helpCardSubtext}>
-                    Explore and book best vendors
-                  </Text>
-                </View>
-              </motion.div>
-            </View>
-          </View>
-
-
-          {/* ================= SECTION 2: Venues Collections in Chennai ================= */}
-          {(() => {
-            const venueCollections = [
-              {
-                title: 'Beach Wedding\nDestination',
-                vendors: '21 Vendors',
-                image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=300&q=80', // Bali temple style
-              },
-              {
-                title: 'Open Ground\nWedding Destination',
-                vendors: '27 Vendors',
-                image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80', // Lawn / Open Ground
-              },
-              {
-                title: 'Mountain Wedding\nDestinations',
-                vendors: '29 Vendors',
-                image: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=300&q=80', // Mountains
-              },
-              {
-                title: 'Resort Wedding\nVenues',
-                vendors: '24 Vendors',
-                image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=300&q=80', // Resort
-              },
-              {
-                title: 'Kerala Wedding\nDestinations',
-                vendors: '15 Vendors',
-                image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=300&q=80', // Kerala Backwaters
-              }
-            ];
-
-            return (
-              <View style={{ marginTop: 12, marginBottom: 8 }}>
-                <Text style={[styles.servicesTitle, { marginBottom: 8 }]}>Destination Wedding</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  {venueCollections.map((item, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setSelectedCollection({
-                          title: item.title.replace('\n', ' ') + ' / Banquet Halls in Chennai',
-                          description: "If you're looking for luxury venues in Chennai, then here are some of the most opulent wedding venues in Chennai that are a part of our Luxury Collection.",
-                          image: item.image,
-                        });
-                        setShowVenueListing(true);
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        margin: 0,
-                        marginRight: index < venueCollections.length - 1 ? 14 : 0,
-                        cursor: 'pointer',
-                        textAlign: 'left'
-                      }}
-                    >
-                      <View style={{
-                        width: 130,
-                        height: 120,
-                        borderRadius: 16,
-                        borderWidth: 1,
-                        borderColor: '#D4C6C9',
-                        backgroundColor: '#F7EFF1',
-                        padding: 10,
-                        justifyContent: 'space-between',
-                      }}>
-                        <View style={{ alignItems: 'flex-start' }}>
-                          <Image source={{ uri: item.image }} style={{ width: 40, height: 40, borderRadius: 20, marginBottom: 4 }} />
-                        </View>
-                        <View>
-                          <Text style={{
-                            color: '#581420',
-                            fontFamily: "'Cormorant Garamond', Georgia, serif",
-                            fontSize: 14,
-                            fontWeight: '700',
-                            marginBottom: 2,
-                            lineHeight: 16,
-                          }}>{item.title}</Text>
-                          <Text style={{
-                            color: '#635B5C',
-                            fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-                            fontSize: 10,
-                            fontWeight: '500',
-                          }}>{item.vendors}</Text>
-                        </View>
-                      </View>
-                    </button>
-                  ))}
-                </ScrollView>
+                </motion.div>
               </View>
-            );
-          })()}
-          <View style={styles.servicesSection}>
-            <View style={styles.servicesHeaderRow}>
-              <Text style={styles.servicesTitle}>Popular Services</Text>
             </View>
 
-            {/* Grid Icons (4 columns grid with perfect vertical alignment) */}
-            <div className="grid grid-cols-4 gap-x-2 gap-y-4 w-full justify-items-center">
-              {/* 1. Photography */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Photography')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Camera className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Photography</Text>
-              </motion.div>
 
-              {/* 2. Makeup */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Makeup')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Sparkles className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Makeup</Text>
-              </motion.div>
+            {/* ================= SECTION 2: Venues Collections in Chennai ================= */}
+            {(() => {
+              const venueCollections = [
+                {
+                  title: 'Beach Wedding\nDestination',
+                  vendors: '21 Vendors',
+                  image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=300&q=80', // Bali temple style
+                },
+                {
+                  title: 'Open Ground\nWedding Destination',
+                  vendors: '27 Vendors',
+                  image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=300&q=80', // Lawn / Open Ground
+                },
+                {
+                  title: 'Mountain Wedding\nDestinations',
+                  vendors: '29 Vendors',
+                  image: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=300&q=80', // Mountains
+                },
+                {
+                  title: 'Resort Wedding\nVenues',
+                  vendors: '24 Vendors',
+                  image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=300&q=80', // Resort
+                },
+                {
+                  title: 'Kerala Wedding\nDestinations',
+                  vendors: '15 Vendors',
+                  image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=300&q=80', // Kerala Backwaters
+                }
+              ];
 
-              {/* 3. Decor */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Decor')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Palette className="w-5 h-5 text-[#581420]" />
+              return (
+                <View style={{ marginTop: 12, marginBottom: 8 }}>
+                  <Text style={[styles.servicesTitle, { marginBottom: 8 }]}>Destination Wedding</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {venueCollections.map((item, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setSelectedCollection({
+                            title: item.title.replace('\n', ' ') + ' / Banquet Halls in Chennai',
+                            description: "If you're looking for luxury venues in Chennai, then here are some of the most opulent wedding venues in Chennai that are a part of our Luxury Collection.",
+                            image: item.image,
+                          });
+                          setShowVenueListing(true);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          padding: 0,
+                          margin: 0,
+                          marginRight: index < venueCollections.length - 1 ? 14 : 0,
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <View style={{
+                          width: 130,
+                          height: 120,
+                          borderRadius: 16,
+                          borderWidth: 1,
+                          borderColor: '#D4C6C9',
+                          backgroundColor: '#F7EFF1',
+                          padding: 10,
+                          justifyContent: 'space-between',
+                        }}>
+                          <View style={{ alignItems: 'flex-start' }}>
+                            <Image source={{ uri: item.image }} style={{ width: 40, height: 40, borderRadius: 20, marginBottom: 4 }} />
+                          </View>
+                          <View>
+                            <Text style={{
+                              color: '#581420',
+                              fontFamily: "'Cormorant Garamond', Georgia, serif",
+                              fontSize: 14,
+                              fontWeight: '700',
+                              marginBottom: 2,
+                              lineHeight: 16,
+                            }}>{item.title}</Text>
+                            <Text style={{
+                              color: '#635B5C',
+                              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                              fontSize: 10,
+                              fontWeight: '500',
+                            }}>{item.vendors}</Text>
+                          </View>
+                        </View>
+                      </button>
+                    ))}
+                  </ScrollView>
                 </View>
-                <Text style={styles.serviceLabel}>Decor</Text>
-              </motion.div>
+              );
+            })()}
+            <View style={styles.servicesSection}>
+              <View style={styles.servicesHeaderRow}>
+                <Text style={styles.servicesTitle}>Popular Services</Text>
+              </View>
 
-              {/* 4. Venue */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Venue')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Building2 className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Venue</Text>
-              </motion.div>
+              {/* Grid Icons (5 columns grid with perfect vertical alignment) */}
+              <div className="grid grid-cols-5 gap-x-2 gap-y-6 w-full justify-items-center">
+                {/* 1. Photography */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Photography')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Camera className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Photography</Text>
+                </motion.div>
 
-              {/* 5. Entertainment */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Entertainment')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Music className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Entertainment</Text>
-              </motion.div>
+                {/* 2. Makeup */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Makeup')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Sparkles className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Makeup</Text>
+                </motion.div>
 
-              {/* 6. Invitations */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Invitations')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Mail className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Invitations</Text>
-              </motion.div>
+                {/* 3. Decor */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Decor')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Palette className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Decor</Text>
+                </motion.div>
 
-              {/* 7. Catering */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Catering')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Utensils className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Catering</Text>
-              </motion.div>
+                {/* 4. Venue */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Venue')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Building2 className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Venue</Text>
+                </motion.div>
 
-              {/* 8. Cars */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Cars')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Car className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Cars</Text>
-              </motion.div>
+                {/* 5. Entertainment */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Entertainment')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Music className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Entertainment</Text>
+                </motion.div>
 
-              {/* 9. Mehendi */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Mehendi')}
-              >
-                <View style={styles.serviceIconBox}>
-                  <Flower2 className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Mehendi</Text>
-              </motion.div>
+                {/* 6. Invitations */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Invitations')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Mail className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Invitations</Text>
+                </motion.div>
 
-              {/* 10. Rituals */}
-              <motion.div
-                whileHover={{ scale: 1.12, y: -3 }}
-                whileTap={{ scale: 0.88 }}
-                transition={{ type: 'spring', stiffness: 450, damping: 20 }}
-                className="w-full cursor-pointer flex flex-col items-center gap-1"
-                onClick={() => handleOptionPress('Rituals')}
+                {/* 7. Catering */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Catering')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Utensils className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Catering</Text>
+                </motion.div>
+
+                {/* 8. Cars */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Cars')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Car className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Cars</Text>
+                </motion.div>
+
+                {/* 9. Mehendi */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Mehendi')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Flower2 className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Mehendi</Text>
+                </motion.div>
+
+                {/* 10. Rituals */}
+                <motion.div
+                  whileHover={{ scale: 1.12, y: -3 }}
+                  whileTap={{ scale: 0.88 }}
+                  transition={{ type: 'spring', stiffness: 450, damping: 20 }}
+                  className="w-full cursor-pointer flex flex-col items-center gap-1"
+                  onClick={() => handleOptionPress('Rituals')}
+                >
+                  <View style={styles.serviceIconBox}>
+                    <Flame className="w-5 h-5 text-[#581420]" />
+                  </View>
+                  <Text style={styles.serviceLabel}>Rituals</Text>
+                </motion.div>
+              </div>
+            </View>
+          </ScrollView>
+        )}
+
+        {/* ================= BOTTOM TAB BAR ================= */}
+        {!isDesktop && !hideTabBar && (
+          <View style={styles.bottomTabBar}>
+            <TouchableOpacity
+              style={styles.tabItem}
+              onPress={() => setActiveTab('home')}
+            >
+              <Home
+                className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'}`}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  activeTab === 'home' && styles.activeTabLabel,
+                ]}
               >
-                <View style={styles.serviceIconBox}>
-                  <Flame className="w-5 h-5 text-[#581420]" />
-                </View>
-                <Text style={styles.serviceLabel}>Rituals</Text>
-              </motion.div>
-            </div>
+                Home
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.tabItem}
+              onPress={() => {
+                if (!isPlannerCreated) {
+                  setSelectedFeatureName('My Wedding');
+                  setShowExploreModal(true);
+                } else {
+                  setActiveTab('my-wedding');
+                }
+              }}
+            >
+              <Sparkles
+                className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'}`}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  activeTab === 'my-wedding' && styles.activeTabLabel,
+                ]}
+              >
+                My Wedding
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.tabItem}
+              onPress={() => {
+                setActiveTab('profile');
+              }}
+            >
+              <User
+                className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'}`}
+              />
+              <Text
+                style={[
+                  styles.tabLabel,
+                  activeTab === 'profile' && styles.activeTabLabel,
+                ]}
+              >
+                Profile
+              </Text>
+            </TouchableOpacity>
           </View>
-        </ScrollView>
-      )}
-
-      {/* ================= BOTTOM TAB BAR ================= */}
-      {!isDesktop && !hideTabBar && (
-        <View style={styles.bottomTabBar}>
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => setActiveTab('home')}
-          >
-            <Home
-              className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'}`}
-            />
-            <Text
-              style={[
-                styles.tabLabel,
-                activeTab === 'home' && styles.activeTabLabel,
-              ]}
-            >
-              Home
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => {
-              if (!isPlannerCreated) {
-                setSelectedFeatureName('My Wedding');
-                setShowExploreModal(true);
-              } else {
-                setActiveTab('my-wedding');
-              }
-            }}
-          >
-            <Sparkles
-              className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'}`}
-            />
-            <Text
-              style={[
-                styles.tabLabel,
-                activeTab === 'my-wedding' && styles.activeTabLabel,
-              ]}
-            >
-              My Wedding
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => {
-              setActiveTab('profile');
-            }}
-          >
-            <User
-              className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'}`}
-            />
-            <Text
-              style={[
-                styles.tabLabel,
-                activeTab === 'profile' && styles.activeTabLabel,
-              ]}
-            >
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+        )}
       </View>
 
 
@@ -1556,6 +1556,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
+            onClick={() => setShowProfileModal(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -1563,6 +1564,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="w-[95%] max-w-[400px] bg-[#FAF6EE] rounded-2xl p-5 border border-stone-200 shadow-2xl flex flex-col gap-3.5 max-h-[85%]"
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <View style={styles.modalHeader}>
@@ -1664,6 +1666,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
+            onClick={() => setShowExploreModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -1671,6 +1674,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25, stiffness: 350 }}
               className="w-full max-w-xs bg-[#FAF6EE] rounded-2xl p-6 border border-[#E2DDD5] shadow-2xl flex flex-col items-center gap-4 text-center"
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Icon Circle matching theme */}
               <View style={styles.explorePopupIconCircle}>
@@ -2147,11 +2151,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 10,
+    paddingHorizontal: 24,
     backgroundColor: '#FEF2F2',
     borderWidth: 1,
     borderColor: '#FCA5A5',
     borderRadius: 12,
     marginTop: 4,
+    alignSelf: 'center',
   },
   modalLogoutText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",

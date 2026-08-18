@@ -128,7 +128,7 @@ export const CreateAccountPage: React.FC<CreateAccountPageProps> = ({
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="w-full bg-[#581420]/10 border border-[#581420]/30 rounded-2xl p-3 flex flex-row items-center justify-center gap-2"
+              className="w-[85%] max-w-[360px] bg-[#581420]/10 border border-[#581420]/30 rounded-2xl p-3 flex flex-row items-center justify-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4 text-[#581420]" />
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#581420' }}>
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
   },
   formFieldsStack: {
     width: '85%',
+    maxWidth: 360,
     alignSelf: 'center',
     gap: 12,
     marginTop: 4,
@@ -258,6 +259,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '85%',
+    maxWidth: 360,
     alignSelf: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,

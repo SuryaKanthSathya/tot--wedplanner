@@ -767,8 +767,10 @@ const styles = StyleSheet.create({
   mainCard: {
     marginTop: 220,
     backgroundColor: '#FAF7F2',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 20,
+    width: '90%',
+    maxWidth: 450,
+    
     minHeight: 800,
     paddingHorizontal: 16,
     paddingTop: 24,
@@ -1362,13 +1364,17 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    display: 'flex',
     zIndex: 200,
   },
   negotiateCard: {
     backgroundColor: '#FAF7F2',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderRadius: 20,
+    width: '90%',
+    maxWidth: 450,
+    
     padding: 20,
     maxHeight: '80%',
     borderWidth: 1,

@@ -394,6 +394,7 @@ const styles: any = StyleSheet.create({
   },
   primaryButton: {
     width: '85%',
+    maxWidth: 360,
     alignSelf: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,
@@ -414,7 +415,8 @@ const styles: any = StyleSheet.create({
     letterSpacing: 0.2,
   },
   successBanner: {
-    width: '100%',
+    width: '85%',
+    maxWidth: 360,
     backgroundColor: '#ECFDF5',
     borderWidth: 1,
     borderColor: '#A7F3D0',
