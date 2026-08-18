@@ -37,6 +37,7 @@ import {
   Instagram,
   Send,
 } from 'lucide-react';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 
 export interface DecorStudio {
   id: string;
@@ -80,7 +81,8 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   onNavigateToProfileMyBookings,
 }) => {
   const [activeTab, setActiveTab] = useState<'about' | 'gallery' | 'packages' | 'reviews'>('about');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -109,79 +111,58 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[studio.id]) {
-          return statuses[studio.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(studio.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(studio.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [studio.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[studio.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((studio.startingPrice || '₹75,000').replace(/[^0-9]/g, ''), 10) || 75000;
+    saveOrUpdateWeddingBooking({
+      vendorId: studio.id,
+      vendorName: studio.name,
+      category: 'Decor',
+      serviceType: 'Theme Wedding Mandap & Grand Stage Decor',
+      image: studio.image,
+      location: studio.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
 
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
     updateQuoteStatus('requested');
-    const basePrice = parseInt((studio.startingPrice || '₹1,50,000').replace(/[^0-9]/g, ''), 10) || 150000;
-    saveOrUpdateQuote({
-      id: `quote-${studio.id}`,
-      vendorId: studio.id,
-      vendorName: studio.name,
-      category: 'Decor',
-      packageName: 'Exquisite Mandap & Entrance Stage Decor',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: '24 Oct 2026',
-      location: studio.location,
-      includedServices: [
-        'Grand Mandap Stage Floral Backdrop',
-        'Bespoke Wooden Mandap Structure Setup',
-        'Royal Entrance Arch Floral Decor',
-        'Groom & Bride Pathway Flowers',
-        'Ambient Mood Lighting & LED Accents',
-      ],
-      image: studio.image,
-    });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 3 seconds
+    // Simulate response after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${studio.id}`,
-        status: 'response_ready',
-      });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
-    }, 3000);
+    }, 2500);
   };
 
+  const handleConfirmQuoteFromQuotation = () => {
+    updateQuoteStatus('confirmed');
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -222,10 +203,33 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
     window.open(`https://instagram.com/${username}`, '_blank');
   };
 
-  // Ensure 100% distinct portfolio images
-  const galleryImages = studio.portfolio && studio.portfolio.length > 0
-    ? studio.portfolio
-    : [studio.image];
+  // Curated 24 high-res luxury wedding decor and floral stage photos
+  const galleryImages = [
+    studio.image,
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1510076857177-7470076d4098?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+  ];
 
   return (
     <View style={styles.container}>
@@ -420,12 +424,15 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
               </View>
 
               <View style={styles.galleryGrid}>
-                {galleryImages.map((imgUrl, index) => (
+                {galleryImages.slice(0, 12).map((imgUrl, index) => (
                   <TouchableOpacity
                     key={index}
                     style={styles.galleryImageWrapper}
                     activeOpacity={0.85}
-                    onPress={() => setSelectedImage(imgUrl)}
+                    onPress={() => {
+                      setGalleryInitialIndex(index);
+                      setIsGalleryOpen(true);
+                    }}
                   >
                     <Image source={{ uri: imgUrl }} style={styles.galleryImage} resizeMode="cover" />
                     <View style={styles.galleryOverlayHover}>
@@ -546,98 +553,98 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
 
       {/* BOTTOM FIXED ACTION BAR */}
       <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting Price</Text>
-          <Text style={styles.bottomPriceValue}>{studio.startingPrice}</Text>
-        </View>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-6">
+          <View style={styles.bottomPriceCol}>
+            <Text style={styles.bottomPriceLabel}>Starting Price</Text>
+            <Text style={styles.bottomPriceValue}>{studio.startingPrice}</Text>
+          </View>
 
-        <View style={styles.bottomActionsRow}>
-          <TouchableOpacity style={styles.circleCallBtn} onPress={handleCall} activeOpacity={0.85}>
-            <Phone className="w-4 h-4 text-[#2A2425]" />
-          </TouchableOpacity>
+          <View style={styles.bottomActionsRow}>
+            <TouchableOpacity style={styles.circleCallBtn} onPress={handleCall} activeOpacity={0.85}>
+              <Phone className="w-4 h-4 text-[#2A2425]" />
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.circleWhatsAppBtn}
-            onPress={handleWhatsApp}
-            activeOpacity={0.85}
-          >
-            <MessageCircle className="w-4 h-4 text-[#15803D]" />
-          </TouchableOpacity>
-
-          {studio.instagram && (
             <TouchableOpacity
-              style={styles.circleInstagramBtn}
-              onPress={handleInstagram}
+              style={styles.circleWhatsAppBtn}
+              onPress={handleWhatsApp}
               activeOpacity={0.85}
             >
-              <Instagram className="w-4 h-4 text-[#C13584]" />
+              <MessageCircle className="w-4 h-4 text-[#15803D]" />
             </TouchableOpacity>
-          )}
 
-          {quoteStatus === 'initial' && (
-            <TouchableOpacity
-              style={styles.primaryQuoteBtn}
-              onPress={() => setShowQuoteModal(true)}
-              activeOpacity={0.85}
-            >
-              <Send className="w-4 h-4 text-white mr-1.5" />
-              <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
-            </TouchableOpacity>
-          )}
+            {studio.instagram && (
+              <TouchableOpacity
+                style={styles.circleInstagramBtn}
+                onPress={handleInstagram}
+                activeOpacity={0.85}
+              >
+                <Instagram className="w-4 h-4 text-[#C13584]" />
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'requested' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.primaryQuoteBtnText}>Pending Response</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'initial' && (
+              <TouchableOpacity
+                style={styles.primaryQuoteBtn}
+                onPress={() => setShowQuoteModal(true)}
+                activeOpacity={0.85}
+              >
+                <Send className="w-4 h-4 text-white mr-1.5" />
+                <Text style={styles.primaryQuoteBtnText}>Request Quote</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'negotiating' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.primaryQuoteBtnText}>Negotiating...</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'requested' && (
+              <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.primaryQuoteBtnText}>Pending Response</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'rejected' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-              <Text style={styles.primaryQuoteBtnText}>Rejected (Reset)</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'negotiating' && (
+              <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.primaryQuoteBtnText}>Negotiating...</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'response_ready' && (
-            <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.primaryQuoteBtnText}>View Quote</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'rejected' && (
+              <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+                <Text style={styles.primaryQuoteBtnText}>Rejected (Reset)</Text>
+              </TouchableOpacity>
+            )}
 
-          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity
-              style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]}
-              onPress={() => setShowInvoiceModal(true)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.primaryQuoteBtnText}>
-                {quoteStatus === 'fully_paid'
-                  ? 'Fully Paid (Invoice)'
-                  : quoteStatus === 'partially_paid'
-                  ? 'Partially Paid (Invoice)'
-                  : 'View Invoice'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+            {quoteStatus === 'response_ready' && (
+              <TouchableOpacity style={[styles.primaryQuoteBtn, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+                <Text style={styles.primaryQuoteBtnText}>View Quote</Text>
+              </TouchableOpacity>
+            )}
+
+            {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+              <TouchableOpacity
+                style={[styles.primaryQuoteBtn, { backgroundColor: '#15803D' }]}
+                onPress={() => setShowInvoiceModal(true)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.primaryQuoteBtnText}>
+                  {quoteStatus === 'fully_paid'
+                    ? 'Fully Paid (Invoice)'
+                    : quoteStatus === 'partially_paid'
+                    ? 'Partially Paid (Invoice)'
+                    : 'View Invoice'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </div>
       </View>
 
-      {/* FULLSCREEN IMAGE MODAL */}
-      <Modal visible={Boolean(selectedImage)} transparent animationType="fade">
-        <View style={styles.modalBg}>
-          <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setSelectedImage(null)}>
-            <X className="w-6 h-6 text-white" />
-          </TouchableOpacity>
-          {selectedImage && (
-            <Image source={{ uri: selectedImage }} style={styles.fullModalImage} resizeMode="contain" />
-          )}
-        </View>
-      </Modal>
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={galleryImages}
+        initialIndex={galleryInitialIndex}
+        title={studio.name}
+        category="Wedding Decor"
+      />
 
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
@@ -1133,15 +1140,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 68,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E8DFD5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingVertical: 10,
     zIndex: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   bottomPriceCol: {
     flexDirection: 'column',

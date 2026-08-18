@@ -251,197 +251,209 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={styles.heroImgWrapper}>
-          <Image source={{ uri: vendor.image }} style={styles.heroImg} resizeMode="cover" />
-          <View style={styles.heroDimOverlay} />
-          <View style={styles.heroTierBadge}>
-            <Award className="w-3.5 h-3.5 text-amber-700 mr-1" />
-            <Text style={styles.heroTierText}>{vendor.tier}</Text>
-          </View>
-        </View>
-
-        <View style={styles.contentPad}>
-          <View style={styles.nameRow}>
-            <Text style={styles.vendorName}>{vendor.name}</Text>
-            <View style={styles.ratingBadge}>
-              <Star className="w-4 h-4 text-amber-500 fill-amber-500 mr-1" />
-              <Text style={styles.ratingText}>{(vendor.rating || 4.9).toFixed(1)}</Text>
-              <Text style={styles.reviewsText}> ({vendor.reviewsCount || 48})</Text>
+        <div className="w-full max-w-4xl mx-auto">
+          <View style={styles.heroImgWrapper}>
+            <img
+              src={vendor.image}
+              alt={vendor.name}
+              className="w-full h-full object-cover object-[center_15%]"
+            />
+            <View style={styles.heroDimOverlay} />
+            <View style={styles.heroTierBadge}>
+              <Award className="w-3.5 h-3.5 text-amber-700 mr-1" />
+              <Text style={styles.heroTierText}>{vendor.tier}</Text>
             </View>
           </View>
 
-          <Text style={styles.categoryText}>{vendor.category}</Text>
+          <View style={styles.contentPad}>
+            <View style={styles.nameRow}>
+              <Text style={styles.vendorName}>{vendor.name}</Text>
+              <View style={styles.ratingBadge}>
+                <Star className="w-4 h-4 text-amber-500 fill-amber-500 mr-1" />
+                <Text style={styles.ratingText}>{(vendor.rating || 4.9).toFixed(1)}</Text>
+                <Text style={styles.reviewsText}> ({vendor.reviewsCount || 48})</Text>
+              </View>
+            </View>
 
-          <View style={styles.infoRow}>
-            {vendor.experience && (
+            <Text style={styles.categoryText}>{vendor.category}</Text>
+
+            <View style={styles.infoRow}>
+              {vendor.experience && (
+                <View style={styles.infoChip}>
+                  <Clock className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+                  <Text style={styles.infoChipText}>{vendor.experience}</Text>
+                </View>
+              )}
               <View style={styles.infoChip}>
-                <Clock className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-                <Text style={styles.infoChipText}>{vendor.experience}</Text>
+                <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+                <Text style={styles.infoChipText}>{vendor.location}, Tamil Nadu</Text>
+              </View>
+              <View style={styles.infoChip}>
+                <Building2 className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+                <Text style={styles.infoChipText}>Mandapam & Home</Text>
+              </View>
+              <View style={styles.infoChip}>
+                <Users className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
+                <Text style={styles.infoChipText}>{religion} Tradition</Text>
+              </View>
+            </View>
+
+            {vendor.languages && vendor.languages.length > 0 && (
+              <View style={styles.section}>
+                <View style={styles.sectionRow}>
+                  <Globe className="w-4 h-4 text-[#581420] mr-2" />
+                  <Text style={styles.sectionLabel}>Ceremony Languages</Text>
+                </View>
+                <Text style={styles.sectionContent}>{vendor.languages.join(' • ')}</Text>
               </View>
             )}
-            <View style={styles.infoChip}>
-              <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-              <Text style={styles.infoChipText}>{vendor.location}, Tamil Nadu</Text>
-            </View>
-            <View style={styles.infoChip}>
-              <Building2 className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-              <Text style={styles.infoChipText}>Mandapam & Home</Text>
-            </View>
-            <View style={styles.infoChip}>
-              <Users className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-              <Text style={styles.infoChipText}>{religion} Tradition</Text>
-            </View>
-          </View>
 
-          {vendor.languages && vendor.languages.length > 0 && (
+            <View style={styles.trustBadgesGrid}>
+              <View style={styles.trustCard}>
+                <View style={styles.googleIconBadge}>
+                  <Text style={styles.googleIconG}>G</Text>
+                </View>
+                <Text style={styles.trustCardTitle}>Google Reviews</Text>
+                <Text style={styles.trustCardVal}>{(vendor.rating || 4.9).toFixed(1)} ★</Text>
+              </View>
+
+              <View style={styles.trustCard}>
+                <Instagram className="w-5 h-5 text-[#E1306C] mb-1" />
+                <Text style={styles.trustCardTitle}>Instagram</Text>
+                <Text style={styles.trustCardVal} numberOfLines={1}>
+                  @{vendor.name.toLowerCase().replace(/[^a-z0-9]/g, '')}
+                </Text>
+              </View>
+
+              <View style={styles.trustCard}>
+                <Trophy className="w-5 h-5 text-[#D97706] mb-1" />
+                <Text style={styles.trustCardTitle}>Heritage</Text>
+                <Text style={styles.trustCardVal}>Vedic Certified</Text>
+              </View>
+
+              <View style={styles.trustCard}>
+                <ShieldCheck className="w-5 h-5 text-[#16A34A] mb-1" />
+                <Text style={styles.trustCardTitle}>TOT Certified</Text>
+                <Text style={styles.trustCardVal}>Verified Specialist</Text>
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
             <View style={styles.section}>
-              <View style={styles.sectionRow}>
-                <Globe className="w-4 h-4 text-[#581420] mr-2" />
-                <Text style={styles.sectionLabel}>Ceremony Languages</Text>
-              </View>
-              <Text style={styles.sectionContent}>{vendor.languages.join(' • ')}</Text>
-            </View>
-          )}
-
-          <View style={styles.trustBadgesGrid}>
-            <View style={styles.trustCard}>
-              <View style={styles.googleIconBadge}>
-                <Text style={styles.googleIconG}>G</Text>
-              </View>
-              <Text style={styles.trustCardTitle}>Google Reviews</Text>
-              <Text style={styles.trustCardVal}>{(vendor.rating || 4.9).toFixed(1)} ★</Text>
-            </View>
-
-            <View style={styles.trustCard}>
-              <Instagram className="w-5 h-5 text-[#E1306C] mb-1" />
-              <Text style={styles.trustCardTitle}>Instagram</Text>
-              <Text style={styles.trustCardVal} numberOfLines={1}>
-                @{vendor.name.toLowerCase().replace(/[^a-z0-9]/g, '')}
+              <Text style={styles.sectionLabel}>About Officiant & Services</Text>
+              <Text style={styles.sectionContent}>
+                {vendor.description ||
+                  `${vendor.name} is an esteemed wedding ritual specialist offering authentic ${religion} wedding ceremonies across Tamil Nadu with deep adherence to sacred traditions and flawless execution.`}
               </Text>
             </View>
 
-            <View style={styles.trustCard}>
-              <Trophy className="w-5 h-5 text-[#D97706] mb-1" />
-              <Text style={styles.trustCardTitle}>Heritage</Text>
-              <Text style={styles.trustCardVal}>Vedic Certified</Text>
+            <View style={styles.divider} />
+
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Ceremonies & Rituals Offered</Text>
+              <View style={{ gap: 10, marginTop: 8 }}>
+                {serviceOptions.map((s) => (
+                  <View key={s} style={styles.serviceItem}>
+                    <CheckCircle2 className="w-4.5 h-4.5 text-[#15803D] mr-2.5 flex-shrink-0" />
+                    <Text style={styles.serviceItemText}>{s}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
 
-            <View style={styles.trustCard}>
-              <ShieldCheck className="w-5 h-5 text-[#16A34A] mb-1" />
-              <Text style={styles.trustCardTitle}>TOT Certified</Text>
-              <Text style={styles.trustCardVal}>Verified Specialist</Text>
+            <View style={styles.divider} />
+
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Ceremony Portfolio</Text>
+              <View style={styles.portfolioGrid}>
+                {portfolioImages.map((img, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.portfolioImgWrapper}
+                    onPress={() => setActivePhotoModal(img)}
+                    activeOpacity={0.85}
+                  >
+                    <img
+                      src={img}
+                      alt={`Portfolio ${idx + 1}`}
+                      className="w-full h-full object-cover object-[center_20%]"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.priceRow}>
+              <View>
+                <Text style={styles.priceLabel}>Starting Price / Dakshina</Text>
+                <Text style={styles.priceSub}>All basic ceremonial materials included</Text>
+              </View>
+              <Text style={styles.priceValue}>{vendor.startingPrice}</Text>
             </View>
           </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>About Officiant & Services</Text>
-            <Text style={styles.sectionContent}>
-              {vendor.description ||
-                `${vendor.name} is an esteemed wedding ritual specialist offering authentic ${religion} wedding ceremonies across Tamil Nadu with deep adherence to sacred traditions and flawless execution.`}
-            </Text>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Ceremonies & Rituals Offered</Text>
-            <View style={{ gap: 10, marginTop: 8 }}>
-              {serviceOptions.map((s) => (
-                <View key={s} style={styles.serviceItem}>
-                  <CheckCircle2 className="w-4.5 h-4.5 text-[#15803D] mr-2.5 flex-shrink-0" />
-                  <Text style={styles.serviceItemText}>{s}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>Ceremony Portfolio</Text>
-            <View style={styles.portfolioGrid}>
-              {portfolioImages.map((img, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={styles.portfolioImgWrapper}
-                  onPress={() => setActivePhotoModal(img)}
-                  activeOpacity={0.85}
-                >
-                  <Image source={{ uri: img }} style={styles.portfolioImg} resizeMode="cover" />
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.priceRow}>
-            <View>
-              <Text style={styles.priceLabel}>Starting Price / Dakshina</Text>
-              <Text style={styles.priceSub}>All basic ceremonial materials included</Text>
-            </View>
-            <Text style={styles.priceValue}>{vendor.startingPrice}</Text>
-          </View>
-        </View>
+        </div>
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.btnWhatsApp} onPress={handleWhatsApp} activeOpacity={0.85}>
-          <MessageCircle className="w-4 h-4 text-[#10B981] mr-1.5" />
-          <Text style={styles.btnWhatsAppText}>WhatsApp</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.btnCall} onPress={handleCallPhone} activeOpacity={0.85}>
-          <Phone className="w-4 h-4 text-[#581420] mr-1.5" />
-          <Text style={styles.btnCallText}>Call</Text>
-        </TouchableOpacity>
-
-        {quoteStatus === 'initial' && (
-          <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
-            <Sparkles className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.btnQuoteText}>Req Quote</Text>
+        <div className="w-full max-w-4xl mx-auto flex items-center gap-2">
+          <TouchableOpacity style={styles.btnWhatsApp} onPress={handleWhatsApp} activeOpacity={0.85}>
+            <MessageCircle className="w-4 h-4 text-[#10B981] mr-1.5" />
+            <Text style={styles.btnWhatsAppText}>WhatsApp</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'requested' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Clock className="w-4 h-4 text-white mr-1.5" />
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Pending Response</Text>
+          <TouchableOpacity style={styles.btnCall} onPress={handleCallPhone} activeOpacity={0.85}>
+            <Phone className="w-4 h-4 text-[#581420] mr-1.5" />
+            <Text style={styles.btnCallText}>Call</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'negotiating' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Clock className="w-4 h-4 text-white mr-1.5" />
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Negotiating...</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
+              <Sparkles className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.btnQuoteText}>Req Quote</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'rejected' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => setQuoteStatus('initial')} activeOpacity={0.85}>
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Quote Rejected (Reset)</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Clock className="w-4 h-4 text-white mr-1.5" />
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'response_ready' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-            <CheckCircle2 className="w-4 h-4 text-white mr-1.5" />
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>View Quote</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Clock className="w-4 h-4 text-white mr-1.5" />
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
 
-        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-          <TouchableOpacity
-            style={[styles.btnQuote, { backgroundColor: '#581420' }]}
-            onPress={() => setShowInvoiceModal(true)}
-            activeOpacity={0.85}
-          >
-            <FileText className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.btnQuoteText}>View Invoice</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => setQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Quote Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <CheckCircle2 className="w-4 h-4 text-white mr-1.5" />
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity
+              style={[styles.btnQuote, { backgroundColor: '#581420' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
+              <FileText className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.btnQuoteText}>View Invoice</Text>
+            </TouchableOpacity>
+          )}
+        </div>
       </View>
 
       {activePhotoModal && (
@@ -557,7 +569,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 2,
   },
-  heroImgWrapper: { width: '100%', height: 280, position: 'relative' },
+  heroImgWrapper: { width: '100%', height: 340, position: 'relative', overflow: 'hidden', backgroundColor: '#F3ECE3' },
   heroImg: { width: '100%', height: '100%' },
   heroDimOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80, backgroundColor: 'transparent' },
   heroTierBadge: {
@@ -572,9 +584,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#FDE68A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   heroTierText: { color: '#92400E', fontSize: 11, fontWeight: '800', textTransform: 'uppercase' as any },
-  contentPad: { paddingHorizontal: 16, paddingTop: 18 },
+  contentPad: { paddingHorizontal: 16, paddingTop: 18, backgroundColor: '#FFFFFF', borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
   nameRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 },
   vendorName: {
     fontSize: 20,
@@ -600,8 +616,8 @@ const styles = StyleSheet.create({
   serviceItem: { flexDirection: 'row', alignItems: 'center' },
   serviceItemText: { fontSize: 13, color: '#3D3234', fontWeight: '500', flex: 1, lineHeight: 18 },
   portfolioGrid: { flexDirection: 'row', flexWrap: 'wrap' as any, gap: 8, marginTop: 6 },
-  portfolioImgWrapper: { width: '48%', height: 100, borderRadius: 12, overflow: 'hidden' },
-  portfolioImg: { width: '100%', height: '100%' },
+  portfolioImgWrapper: { width: '48%', height: 120, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F3ECE3' },
+  portfolioImg: { width: '100%', height: '100%', objectFit: 'cover' as any, objectPosition: 'center 20%' as any },
   priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F5EEE6', padding: 14, borderRadius: 14, marginBottom: 14 },
   priceLabel: { fontSize: 13, color: '#2A2425', fontWeight: '700' },
   priceSub: { fontSize: 11, color: '#78696A', marginTop: 2 },

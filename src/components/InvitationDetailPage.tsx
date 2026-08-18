@@ -31,6 +31,7 @@ import { RequestQuoteModal } from './RequestQuoteModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -87,7 +88,8 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
   onNavigateToMyWeddingPayments,
   onNavigateToProfileMyBookings,
 }) => {
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -116,89 +118,86 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[invite.id]) {
-          return statuses[invite.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(invite.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(invite.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [invite.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[invite.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((invite.startingPrice || '₹15,000').replace(/[^0-9]/g, ''), 10) || 15000;
+    saveOrUpdateWeddingBooking({
+      vendorId: invite.id,
+      vendorName: invite.name,
+      category: 'Invitations',
+      serviceType: 'Bespoke Wedding Invitations & E-Invites',
+      image: invite.image,
+      location: invite.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
 
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
     updateQuoteStatus('requested');
-    const basePrice = parseInt((invite.startingPrice || '₹15,000').replace(/[^0-9]/g, ''), 10) || 15000;
-    saveOrUpdateQuote({
-      id: `quote-${invite.id}`,
-      vendorId: invite.id,
-      vendorName: invite.name,
-      category: 'Invitations',
-      packageName: 'Custom Animated Luxury E-Invite & Printed Cards',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: '24 Oct 2026',
-      location: invite.location,
-      includedServices: [
-        'Bespoke Animated Video Invitation Design',
-        'Couple Save-the-Date Digital Flyer',
-        '150 Gold Foil Premium Printed Cards',
-        'Custom Couple Wedding Monogram Design',
-        'Digital RSVP Portal & Guest Tracking Link',
-      ],
-      image: invite.image,
-    });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 3 seconds
+    // Simulate vendor response ready after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${invite.id}`,
-        status: 'response_ready',
-      });
-      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setToastMessage('Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
-    }, 3000);
+    }, 2500);
   };
 
+  const handleConfirmQuoteFromQuotation = () => {
+    updateQuoteStatus('confirmed');
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
+  };
 
-  const portfolioImages =
-    invite.portfolio && invite.portfolio.length >= 4
-      ? invite.portfolio.slice(0, 4)
-      : [
-          invite.image,
-          invite.image,
-          invite.image,
-          invite.image,
-        ];
+  // Curated 24 luxury invitation cards & stationary photos
+  const portfolioImages = [
+    invite.image,
+    'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85',
+  ];
 
   const phoneNum = invite.phone || '+91 91501 97966';
   const whatsappNum = invite.whatsapp || '919150197966';
@@ -378,33 +377,45 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           <View style={styles.photoGrid}>
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[0])}
+              onPress={() => {
+                setGalleryInitialIndex(0);
+                setIsGalleryOpen(true);
+              }}
             >
               <Image source={{ uri: portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[1] || portfolioImages[0])}
+              onPress={() => {
+                setGalleryInitialIndex(1);
+                setIsGalleryOpen(true);
+              }}
             >
               <Image source={{ uri: portfolioImages[1] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[2] || portfolioImages[0])}
+              onPress={() => {
+                setGalleryInitialIndex(2);
+                setIsGalleryOpen(true);
+              }}
             >
               <Image source={{ uri: portfolioImages[2] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[3] || portfolioImages[0])}
+              onPress={() => {
+                setGalleryInitialIndex(3);
+                setIsGalleryOpen(true);
+              }}
             >
               <Image source={{ uri: portfolioImages[3] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
               <View style={styles.morePhotosOverlay}>
                 <Text style={styles.morePhotosText}>
-                  +{Math.max(0, (invite.portfolio || portfolioImages).length - 3)}
+                  +20
                 </Text>
                 <Text style={styles.morePhotosSubtext}>More Photos</Text>
               </View>
@@ -558,86 +569,79 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
 
       {/* STICKY BOTTOM ACTION BAR */}
       <View style={styles.bottomBarNew}>
-        <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
-          <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
-          <Text style={styles.btnWhatsappText}>WhatsApp</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.btnCall} onPress={handleCall} activeOpacity={0.8}>
-          <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
-          <Text style={styles.btnCallText}>Call Now</Text>
-        </TouchableOpacity>
-
-        {quoteStatus === 'initial' && (
-          <TouchableOpacity
-            style={styles.btnQuote}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.btnQuoteText}>Req Quote</Text>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
+          <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
+            <Text style={styles.btnWhatsappText}>WhatsApp</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'requested' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Text style={styles.btnQuoteText}>Pending Response</Text>
+          <TouchableOpacity style={styles.btnCall} onPress={handleCall} activeOpacity={0.8}>
+            <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
+            <Text style={styles.btnCallText}>Call Now</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'negotiating' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Text style={styles.btnQuoteText}>Negotiating...</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.btnQuote}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.btnQuoteText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'rejected' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-            <Text style={styles.btnQuoteText}>Rejected (Reset)</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.btnQuoteText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'response_ready' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-            <Text style={styles.btnQuoteText}>View Quote</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={styles.btnQuoteText}>Negotiating...</Text>
+            </TouchableOpacity>
+          )}
 
-        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-          <TouchableOpacity
-            style={[styles.btnQuote, { backgroundColor: '#15803D' }]}
-            onPress={() => setShowInvoiceModal(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.btnQuoteText}>
-              {quoteStatus === 'fully_paid'
-                ? 'Fully Paid (Invoice)'
-                : quoteStatus === 'partially_paid'
-                ? 'Partially Paid (Invoice)'
-                : 'View Invoice'}
-            </Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={styles.btnQuoteText}>Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+              <Text style={styles.btnQuoteText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity
+              style={[styles.btnQuote, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.btnQuoteText}>
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </div>
       </View>
 
-      {/* PHOTO ZOOM MODAL */}
-      <Modal visible={Boolean(activePhotoModal)} transparent animationType="fade">
-        <View style={styles.photoModalContainer}>
-          <TouchableOpacity
-            style={styles.photoModalClose}
-            onPress={() => setActivePhotoModal(null)}
-          >
-            <X className="w-6 h-6 text-white" />
-          </TouchableOpacity>
-          {activePhotoModal && (
-            <Image
-              source={{ uri: activePhotoModal }}
-              style={styles.fullPhoto}
-              resizeMode="contain"
-            />
-          )}
-        </View>
-      </Modal>
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={portfolioImages}
+        initialIndex={galleryInitialIndex}
+        title={invite.name}
+        category="Invitations"
+      />
 
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
@@ -1099,16 +1103,15 @@ minHeight: 800,
     bottom: 0,
     left: 0,
     right: 0,
-    height: 68,
     backgroundColor: '#FAF7F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    zIndex: 20,
-    gap: 8,
+    paddingVertical: 10,
+    zIndex: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   btnWhatsapp: {
     flex: 1,

@@ -39,6 +39,7 @@ import { QuotationScreen } from './QuotationScreen';
 import { MehendiArtist } from './MehendiListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -67,7 +68,8 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
   onNavigateToProfileMyBookings,
 }) => {
   const [activeTab, setActiveTab] = useState<'portfolio' | 'packages' | 'designs' | 'reviews'>('portfolio');
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -96,90 +98,86 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[artist.id]) {
-          return statuses[artist.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(artist.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(artist.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [artist.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[artist.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((artist.startingPrice || '₹10,000').replace(/[^0-9]/g, ''), 10) || 10000;
+    saveOrUpdateWeddingBooking({
+      vendorId: artist.id,
+      vendorName: artist.name,
+      category: 'Mehendi',
+      serviceType: 'Organic Bridal Mehendi & Henna Art',
+      image: artist.image,
+      location: artist.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
 
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
     updateQuoteStatus('requested');
-    const basePrice = parseInt((artist.startingPrice || '₹25,000').replace(/[^0-9]/g, ''), 10) || 25000;
-    saveOrUpdateQuote({
-      id: `quote-${artist.id}`,
-      vendorId: artist.id,
-      vendorName: artist.name,
-      category: 'Mehendi',
-      packageName: 'Traditional South Indian Bridal Mehendi Package',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: '24 Oct 2026',
-      location: artist.location,
-      includedServices: [
-        'Full Bridal Hands Mehendi',
-        'Bridal Feet Mehendi',
-        'Guest Mehendi (up to 15 guests)',
-        'Organic Natural Henna Cones',
-        'Mehendi Design Consultation',
-      ],
-      image: artist.image,
-    });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 3 seconds
+    // Simulate response after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${artist.id}`,
-        status: 'response_ready',
-      });
       setToastMessage('Vendor Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
-    }, 3000);
+    }, 2500);
   };
 
+  const handleConfirmQuoteFromQuotation = () => {
+    updateQuoteStatus('confirmed');
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
+  };
 
-  const portfolioImages = artist.portfolio && artist.portfolio.length > 0
-    ? artist.portfolio
-    : [
-        artist.image,
-        '/images/mehendi/mehendi_arabic_style_1786617685166.jpg',
-        '/images/mehendi/mehendi_intricate_palms_1786617718285.jpg',
-        '/images/mehendi/mehendi_jewelry_bangles_1786617751591.jpg',
-        '/images/mehendi/mehendi_modern_minimalist_1786617671026.jpg',
-        '/images/mehendi/mehendi_traditional_feet_1786617653822.jpg',
-      ];
+  // Curated 24 luxury bridal mehendi photos
+  const portfolioImages = [
+    artist.image,
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1510076857177-7470076d4098?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85',
+  ];
 
   const packagesList = [
     {
@@ -508,11 +506,14 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
           <View style={styles.tabContent}>
             <Text style={styles.tabSubtitle}>Tap image to view high-definition bridal details</Text>
             <View style={styles.portfolioGrid}>
-              {portfolioImages.map((imgUrl, index) => (
+              {portfolioImages.slice(0, 12).map((imgUrl, index) => (
                 <TouchableOpacity
                   key={index}
                   style={styles.portfolioImageWrapper}
-                  onPress={() => setActivePhotoModal(imgUrl)}
+                  onPress={() => {
+                    setGalleryInitialIndex(index);
+                    setIsGalleryOpen(true);
+                  }}
                   activeOpacity={0.85}
                 >
                   <Image source={{ uri: imgUrl }} style={styles.portfolioGridImg} />
@@ -619,87 +620,84 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
 
       {/* STICKY BOTTOM ACTION BAR */}
       <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting From</Text>
-          <Text style={styles.bottomPriceValue}>{artist.startingPrice}</Text>
-        </View>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-6">
+          <View style={styles.bottomPriceCol}>
+            <Text style={styles.bottomPriceLabel}>Starting From</Text>
+            <Text style={styles.bottomPriceValue}>{artist.startingPrice}</Text>
+          </View>
 
-        <View style={styles.bottomActionBtns}>
-          <TouchableOpacity style={styles.callIconBtn} onPress={handleCallPhone} activeOpacity={0.8}>
-            <Phone className="w-4 h-4 text-[#2A2425]" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.whatsappIconBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-            <MessageCircle className="w-4 h-4 text-emerald-700" />
-          </TouchableOpacity>
-
-          {quoteStatus === 'initial' && (
-            <TouchableOpacity
-              style={styles.quoteBtnMain}
-              onPress={() => setShowQuoteModal(true)}
-              activeOpacity={0.85}
-            >
-              <Send className="w-4 h-4 text-white mr-1.5" />
-              <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+          <View style={styles.bottomActionBtns}>
+            <TouchableOpacity style={styles.callIconBtn} onPress={handleCallPhone} activeOpacity={0.8}>
+              <Phone className="w-4 h-4 text-[#2A2425]" />
             </TouchableOpacity>
-          )}
 
-          {quoteStatus === 'requested' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+            <TouchableOpacity style={styles.whatsappIconBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
+              <MessageCircle className="w-4 h-4 text-emerald-700" />
             </TouchableOpacity>
-          )}
 
-          {quoteStatus === 'negotiating' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'initial' && (
+              <TouchableOpacity
+                style={styles.quoteBtnMain}
+                onPress={() => setShowQuoteModal(true)}
+                activeOpacity={0.85}
+              >
+                <Send className="w-4 h-4 text-white mr-1.5" />
+                <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'rejected' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-              <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'requested' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'response_ready' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.quoteBtnMainText}>View Quote</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'negotiating' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
+              </TouchableOpacity>
+            )}
 
-          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity
-              style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
-              onPress={() => setShowInvoiceModal(true)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.quoteBtnMainText}>
-                {quoteStatus === 'fully_paid'
-                  ? 'Fully Paid (Invoice)'
-                  : quoteStatus === 'partially_paid'
-                  ? 'Partially Paid (Invoice)'
-                  : 'View Invoice'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+            {quoteStatus === 'rejected' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+                <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
+              </TouchableOpacity>
+            )}
+
+            {quoteStatus === 'response_ready' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+                <Text style={styles.quoteBtnMainText}>View Quote</Text>
+              </TouchableOpacity>
+            )}
+
+            {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+              <TouchableOpacity
+                style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
+                onPress={() => setShowInvoiceModal(true)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.quoteBtnMainText}>
+                  {quoteStatus === 'fully_paid'
+                    ? 'Fully Paid (Invoice)'
+                    : quoteStatus === 'partially_paid'
+                    ? 'Partially Paid (Invoice)'
+                    : 'View Invoice'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </div>
       </View>
 
-      {/* PHOTO ZOOM MODAL */}
-      <Modal visible={Boolean(activePhotoModal)} transparent animationType="fade">
-        <View style={styles.photoModalContainer}>
-          <TouchableOpacity
-            style={styles.photoModalClose}
-            onPress={() => setActivePhotoModal(null)}
-          >
-            <X className="w-6 h-6 text-white" />
-          </TouchableOpacity>
-          {activePhotoModal && (
-            <Image source={{ uri: activePhotoModal }} style={styles.fullPhoto} resizeMode="contain" />
-          )}
-        </View>
-      </Modal>
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={portfolioImages}
+        initialIndex={galleryInitialIndex}
+        title={artist.name}
+        category="Bridal Mehendi"
+      />
 
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
@@ -1277,15 +1275,15 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 64,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E8DFD5',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    zIndex: 20,
+    paddingVertical: 10,
+    zIndex: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   bottomPriceCol: {
     flexShrink: 1,

@@ -290,7 +290,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
       '/images/christian1.jpeg',
       '/images/christian2.jpeg',
       '/images/christian3.jpeg',
-      'https://loremflickr.com/800/800/christian,wedding/all?lock=4',
+      '/images/christian4.jpeg',
     ],
     religion: 'Christian',
   },
@@ -312,8 +312,8 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     portfolio: [
       '/images/christian2.jpeg',
       '/images/christian1.jpeg',
+      '/images/christian4.jpeg',
       '/images/christian3.jpeg',
-      'https://loremflickr.com/800/800/christian,wedding/all?lock=8',
     ],
     religion: 'Christian',
   },
@@ -336,7 +336,7 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
       '/images/christian3.jpeg',
       '/images/christian2.jpeg',
       '/images/christian1.jpeg',
-      'https://loremflickr.com/800/800/christian,wedding/all?lock=12',
+      '/images/christian4.jpeg',
     ],
     religion: 'Christian',
   },
@@ -350,16 +350,16 @@ export const RITUALS_VENDORS_DATA: RitualsVendor[] = [
     startingPrice: '₹8,000 onwards',
     priceValue: 8000,
     tier: 'Essential',
-    image: '/images/christian1.jpeg',
+    image: '/images/christian4.jpeg',
     description: 'Heartfelt Christian wedding blessing services for couples seeking a meaningful, personalized ceremony that honors their faith.',
     experience: '11 Years',
     phone: '+91 91501 97966',
     languages: ['English', 'Tamil'],
     portfolio: [
+      '/images/christian4.jpeg',
       '/images/christian1.jpeg',
-      '/images/christian3.jpeg',
       '/images/christian2.jpeg',
-      'https://loremflickr.com/800/800/christian,wedding/all?lock=16',
+      '/images/christian3.jpeg',
     ],
     religion: 'Christian',
   },
@@ -417,40 +417,42 @@ const ReligionSelectionScreen: React.FC<ReligionSelectionScreenProps> = ({ onBac
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40, paddingTop: 8 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero Text */}
-        <View style={selStyles.heroSection}>
-          <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}& Ceremony</Text>
-          <Text style={selStyles.heroSubtitle}>
-            Choose your wedding tradition to find the right ceremony services and vendors.
-          </Text>
-        </View>
+        <div className="w-full max-w-2xl mx-auto">
+          {/* Hero Text */}
+          <View style={selStyles.heroSection}>
+            <Text style={selStyles.heroTitle}>Wedding Rituals{"\n"}& Ceremony</Text>
+            <Text style={selStyles.heroSubtitle}>
+              Choose your wedding tradition to find the right ceremony services and vendors.
+            </Text>
+          </View>
 
-        {/* Religion Cards */}
-        <View style={{ gap: 14 }}>
-          {religions.map((rel) => (
-            <motion.div
-              key={rel.key}
-              whileHover={{ scale: 1.01, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-            >
-              <TouchableOpacity
-                style={[selStyles.religionCard, { borderColor: rel.color + '40' }]}
-                onPress={() => onSelectReligion(rel.key)}
-                activeOpacity={0.85}
+          {/* Religion Cards */}
+          <View style={{ gap: 14 }}>
+            {religions.map((rel) => (
+              <motion.div
+                key={rel.key}
+                whileHover={{ scale: 1.01, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
               >
-                <View style={[selStyles.religionIconBox, { backgroundColor: rel.bg }]}>
-                  {rel.icon}
-                </View>
-                <View style={selStyles.religionCardContent}>
-                  <Text style={selStyles.religionLabel}>{rel.label}</Text>
-                  <Text style={selStyles.religionSubtitle}>{rel.subtitle}</Text>
-                </View>
-                <ChevronRight className="w-5 h-5" style={{ color: rel.color }} />
-              </TouchableOpacity>
-            </motion.div>
-          ))}
-        </View>
+                <TouchableOpacity
+                  style={[selStyles.religionCard, { borderColor: rel.color + '40' }]}
+                  onPress={() => onSelectReligion(rel.key)}
+                  activeOpacity={0.85}
+                >
+                  <View style={[selStyles.religionIconBox, { backgroundColor: rel.bg }]}>
+                    {rel.icon}
+                  </View>
+                  <View style={selStyles.religionCardContent}>
+                    <Text style={selStyles.religionLabel}>{rel.label}</Text>
+                    <Text style={selStyles.religionSubtitle}>{rel.subtitle}</Text>
+                  </View>
+                  <ChevronRight className="w-5 h-5" style={{ color: rel.color }} />
+                </TouchableOpacity>
+              </motion.div>
+            ))}
+          </View>
+        </div>
       </ScrollView>
     </View>
   );
@@ -550,160 +552,194 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
 
       {/* Subtitle strip */}
       <View style={listStyles.subtitleStrip}>
-        <Text style={listStyles.subtitleText}>{subtitles[religion]}</Text>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Text style={listStyles.subtitleText}>{subtitles[religion]}</Text>
+        </div>
       </View>
 
-      {/* SEARCH */}
-      <View style={listStyles.searchSection}>
-        <View style={listStyles.searchBox}>
-          <Search className="w-4 h-4 text-[#8C7A7C] mr-2" />
-          <TextInput
-            style={listStyles.searchInput}
-            placeholder={`Search ${religion} ceremony services...`}
-            placeholderTextColor="#8C7A7C"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery ? (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <X className="w-4 h-4 text-[#8C7A7C]" />
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        {/* SEARCH */}
+        <View style={listStyles.searchSection}>
+          <View style={listStyles.searchBox}>
+            <Search className="w-4 h-4 text-[#8C7A7C] mr-2" />
+            <TextInput
+              style={listStyles.searchInput}
+              placeholder={`Search ${religion} ceremony services...`}
+              placeholderTextColor="#8C7A7C"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery ? (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <X className="w-4 h-4 text-[#8C7A7C]" />
+              </TouchableOpacity>
+            ) : null}
+          </View>
+        </View>
+
+        {/* FILTER PILLS */}
+        <View style={listStyles.filterBarContainer}>
+          {[
+            { label: selectedCity === 'All Cities' ? 'All Cities ▼' : `${selectedCity} ▼`, active: selectedCity !== 'All Cities', onPress: () => { closeAllDropdowns(); setShowCityDropdown(true); } },
+            { label: selectedBudget === 'All Budgets' ? 'Budget ▼' : `${selectedBudget} ▼`, active: selectedBudget !== 'All Budgets', onPress: () => { closeAllDropdowns(); setShowBudgetDropdown(true); } },
+            { label: selectedRating === 'All Ratings' ? 'Rating ▼' : `${selectedRating} ▼`, active: selectedRating !== 'All Ratings', onPress: () => { closeAllDropdowns(); setShowRatingDropdown(true); } },
+            { label: selectedTier === 'All Tiers' ? 'Tier ▼' : `${selectedTier} ▼`, active: selectedTier !== 'All Tiers', onPress: () => { closeAllDropdowns(); setShowTierDropdown(true); } },
+          ].map((chip, i) => (
+            <TouchableOpacity key={i} style={[listStyles.filterChip, chip.active && listStyles.filterChipActive]} onPress={chip.onPress} activeOpacity={0.8}>
+              <Text style={[listStyles.filterChipText, chip.active && listStyles.filterChipTextActive]} numberOfLines={1}>{chip.label}</Text>
             </TouchableOpacity>
-          ) : null}
+          ))}
         </View>
-      </View>
 
-      {/* FILTER PILLS */}
-      <View style={listStyles.filterBarContainer}>
-        {[
-          { label: selectedCity === 'All Cities' ? 'All Cities ▼' : `${selectedCity} ▼`, active: selectedCity !== 'All Cities', onPress: () => { closeAllDropdowns(); setShowCityDropdown(true); } },
-          { label: selectedBudget === 'All Budgets' ? 'Budget ▼' : `${selectedBudget} ▼`, active: selectedBudget !== 'All Budgets', onPress: () => { closeAllDropdowns(); setShowBudgetDropdown(true); } },
-          { label: selectedRating === 'All Ratings' ? 'Rating ▼' : `${selectedRating} ▼`, active: selectedRating !== 'All Ratings', onPress: () => { closeAllDropdowns(); setShowRatingDropdown(true); } },
-          { label: selectedTier === 'All Tiers' ? 'Tier ▼' : `${selectedTier} ▼`, active: selectedTier !== 'All Tiers', onPress: () => { closeAllDropdowns(); setShowTierDropdown(true); } },
-        ].map((chip, i) => (
-          <TouchableOpacity key={i} style={[listStyles.filterChip, chip.active && listStyles.filterChipActive]} onPress={chip.onPress} activeOpacity={0.8}>
-            <Text style={[listStyles.filterChipText, chip.active && listStyles.filterChipTextActive]} numberOfLines={1}>{chip.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* DROPDOWN BACKDROP */}
+        {(showCityDropdown || showBudgetDropdown || showRatingDropdown || showTierDropdown) && (
+          <div className="fixed inset-0 z-30" onClick={closeAllDropdowns} />
+        )}
 
-      {/* DROPDOWNS */}
-      <AnimatePresence>
-        {showCityDropdown && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[162px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] max-h-[220px] overflow-y-auto flex flex-col gap-1">
-            {TAMIL_NADU_DISTRICTS.map((d) => (
-              <TouchableOpacity key={d} style={[listStyles.dropdownOption, selectedCity === d && listStyles.dropdownOptionActive]}
-                onPress={() => { setSelectedCity(d); setShowCityDropdown(false); }}>
-                <Text style={[listStyles.dropdownOptionText, selectedCity === d && listStyles.dropdownOptionTextActive]}>{d}</Text>
-                {selectedCity === d && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showBudgetDropdown && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[162px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
-            {BUDGET_RANGES.map((b) => (
-              <TouchableOpacity key={b} style={[listStyles.dropdownOption, selectedBudget === b && listStyles.dropdownOptionActive]}
-                onPress={() => { setSelectedBudget(b); setShowBudgetDropdown(false); }}>
-                <Text style={[listStyles.dropdownOptionText, selectedBudget === b && listStyles.dropdownOptionTextActive]}>{b}</Text>
-                {selectedBudget === b && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showRatingDropdown && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[162px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
-            {RATING_OPTIONS.map((r) => (
-              <TouchableOpacity key={r} style={[listStyles.dropdownOption, selectedRating === r && listStyles.dropdownOptionActive]}
-                onPress={() => { setSelectedRating(r); setShowRatingDropdown(false); }}>
-                <Text style={[listStyles.dropdownOptionText, selectedRating === r && listStyles.dropdownOptionTextActive]}>{r}</Text>
-                {selectedRating === r && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {showTierDropdown && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="absolute top-[162px] left-4 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
-            {TIER_OPTIONS.map((t) => (
-              <TouchableOpacity key={t} style={[listStyles.dropdownOption, selectedTier === t && listStyles.dropdownOptionActive]}
-                onPress={() => { setSelectedTier(t); setShowTierDropdown(false); }}>
-                <Text style={[listStyles.dropdownOptionText, selectedTier === t && listStyles.dropdownOptionTextActive]}>{t}</Text>
-                {selectedTier === t && <Check className="w-4 h-4 text-[#581420]" />}
-              </TouchableOpacity>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* DROPDOWNS */}
+        <AnimatePresence>
+          {showCityDropdown && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="absolute top-[108px] left-4 right-4 sm:left-4 sm:w-80 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] max-h-[260px] overflow-y-auto flex flex-col gap-1">
+              {TAMIL_NADU_DISTRICTS.map((d) => (
+                <TouchableOpacity key={d} style={[listStyles.dropdownOption, selectedCity === d && listStyles.dropdownOptionActive]}
+                  onPress={() => { setSelectedCity(d); setShowCityDropdown(false); }}>
+                  <Text style={[listStyles.dropdownOptionText, selectedCity === d && listStyles.dropdownOptionTextActive]}>{d}</Text>
+                  {selectedCity === d && <Check className="w-4 h-4 text-[#581420]" />}
+                </TouchableOpacity>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showBudgetDropdown && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="absolute top-[108px] left-4 sm:left-1/4 sm:w-80 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
+              {BUDGET_RANGES.map((b) => (
+                <TouchableOpacity key={b} style={[listStyles.dropdownOption, selectedBudget === b && listStyles.dropdownOptionActive]}
+                  onPress={() => { setSelectedBudget(b); setShowBudgetDropdown(false); }}>
+                  <Text style={[listStyles.dropdownOptionText, selectedBudget === b && listStyles.dropdownOptionTextActive]}>{b}</Text>
+                  {selectedBudget === b && <Check className="w-4 h-4 text-[#581420]" />}
+                </TouchableOpacity>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showRatingDropdown && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="absolute top-[108px] left-4 sm:left-2/4 sm:w-72 right-4 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
+              {RATING_OPTIONS.map((r) => (
+                <TouchableOpacity key={r} style={[listStyles.dropdownOption, selectedRating === r && listStyles.dropdownOptionActive]}
+                  onPress={() => { setSelectedRating(r); setShowRatingDropdown(false); }}>
+                  <Text style={[listStyles.dropdownOptionText, selectedRating === r && listStyles.dropdownOptionTextActive]}>{r}</Text>
+                  {selectedRating === r && <Check className="w-4 h-4 text-[#581420]" />}
+                </TouchableOpacity>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showTierDropdown && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+              className="absolute top-[108px] right-4 sm:w-72 z-40 bg-white rounded-2xl p-3 shadow-xl border border-[#E8DFD5] flex flex-col gap-1">
+              {TIER_OPTIONS.map((t) => (
+                <TouchableOpacity key={t} style={[listStyles.dropdownOption, selectedTier === t && listStyles.dropdownOptionActive]}
+                  onPress={() => { setSelectedTier(t); setShowTierDropdown(false); }}>
+                  <Text style={[listStyles.dropdownOptionText, selectedTier === t && listStyles.dropdownOptionTextActive]}>{t}</Text>
+                  {selectedTier === t && <Check className="w-4 h-4 text-[#581420]" />}
+                </TouchableOpacity>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      {/* LIST HEADER */}
-      <View style={listStyles.resultsHeader}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={listStyles.recommendedTitle}>Recommended Ceremony Providers</Text>
-          <Sparkles className="w-4 h-4 text-[#C28E38] ml-1.5" />
+        {/* LIST HEADER */}
+        <View style={listStyles.resultsHeader}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={listStyles.recommendedTitle}>Recommended Ceremony Providers</Text>
+            <Sparkles className="w-4 h-4 text-[#C28E38] ml-1.5" />
+          </View>
+          <Text style={listStyles.resultCountText}>{filtered.length} vendors</Text>
         </View>
-        <Text style={listStyles.resultCountText}>{filtered.length} vendors</Text>
-      </View>
+      </div>
 
       {/* VENDOR LIST */}
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 60, paddingHorizontal: 16 }}>
-        {filtered.length === 0 ? (
-          <View style={listStyles.emptyContainer}>
-            <Flame className="w-10 h-10 text-[#A8989A] mb-2" />
-            <Text style={listStyles.emptyTitle}>No Vendors Found</Text>
-            <Text style={listStyles.emptySub}>Try adjusting your search or filters.</Text>
-            <TouchableOpacity style={listStyles.resetFilterBtn} onPress={() => { setSearchQuery(''); setSelectedCity('All Cities'); setSelectedBudget('All Budgets'); setSelectedRating('All Ratings'); setSelectedTier('All Tiers'); }}>
-              <Text style={listStyles.resetFilterBtnText}>Reset Filters</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          filtered.map((vendor) => {
-            const isBookmarked = Boolean(savedRitualsIds[vendor.id]);
-            return (
-              <View key={vendor.id} style={listStyles.cardContainer}>
-                <View style={listStyles.cardImgWrapper}>
-                  <Image source={{ uri: vendor.image }} style={listStyles.cardImg} />
-                  <View style={listStyles.cardTierBadge}>
-                    <Text style={listStyles.cardTierBadgeText}>{vendor.tier}</Text>
-                  </View>
-                  <TouchableOpacity style={listStyles.cardBookmarkBtn} onPress={() => onToggleSavedRitual(vendor.id)} activeOpacity={0.8}>
-                    <Bookmark className={`w-4 h-4 ${isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'}`} />
-                  </TouchableOpacity>
-                </View>
-                <View style={listStyles.cardBody}>
-                  <View style={listStyles.cardTitleRow}>
-                    <Text style={listStyles.cardTitle} numberOfLines={1}>{vendor.name}</Text>
-                    <View style={listStyles.cardRatingPill}>
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500 mr-1" />
-                      <Text style={listStyles.cardRatingText}>{vendor.rating.toFixed(1)}</Text>
-                      <Text style={listStyles.cardReviewsText}>({vendor.reviewsCount})</Text>
+        <div className="w-full max-w-7xl mx-auto">
+          {filtered.length === 0 ? (
+            <View style={listStyles.emptyContainer}>
+              <Flame className="w-10 h-10 text-[#A8989A] mb-2" />
+              <Text style={listStyles.emptyTitle}>No Vendors Found</Text>
+              <Text style={listStyles.emptySub}>Try adjusting your search or filters.</Text>
+              <TouchableOpacity style={listStyles.resetFilterBtn} onPress={() => { setSearchQuery(''); setSelectedCity('All Cities'); setSelectedBudget('All Budgets'); setSelectedRating('All Ratings'); setSelectedTier('All Tiers'); }}>
+                <Text style={listStyles.resetFilterBtnText}>Reset Filters</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+              {filtered.map((vendor) => {
+                const isBookmarked = Boolean(savedRitualsIds[vendor.id]);
+                return (
+                  <motion.div
+                    key={vendor.id}
+                    whileHover={{ y: -3, scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="w-full cursor-pointer flex"
+                    onClick={() => setSelectedVendor(vendor)}
+                  >
+                    <View style={listStyles.cardContainer}>
+                      <View style={listStyles.cardImgWrapper}>
+                        <img
+                          src={vendor.image}
+                          alt={vendor.name}
+                          className="w-full h-full object-cover object-[center_15%]"
+                          loading="lazy"
+                        />
+                        <View style={listStyles.cardTierBadge}>
+                          <Text style={listStyles.cardTierBadgeText}>{vendor.tier}</Text>
+                        </View>
+                        <TouchableOpacity
+                          style={listStyles.cardBookmarkBtn}
+                          onPress={(e) => {
+                            e.stopPropagation();
+                            onToggleSavedRitual(vendor.id);
+                          }}
+                          activeOpacity={0.8}
+                        >
+                          <Bookmark className={`w-4 h-4 ${isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#8C7A7C]'}`} />
+                        </TouchableOpacity>
+                      </View>
+                      <View style={listStyles.cardBody}>
+                        <View style={listStyles.cardTitleRow}>
+                          <Text style={listStyles.cardTitle} numberOfLines={1}>{vendor.name}</Text>
+                          <View style={listStyles.cardRatingPill}>
+                            <Star className="w-3 h-3 text-amber-500 fill-amber-500 mr-1" />
+                            <Text style={listStyles.cardRatingText}>{vendor.rating.toFixed(1)}</Text>
+                            <Text style={listStyles.cardReviewsText}>({vendor.reviewsCount})</Text>
+                          </View>
+                        </View>
+                        <View style={listStyles.cardLocationRow}>
+                          <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
+                          <Text style={listStyles.cardLocationText}>{vendor.location}</Text>
+                          <Text style={listStyles.cardDot}>•</Text>
+                          <Text style={listStyles.cardCategoryText} numberOfLines={1}>{vendor.category}</Text>
+                        </View>
+                        <View style={listStyles.cardPriceRow}>
+                          <Text style={listStyles.cardPriceValue}>{vendor.startingPrice}</Text>
+                          <TouchableOpacity style={listStyles.cardViewBtn} onPress={() => setSelectedVendor(vendor)} activeOpacity={0.85}>
+                            <Text style={listStyles.cardViewBtnText}>View Details</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
                     </View>
-                  </View>
-                  <View style={listStyles.cardLocationRow}>
-                    <MapPin className="w-3.5 h-3.5 text-[#8C7A7C] mr-1" />
-                    <Text style={listStyles.cardLocationText}>{vendor.location}</Text>
-                    <Text style={listStyles.cardDot}>•</Text>
-                    <Text style={listStyles.cardCategoryText} numberOfLines={1}>{vendor.category}</Text>
-                  </View>
-                  <View style={listStyles.cardPriceRow}>
-                    <Text style={listStyles.cardPriceValue}>{vendor.startingPrice}</Text>
-                    <TouchableOpacity style={listStyles.cardViewBtn} onPress={() => setSelectedVendor(vendor)} activeOpacity={0.85}>
-                      <Text style={listStyles.cardViewBtnText}>View Details</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            );
-          })
-        )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </ScrollView>
     </View>
   );
@@ -763,9 +799,9 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
 // ──────────────────────────────────────────────
 const selStyles = StyleSheet.create({
   container: { flex: 1, height: '100%' as any, maxHeight: '100%' as any, width: '100%', backgroundColor: '#FAF7F2', overflow: 'hidden' as any, display: 'flex' as any, flexDirection: 'column' },
-  header: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: '#FAF7F2', borderBottomWidth: 1, borderBottomColor: '#EFE7DE' },
+  header: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, width: '100%', backgroundColor: '#FAF7F2', borderBottomWidth: 1, borderBottomColor: '#EFE7DE' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#E8DFD5' },
-  headerTitle: { fontSize: 16, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif' },
+  headerTitle: { fontSize: 16, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', flex: 1, textAlign: 'center' },
   heroSection: { paddingVertical: 28 },
   heroTitle: { fontSize: 28, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', lineHeight: 36, marginBottom: 10 },
   heroSubtitle: { fontSize: 14, color: '#6B5A5C', lineHeight: 21, fontWeight: '400' },
@@ -778,15 +814,15 @@ const selStyles = StyleSheet.create({
 
 const listStyles = StyleSheet.create({
   container: { flex: 1, height: '100%' as any, maxHeight: '100%' as any, width: '100%', backgroundColor: '#FAF7F2', overflow: 'hidden' as any, display: 'flex' as any, flexDirection: 'column' },
-  header: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, backgroundColor: '#FAF7F2', borderBottomWidth: 1, borderBottomColor: '#EFE7DE' },
+  header: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, width: '100%', backgroundColor: '#FAF7F2', borderBottomWidth: 1, borderBottomColor: '#EFE7DE' },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#E8DFD5' },
-  headerTitle: { fontSize: 15, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', flex: 1, textAlign: 'center' },
-  subtitleStrip: { paddingHorizontal: 16, paddingVertical: 6, backgroundColor: '#F5EEE6' },
+  headerTitle: { fontSize: 16, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', flex: 1, textAlign: 'center' },
+  subtitleStrip: { paddingVertical: 6, backgroundColor: '#F5EEE6' },
   subtitleText: { fontSize: 11, color: '#6B5A5C', textAlign: 'center', fontWeight: '400' },
-  searchSection: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 6 },
+  searchSection: { paddingTop: 10, paddingBottom: 6 },
   searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFFFF', height: 40, borderRadius: 20, paddingHorizontal: 12, borderWidth: 1, borderColor: '#E2D8CD' },
   searchInput: { flex: 1, fontSize: 12, color: '#2A2425', outlineStyle: 'none' as any },
-  filterBarContainer: { flexDirection: 'row', paddingHorizontal: 16, gap: 8, marginBottom: 10, marginTop: 2 },
+  filterBarContainer: { flexDirection: 'row', gap: 8, marginBottom: 10, marginTop: 2 },
   filterChip: { flex: 1, height: 36, borderRadius: 24, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DDD6CE', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.03, shadowRadius: 2, elevation: 1 },
   filterChipActive: { backgroundColor: '#FFFFFF', borderColor: '#581420', borderWidth: 1.5 },
   filterChipText: { fontSize: 12, fontWeight: '500', color: '#332B2C', textAlign: 'center' },
@@ -795,33 +831,85 @@ const listStyles = StyleSheet.create({
   dropdownOptionActive: { backgroundColor: '#F3ECE3' },
   dropdownOptionText: { fontSize: 12, color: '#3D3234', fontWeight: '500' },
   dropdownOptionTextActive: { color: '#581420', fontWeight: '800' },
-  resultsHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 10, marginTop: 4 },
-  recommendedTitle: { fontSize: 14, fontFamily: 'Playfair Display, serif', fontWeight: '800', color: '#2A2425' },
+  resultsHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, marginTop: 4 },
+  recommendedTitle: { fontSize: 15, fontFamily: 'Playfair Display, serif', fontWeight: '800', color: '#2A2425' },
   resultCountText: { fontSize: 11, color: '#8C7A7C', fontWeight: '600' },
   emptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
   emptyTitle: { fontSize: 15, fontWeight: '700', color: '#2A2425', marginBottom: 4 },
   emptySub: { fontSize: 12, color: '#8C7A7C', textAlign: 'center', marginBottom: 14 },
   resetFilterBtn: { backgroundColor: '#581420', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 16 },
   resetFilterBtnText: { color: '#FFFFFF', fontSize: 12, fontWeight: '700' },
-  cardContainer: { backgroundColor: '#FFFFFF', borderRadius: 18, marginBottom: 14, overflow: 'hidden', borderWidth: 1, borderColor: '#E8DFD5', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 5, elevation: 2 },
-  cardImgWrapper: { position: 'relative', height: 180, width: '100%' },
-  cardImg: { width: '100%', height: '100%' },
-  cardTierBadge: { position: 'absolute', top: 10, left: 10, backgroundColor: '#FEF3C7', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, borderWidth: 1, borderColor: '#FDE68A' },
+  cardContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+    width: '100%',
+    display: 'flex' as any,
+    flexDirection: 'column',
+    flex: 1,
+  },
+  cardImgWrapper: {
+    position: 'relative',
+    height: 210,
+    width: '100%',
+    backgroundColor: '#F3ECE3',
+    overflow: 'hidden',
+  },
+  cardImg: {
+    width: '100%',
+    height: '100%',
+  },
+  cardTierBadge: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
   cardTierBadgeText: { color: '#92400E', fontSize: 10, fontWeight: '800', textTransform: 'uppercase' as any },
-  cardBookmarkBtn: { position: 'absolute', top: 10, right: 10, width: 32, height: 32, borderRadius: 16, backgroundColor: '#FFFFFF', justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 3 },
-  cardBody: { padding: 12 },
-  cardTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
+  cardBookmarkBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+  },
+  cardBody: { padding: 14, flex: 1, display: 'flex' as any, flexDirection: 'column', justifyContent: 'space-between' },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
   cardTitle: { fontSize: 15, fontWeight: '800', color: '#2A2425', fontFamily: 'Playfair Display, serif', flex: 1, marginRight: 6 },
   cardRatingPill: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFFBEB', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
   cardRatingText: { fontSize: 11, fontWeight: '800', color: '#92400E' },
   cardReviewsText: { fontSize: 10, color: '#B45309', marginLeft: 2 },
-  cardLocationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  cardLocationRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   cardLocationText: { fontSize: 11, color: '#6B5A5C', fontWeight: '500' },
   cardDot: { fontSize: 10, color: '#C2B5B7', marginHorizontal: 6 },
   cardCategoryText: { fontSize: 11, color: '#581420', fontWeight: '600', flex: 1 },
-  cardPriceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F3ECE3' },
+  cardPriceRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F3ECE3' },
   cardPriceValue: { fontSize: 14, fontWeight: '800', color: '#2A2425' },
-  cardViewBtn: { backgroundColor: '#581420', paddingHorizontal: 16, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  cardViewBtnText: { color: '#FFFFFF', fontSize: 11, fontWeight: '700' },
+  cardViewBtn: { backgroundColor: '#F5EEE6', borderWidth: 1, borderColor: '#E8DFD5', paddingHorizontal: 11, paddingVertical: 5, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  cardViewBtnText: { color: '#581420', fontSize: 10.5, fontWeight: '700' },
 });
 

@@ -43,6 +43,7 @@ import { QuotationScreen } from './QuotationScreen';
 import { EntertainmentItem as EntertainmentArtist } from '../constants/EntertainmentData';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -72,7 +73,8 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'videos'>('photos');
   const [isReadMore, setIsReadMore] = useState(false);
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
@@ -102,79 +104,58 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[artist.id]) {
-          return statuses[artist.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(artist.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(artist.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [artist.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[artist.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((artist.startingPrice || '₹45,000').replace(/[^0-9]/g, ''), 10) || 45000;
+    saveOrUpdateWeddingBooking({
+      vendorId: artist.id,
+      vendorName: artist.name,
+      category: 'Entertainment',
+      serviceType: 'Live Music, DJ & Performance',
+      image: artist.image,
+      location: artist.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
 
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
     updateQuoteStatus('requested');
-    const basePrice = parseInt((artist.startingPrice || '₹50,000').replace(/[^0-9]/g, ''), 10) || 50000;
-    saveOrUpdateQuote({
-      id: `quote-${artist.id}`,
-      vendorId: artist.id,
-      vendorName: artist.name,
-      category: 'Entertainment',
-      packageName: 'Grand Wedding DJ & Live Band Entertainment',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: eventDate || '15 Dec 2026',
-      location: artist.location || 'Chennai, Tamil Nadu',
-      includedServices: [
-        'Professional Live Band & DJ Performance',
-        'High-End Line Array Sound System Setup',
-        'Intelligent Dance Floor Lighting Rig',
-        'Anchor / Emcee for Event Hosting',
-        'Traditional Nadaswaram Group for Welcoming',
-      ],
-      image: artist.image,
-    });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 3 seconds
+    // Simulate vendor response ready after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${artist.id}`,
-        status: 'response_ready',
-      });
-      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setToastMessage('Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
-    }, 3000);
+    }, 2500);
   };
 
+  const handleConfirmQuoteFromQuotation = () => {
+    updateQuoteStatus('confirmed');
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
+  };
 
   // Quote form state
   const [customerName, setCustomerName] = useState('');
@@ -182,7 +163,7 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
   const [eventDate, setEventDate] = useState('15 December 2026');
   const [eventLocation, setEventLocation] = useState(artist.location || 'Chennai, Tamil Nadu');
   const [eventType, setEventType] = useState<'Wedding' | 'Reception' | 'Engagement' | 'Other'>('Wedding');
-  const [entertainmentType, setEntertainmentType] = useState('Wedding Entertainment');
+  const [artistType, setArtistType] = useState('Live Band & DJ');
   const [showPhotoTypeDropdown, setShowPhotoTypeDropdown] = useState(false);
 
   const showToast = (msg: string) => {
@@ -194,21 +175,39 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
 
   // Helper to get artist initials for logo
   const getInitials = (name: string) => {
-    const words = name.replace(/entertainment/gi, '').trim().split(' ');
+    const words = name.replace(/entertainment|music|band|dj/gi, '').trim().split(' ');
     if (words.length >= 2) {
       return (words[0][0] + words[1][0]).toUpperCase();
     }
     return name.slice(0, 3).toUpperCase();
   };
 
-  // Sample photo gallery array
+  // Curated 24 live wedding entertainment, DJ & stage photos
   const photoGallery = [
     artist.image,
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
   ];
 
   const handleShare = () => {
@@ -393,7 +392,10 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
                   <TouchableOpacity
                     key={index}
                     style={styles.gridPhotoWrapper}
-                    onPress={() => setActivePhotoModal(imgUrl)}
+                    onPress={() => {
+                      setGalleryInitialIndex(index);
+                      setIsGalleryOpen(true);
+                    }}
                     activeOpacity={0.9}
                   >
                     <Image source={{ uri: imgUrl }} style={styles.gridPhoto} resizeMode="cover" />
@@ -403,7 +405,10 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
                 {/* 4th slot with "+20 More Photos" overlay */}
                 <TouchableOpacity
                   style={styles.gridPhotoWrapper}
-                  onPress={() => setActivePhotoModal(photoGallery[3] || artist.image)}
+                  onPress={() => {
+                    setGalleryInitialIndex(3);
+                    setIsGalleryOpen(true);
+                  }}
                   activeOpacity={0.9}
                 >
                   <Image source={{ uri: photoGallery[3] || artist.image }} style={styles.gridPhoto} resizeMode="cover" />
@@ -521,17 +526,18 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
 
       {/* FIXED BOTTOM ACTION BAR */}
       <View style={styles.fixedBottomBar}>
-        <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-          <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
-          <Text style={styles.whatsappBtnText}>WhatsApp</Text>
-        </TouchableOpacity>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
+          <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
+            <Text style={styles.whatsappBtnText}>WhatsApp</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
-          <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
-          <Text style={styles.callNowBtnText}>Call Now</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
+            <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
+            <Text style={styles.callNowBtnText}>Call Now</Text>
+          </TouchableOpacity>
 
-                  {quoteStatus === 'initial' && (
+          {quoteStatus === 'initial' && (
             <TouchableOpacity
               style={styles.sendQuoteBtn}
               onPress={() => setShowQuoteModal(true)}
@@ -581,20 +587,18 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
               </Text>
             </TouchableOpacity>
           )}
+        </div>
       </View>
 
-      {/* LIGHTBOX PHOTO MODAL */}
-      {activePhotoModal && (
-        <Modal transparent animationType="fade" visible={Boolean(activePhotoModal)}>
-          <View style={styles.lightboxBackdrop}>
-            <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setActivePhotoModal(null)}>
-              <X className="w-6 h-6 text-white" />
-            </TouchableOpacity>
-
-            <Image source={{ uri: activePhotoModal }} style={styles.lightboxImage} resizeMode="contain" />
-          </View>
-        </Modal>
-      )}
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={photoGallery}
+        initialIndex={galleryInitialIndex}
+        title={artist.name}
+        category="Entertainment"
+      />
 
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
@@ -1180,15 +1184,12 @@ paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderColor: '#EFE7DE',
-    paddingHorizontal: 12,
     paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
+    zIndex: 40,
   },
   whatsappBtn: {
     flex: 1,

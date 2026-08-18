@@ -44,6 +44,7 @@ import { QuotationScreen } from './QuotationScreen';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import {
   getWeddingBookingByVendorId,
   saveOrUpdateWeddingBooking,
@@ -113,7 +114,8 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
   onNavigateToProfileMyBookings,
 }) => {
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
   const [showQuotationScreen, setShowQuotationScreen] = useState<boolean>(false);
@@ -136,7 +138,7 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
     setToastMessage(msg);
   };
 
-  // Quote Flow Local States synced with localStorage
+  // Quote Flow Local States
   const [quoteStatus, setQuoteStatus] = useState<
     'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating'
   >(() => {
@@ -151,29 +153,36 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[venue.id]) {
-          return statuses[venue.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(venue.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(venue.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [venue.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[venue.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((venue.startingPrice || '₹2,50,000').replace(/[^0-9]/g, ''), 10) || 250000;
+    saveOrUpdateWeddingBooking({
+      vendorId: venue.id,
+      vendorName: venue.name,
+      category: 'Venues',
+      serviceType: 'Luxury Banquet & Wedding Lawn',
+      image: venue.image,
+      location: venue.location || venue.city || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const handleQuoteRequestSent = () => {
@@ -200,7 +209,6 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
         '2 Deluxe AC Bridal & Groom Changing Suites',
         '100% Uninterrupted Power Generator Backup',
         'Dedicated Valet Parking & Security Staff',
-        'Basic Stage Lighting & Audio Sound Rig',
       ],
       image: heroImages[0] || venue.image,
     });
@@ -218,15 +226,33 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
     }, 3000);
   };
 
-  const heroImages = (venue.portfolio && venue.portfolio.length > 0)
-    ? venue.portfolio
-    : [
-        venue.image || '/src/assets/images/beach_resort_decor.jpg',
-        '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
-        '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-        '/src/assets/images/modern_canopy_decor.jpg',
-        '/src/assets/images/pastel_reception_stage.jpg',
-      ];
+  // Curated 24 luxury venue & banquet hall photos
+  const heroImages = [
+    venue.image || '/src/assets/images/beach_resort_decor.jpg',
+    '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+    '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
+    '/src/assets/images/modern_canopy_decor.jpg',
+    '/src/assets/images/pastel_reception_stage.jpg',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+  ];
 
   const handleNextImage = () => {
     setActiveImageIndex((prev) => (prev + 1) % heroImages.length);
@@ -429,7 +455,8 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
             style={styles.imageCounter}
             onPress={(e) => {
               e.stopPropagation();
-              setActivePhotoModal(heroImages[activeImageIndex]);
+              setGalleryInitialIndex(activeImageIndex);
+              setIsGalleryOpen(true);
             }}
           >
             <Camera className="w-3.5 h-3.5 text-[#3B2F2F] mr-1" />
@@ -608,10 +635,22 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
               </View>
             </View>
             <View style={styles.banquetImageGrid}>
-              <TouchableOpacity style={{ flex: 1 }} onPress={() => setActivePhotoModal(heroImages[1])}>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setGalleryInitialIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+              >
                 <Image source={{ uri: heroImages[1] }} style={styles.banquetGridImg} />
               </TouchableOpacity>
-              <TouchableOpacity style={{ flex: 1 }} onPress={() => setActivePhotoModal(heroImages[2])}>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setGalleryInitialIndex(2);
+                  setIsGalleryOpen(true);
+                }}
+              >
                 <Image source={{ uri: heroImages[2] }} style={styles.banquetGridImg} />
               </TouchableOpacity>
             </View>
@@ -630,10 +669,22 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
               </View>
             </View>
             <View style={styles.banquetImageGrid}>
-              <TouchableOpacity style={{ flex: 1 }} onPress={() => setActivePhotoModal(heroImages[3])}>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setGalleryInitialIndex(3);
+                  setIsGalleryOpen(true);
+                }}
+              >
                 <Image source={{ uri: heroImages[3] }} style={styles.banquetGridImg} />
               </TouchableOpacity>
-              <TouchableOpacity style={{ flex: 1 }} onPress={() => setActivePhotoModal(heroImages[4] || heroImages[0])}>
+              <TouchableOpacity
+                style={{ flex: 1 }}
+                onPress={() => {
+                  setGalleryInitialIndex(4);
+                  setIsGalleryOpen(true);
+                }}
+              >
                 <Image source={{ uri: heroImages[4] || heroImages[0] }} style={styles.banquetGridImg} />
               </TouchableOpacity>
             </View>
@@ -713,87 +764,84 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
       {/* STICKY BOTTOM ACTION BAR */}
       <View style={styles.bottomBar}>
-        <View style={styles.bottomPriceCol}>
-          <Text style={styles.bottomPriceLabel}>Starting From</Text>
-          <Text style={styles.bottomPriceValue} numberOfLines={1}>{venue.startingPrice}</Text>
-        </View>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-6">
+          <View style={styles.bottomPriceCol}>
+            <Text style={styles.bottomPriceLabel}>Starting From</Text>
+            <Text style={styles.bottomPriceValue} numberOfLines={1}>{venue.startingPrice}</Text>
+          </View>
 
-        <View style={styles.bottomActionBtns}>
-          <TouchableOpacity style={styles.callIconBtn} onPress={handleCall} activeOpacity={0.8}>
-            <Phone className="w-4 h-4 text-[#2A2425]" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.whatsappIconBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-            <MessageCircle className="w-4 h-4 text-emerald-700" />
-          </TouchableOpacity>
-
-          {quoteStatus === 'initial' && (
-            <TouchableOpacity
-              style={styles.quoteBtnMain}
-              onPress={() => setShowQuoteModal(true)}
-              activeOpacity={0.85}
-            >
-              <Send className="w-3.5 h-3.5 text-white mr-1.5" />
-              <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+          <View style={styles.bottomActionBtns}>
+            <TouchableOpacity style={styles.callIconBtn} onPress={handleCall} activeOpacity={0.8}>
+              <Phone className="w-4 h-4 text-[#2A2425]" />
             </TouchableOpacity>
-          )}
 
-          {quoteStatus === 'requested' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+            <TouchableOpacity style={styles.whatsappIconBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
+              <MessageCircle className="w-4 h-4 text-emerald-700" />
             </TouchableOpacity>
-          )}
 
-          {quoteStatus === 'negotiating' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-              <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'initial' && (
+              <TouchableOpacity
+                style={styles.quoteBtnMain}
+                onPress={() => setShowQuoteModal(true)}
+                activeOpacity={0.85}
+              >
+                <Send className="w-3.5 h-3.5 text-white mr-1.5" />
+                <Text style={styles.quoteBtnMainText}>Request Quote</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'rejected' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-              <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'requested' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.quoteBtnMainText}>Pending Response</Text>
+              </TouchableOpacity>
+            )}
 
-          {quoteStatus === 'response_ready' && (
-            <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
-              <Text style={styles.quoteBtnMainText}>View Quote</Text>
-            </TouchableOpacity>
-          )}
+            {quoteStatus === 'negotiating' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+                <Text style={styles.quoteBtnMainText}>Negotiating...</Text>
+              </TouchableOpacity>
+            )}
 
-          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-            <TouchableOpacity
-              style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
-              onPress={() => setShowInvoiceModal(true)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.quoteBtnMainText}>
-                {quoteStatus === 'fully_paid'
-                  ? 'Fully Paid (Invoice)'
-                  : quoteStatus === 'partially_paid'
-                  ? 'Partially Paid'
-                  : 'View Invoice'}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+            {quoteStatus === 'rejected' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+                <Text style={styles.quoteBtnMainText}>Rejected (Reset)</Text>
+              </TouchableOpacity>
+            )}
+
+            {quoteStatus === 'response_ready' && (
+              <TouchableOpacity style={[styles.quoteBtnMain, { backgroundColor: '#10B981' }]} onPress={() => setShowQuotationScreen(true)} activeOpacity={0.85}>
+                <Text style={styles.quoteBtnMainText}>View Quote</Text>
+              </TouchableOpacity>
+            )}
+
+            {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+              <TouchableOpacity
+                style={[styles.quoteBtnMain, { backgroundColor: '#15803D' }]}
+                onPress={() => setShowInvoiceModal(true)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.quoteBtnMainText}>
+                  {quoteStatus === 'fully_paid'
+                    ? 'Fully Paid (Invoice)'
+                    : quoteStatus === 'partially_paid'
+                    ? 'Partially Paid'
+                    : 'View Invoice'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </div>
       </View>
 
-      {/* PHOTO ZOOM MODAL */}
-      <Modal visible={Boolean(activePhotoModal)} transparent animationType="fade">
-        <View style={styles.photoModalContainer}>
-          <TouchableOpacity
-            style={styles.photoModalClose}
-            onPress={() => setActivePhotoModal(null)}
-          >
-            <X className="w-6 h-6 text-white" />
-          </TouchableOpacity>
-          {activePhotoModal && (
-            <Image source={{ uri: activePhotoModal }} style={styles.fullPhoto} resizeMode="contain" />
-          )}
-        </View>
-      </Modal>
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={heroImages}
+        initialIndex={galleryInitialIndex}
+        title={venue.name}
+        category="Wedding Venue"
+      />
 
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
@@ -1379,14 +1427,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 60,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#EBE5DE',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingVertical: 10,
     zIndex: 100,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },

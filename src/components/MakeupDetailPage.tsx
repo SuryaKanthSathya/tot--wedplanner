@@ -35,6 +35,7 @@ import { MakeupStudio } from './MakeupListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { QuotationScreen } from './QuotationScreen';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -62,7 +63,8 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
   onNavigateToMyWeddingPayments,
   onNavigateToProfileMyBookings,
 }) => {
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -117,49 +119,31 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showNegotiateView, setShowNegotiateView] = useState(false);
   const [negotiatePrice, setNegotiatePrice] = useState('');
   const [negotiateMessage, setNegotiateMessage] = useState('');
 
+  // Default initial mock quote values
   const [mockQuoteDetails, setMockQuoteDetails] = useState(() => {
     const basePrice = parseInt(studio.startingPrice.replace(/[^0-9]/g, ''), 10) || 35000;
-    const defaultDetails = {
-      artistName: studio.name || 'Glow Bridal Studio',
-      packageName: 'Premium Bridal Makeup',
-      includedServices: [
-        'Bridal Makeup',
-        'Hair Styling',
-        'Saree Draping',
-        'Makeup for Reception',
-        'Makeup Trial',
-      ],
-      weddingDate: '24 Oct 2026',
-      location: studio.location || 'Chennai, TN',
+    const advance = Math.round(basePrice * 0.3);
+    const remaining = basePrice - advance;
+    return {
+      packageName: 'Signature HD Bridal Makeup & Saree Draping',
       totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
+      advanceAmount: advance,
+      remainingAmount: remaining,
+      weddingDate: '15 December 2026',
+      location: studio.location || 'Chennai, Tamil Nadu',
+      includedServices: [
+        'Bridal HD / Airbrush Makeup',
+        'Hair Styling & Fresh Floral Styling',
+        'Saree Draping & Dupatta Setting',
+        'Lashes, Lenses & High-End Cosmetic Brands',
+        'Trial Session Included in Signature Package',
+      ],
     };
-
-    try {
-      const savedQuotesJson = localStorage.getItem('tot_confirmed_quotes');
-      if (savedQuotesJson) {
-        const quotes = JSON.parse(savedQuotesJson);
-        const match = quotes.find((q: any) => q.id === `quote-${studio.id}`);
-        if (match) {
-          return {
-            ...defaultDetails,
-            totalAmount: match.totalAmount,
-            advanceAmount: match.advanceAmount,
-            remainingAmount: match.remainingAmount,
-            weddingDate: match.weddingDate,
-            location: match.location,
-            includedServices: match.includedServices,
-          };
-        }
-      }
-    } catch (e) {
-      console.warn(e);
-    }
-    return defaultDetails;
   });
 
   const handleQuoteRequestSent = () => {
@@ -219,23 +203,23 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
     };
 
     try {
-      const existingQuotesJson = localStorage.getItem('tot_confirmed_quotes');
-      let existingQuotes = existingQuotesJson ? JSON.parse(existingQuotesJson) : [];
-      // Remove existing duplicate
-      existingQuotes = existingQuotes.filter((q: any) => q.id !== newQuote.id);
-      existingQuotes.push(newQuote);
-      localStorage.setItem('tot_confirmed_quotes', JSON.stringify(existingQuotes));
+      const saved = localStorage.getItem('tot_confirmed_quotes');
+      const list = saved ? JSON.parse(saved) : [];
+      const filtered = list.filter((q: any) => q.id !== newQuote.id);
+      filtered.push(newQuote);
+      localStorage.setItem('tot_confirmed_quotes', JSON.stringify(filtered));
     } catch (e) {
-      console.warn('Error saving confirmed quote:', e);
+      console.warn(e);
     }
 
     setShowQuotationScreen(false);
-    setToastMessage('Quote Confirmed! Added to My Quotes');
+    setShowInvoiceModal(true);
+    setToastMessage('✓ Quote Confirmed! View Invoice & Pay');
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const handleProcessPayment = () => {
-    if (selectedPaymentOption === 'advance') {
+  const handlePaymentSuccess = (paymentType: 'advance' | 'full') => {
+    if (paymentType === 'advance') {
       updateQuoteStatus('partially_paid');
       setToastMessage('Advance Paid (Partially Paid)!');
     } else {
@@ -300,14 +284,33 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
     }, 3500);
   };
 
-  const portfolioImages = studio.portfolio && studio.portfolio.length >= 4
-    ? studio.portfolio.slice(0, 4)
-    : [
-        studio.image,
-        'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=600&q=80',
-      ];
+  // Curated 24 luxury bridal makeup photos
+  const portfolioImages = [
+    studio.image,
+    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+  ];
 
   const handleShare = () => {
     if (navigator.share) {
@@ -457,19 +460,19 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
           {/* PHOTO GRID */}
           <View style={styles.photoGrid}>
-            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[0])}>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}>
               <Image source={{ uri: portfolioImages[0] }} style={styles.photoImg} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[1])}>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => { setGalleryInitialIndex(1); setIsGalleryOpen(true); }}>
               <Image source={{ uri: portfolioImages[1] }} style={styles.photoImg} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[2])}>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}>
               <Image source={{ uri: portfolioImages[2] }} style={styles.photoImg} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.photoGridItem} onPress={() => setActivePhotoModal(portfolioImages[3])}>
+            <TouchableOpacity style={styles.photoGridItem} onPress={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}>
               <Image source={{ uri: portfolioImages[3] }} style={styles.photoImg} />
               <View style={styles.morePhotosOverlay}>
-                <Text style={styles.morePhotosText}>+23</Text>
+                <Text style={styles.morePhotosText}>+20</Text>
                 <Text style={styles.morePhotosSubtext}>More Photos</Text>
               </View>
             </TouchableOpacity>
@@ -558,87 +561,82 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
               <Image source={{uri: 'https://cdn-icons-png.flaticon.com/512/2991/2991148.png'}} style={{width: 14, height: 14}} />
             </View>
           </View>
-
         </View>
       </ScrollView>
-
-      {/* NEW STICKY BOTTOM ACTION BAR */}
+      {/* STICKY BOTTOM ACTION BAR */}
       <View style={styles.bottomBarNew}>
-        <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
-          <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
-          <Text style={styles.btnWhatsappText}>WhatsApp</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.btnCall} onPress={handleCallPhone} activeOpacity={0.8}>
-          <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
-          <Text style={styles.btnCallText}>Call Now</Text>
-        </TouchableOpacity>
-        
-        {quoteStatus === 'initial' && (
-          <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
-            <Text style={styles.btnQuoteText}>Req Quote</Text>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
+          <TouchableOpacity style={styles.btnWhatsapp} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <MessageCircle size={14} color="#10B981" style={{ marginRight: 4 }} />
+            <Text style={styles.btnWhatsappText}>WhatsApp</Text>
           </TouchableOpacity>
-        )}
+          
+          <TouchableOpacity style={styles.btnCall} onPress={handleCallPhone} activeOpacity={0.8}>
+            <Phone size={14} color="#4B5563" style={{ marginRight: 4 }} />
+            <Text style={styles.btnCallText}>Call Now</Text>
+          </TouchableOpacity>
+          
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity style={styles.btnQuote} onPress={() => setShowQuoteModal(true)} activeOpacity={0.85}>
+              <Text style={styles.btnQuoteText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'requested' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Pending Response</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'negotiating' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Negotiating Price...</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'negotiating' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#F59E0B' }]} disabled activeOpacity={1}>
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Negotiating Price...</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'rejected' && (
-          <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Quote Rejected (Reset)</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'rejected' && (
+            <TouchableOpacity style={[styles.btnQuote, { backgroundColor: '#DC2626' }]} onPress={() => updateQuoteStatus('initial')} activeOpacity={0.85}>
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>Quote Rejected (Reset)</Text>
+            </TouchableOpacity>
+          )}
 
-        {quoteStatus === 'response_ready' && (
-          <TouchableOpacity
-            style={[styles.btnQuote, { backgroundColor: '#10B981' }]}
-            onPress={() => setShowQuotationScreen(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>View Quote</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity
+              style={[styles.btnQuote, { backgroundColor: '#10B981' }]}
+              onPress={() => setShowQuotationScreen(true)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>View Quote</Text>
+            </TouchableOpacity>
+          )}
 
-        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-          <TouchableOpacity
-            style={[styles.btnQuote, { backgroundColor: '#15803D' }]}
-            onPress={() => setShowInvoiceModal(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>
-              {quoteStatus === 'fully_paid'
-                ? 'Fully Paid (Invoice)'
-                : quoteStatus === 'partially_paid'
-                ? 'Partially Paid (Invoice)'
-                : 'View Invoice'}
-            </Text>
-          </TouchableOpacity>
-        )}
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity
+              style={[styles.btnQuote, { backgroundColor: '#15803D' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.btnQuoteText, { color: '#FFFFFF' }]}>
+                {quoteStatus === 'fully_paid'
+                  ? 'Fully Paid (Invoice)'
+                  : quoteStatus === 'partially_paid'
+                  ? 'Partially Paid (Invoice)'
+                  : 'View Invoice'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </div>
       </View>
 
-      {/* PHOTO ZOOM MODAL */}
-      <Modal visible={Boolean(activePhotoModal)} transparent animationType="fade">
-        <View style={styles.photoModalContainer}>
-          <TouchableOpacity
-            style={styles.photoModalClose}
-            onPress={() => setActivePhotoModal(null)}
-          >
-            <X className="w-6 h-6 text-white" />
-          </TouchableOpacity>
-          {activePhotoModal && (
-            <Image source={{ uri: activePhotoModal }} style={styles.fullPhoto} resizeMode="contain" />
-          )}
-        </View>
-      </Modal>
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={portfolioImages}
+        initialIndex={galleryInitialIndex}
+        title={studio.name}
+        category="Bridal Makeup"
+      />
 
       {/* REQUEST QUOTE MODAL */}
       <RequestQuoteModal
@@ -1078,16 +1076,15 @@ minHeight: 800,
     bottom: 0,
     left: 0,
     right: 0,
-    height: 68,
     backgroundColor: '#FAF7F2',
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    zIndex: 20,
-    gap: 8,
+    paddingVertical: 10,
+    zIndex: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
   },
   btnWhatsapp: {
     flex: 1,

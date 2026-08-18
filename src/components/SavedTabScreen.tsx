@@ -1234,13 +1234,15 @@ const styles = StyleSheet.create({
     color: '#581420',
   },
   viewDetailsBtn: {
-    backgroundColor: '#F3ECE4',
+    backgroundColor: '#F5EEE6',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   viewDetailsBtnText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
     color: '#581420',
   },

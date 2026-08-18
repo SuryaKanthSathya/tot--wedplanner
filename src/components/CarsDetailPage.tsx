@@ -43,6 +43,7 @@ import { QuotationScreen } from './QuotationScreen';
 import { CarItem } from '../constants/CarsData';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -72,7 +73,8 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'videos'>('photos');
   const [isReadMore, setIsReadMore] = useState(false);
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
@@ -102,77 +104,57 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
           if (match.status === 'confirmed') return 'confirmed';
         }
       }
-      const statusesJson = localStorage.getItem('tot_quote_statuses');
-      if (statusesJson) {
-        const statuses = JSON.parse(statusesJson);
-        if (statuses[car.id]) {
-          return statuses[car.id];
-        }
-      }
     } catch (e) {
-      console.warn(e);
+      console.error(e);
     }
+    const existing = getWeddingBookingByVendorId(car.id);
+    if (existing) return existing.status;
     return 'initial';
   });
 
-  const updateQuoteStatus = (newStatus: typeof quoteStatus) => {
+  useEffect(() => {
+    const handleUpdate = () => {
+      const existing = getWeddingBookingByVendorId(car.id);
+      if (existing) setQuoteStatus(existing.status);
+    };
+    window.addEventListener('tot_wedding_payments_updated', handleUpdate);
+    return () => window.removeEventListener('tot_wedding_payments_updated', handleUpdate);
+  }, [car.id]);
+
+  const updateQuoteStatus = (newStatus: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating') => {
     setQuoteStatus(newStatus);
-    try {
-      const statusesJson = localStorage.getItem('tot_quote_statuses') || '{}';
-      const statuses = JSON.parse(statusesJson);
-      statuses[car.id] = newStatus;
-      localStorage.setItem('tot_quote_statuses', JSON.stringify(statuses));
-    } catch (e) {
-      console.warn(e);
-    }
+    const basePrice = parseInt((car.startingPrice || '₹25,000').replace(/[^0-9]/g, ''), 10) || 25000;
+    saveOrUpdateWeddingBooking({
+      vendorId: car.id,
+      vendorName: car.name,
+      category: 'Cars',
+      serviceType: 'Luxury & Vintage Wedding Cars',
+      image: car.image,
+      location: car.location || 'Chennai, Tamil Nadu',
+      totalAmount: basePrice,
+      status: newStatus,
+    });
   };
 
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
 
-  const handleShowToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
   const handleQuoteRequestSent = () => {
     setShowQuoteModal(false);
     updateQuoteStatus('requested');
-    const basePrice = parseInt((car.startingPrice || '₹25,000').replace(/[^0-9]/g, ''), 10) || 25000;
-    saveOrUpdateQuote({
-      id: `quote-${car.id}`,
-      vendorId: car.id,
-      vendorName: car.name,
-      category: 'Cars',
-      packageName: 'Premium Chauffeur Driven Luxury Car Rental',
-      status: 'requested',
-      paymentStatus: 'pending',
-      totalAmount: basePrice,
-      advanceAmount: Math.round(basePrice * 0.3),
-      remainingAmount: basePrice - Math.round(basePrice * 0.3),
-      weddingDate: eventDate || '15 Dec 2026',
-      location: car.location || 'Chennai, Tamil Nadu',
-      includedServices: [
-        'Luxury Wedding Car Rental (8 Hours)',
-        'Professional Groomed Chauffeur',
-        'Premium Floral Car Decoration',
-        'Fuel Allowance within City Limits',
-        'In-Car Refreshments & Mineral Water',
-      ],
-      image: car.image,
-    });
-    setToastMessage('Quote Request Sent! Added to My Quotes');
-    setTimeout(() => setToastMessage(null), 3000);
+    setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 3 seconds
+    // Simulate vendor response ready after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      saveOrUpdateQuote({
-        id: `quote-${car.id}`,
-        status: 'response_ready',
-      });
-      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setToastMessage('Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
-    }, 3000);
+    }, 2500);
+  };
+
+  const handleConfirmQuoteFromQuotation = () => {
+    updateQuoteStatus('confirmed');
+    setShowQuotationScreen(false);
+    setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
   };
 
 
@@ -201,14 +183,32 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
     return name.slice(0, 3).toUpperCase();
   };
 
-  // Sample photo gallery array
+  // Curated 24 luxury & vintage wedding car photos
   const photoGallery = [
     car.image,
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
   ];
 
   const handleShare = () => {
@@ -393,7 +393,10 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
                   <TouchableOpacity
                     key={index}
                     style={styles.gridPhotoWrapper}
-                    onPress={() => setActivePhotoModal(imgUrl)}
+                    onPress={() => {
+                      setGalleryInitialIndex(index);
+                      setIsGalleryOpen(true);
+                    }}
                     activeOpacity={0.9}
                   >
                     <Image source={{ uri: imgUrl }} style={styles.gridPhoto} resizeMode="cover" />
@@ -403,7 +406,10 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
                 {/* 4th slot with "+20 More Photos" overlay */}
                 <TouchableOpacity
                   style={styles.gridPhotoWrapper}
-                  onPress={() => setActivePhotoModal(photoGallery[3] || car.image)}
+                  onPress={() => {
+                    setGalleryInitialIndex(3);
+                    setIsGalleryOpen(true);
+                  }}
                   activeOpacity={0.9}
                 >
                   <Image source={{ uri: photoGallery[3] || car.image }} style={styles.gridPhoto} resizeMode="cover" />
@@ -521,17 +527,18 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
 
       {/* FIXED BOTTOM ACTION BAR */}
       <View style={styles.fixedBottomBar}>
-        <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-          <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
-          <Text style={styles.whatsappBtnText}>WhatsApp</Text>
-        </TouchableOpacity>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
+          <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
+            <Text style={styles.whatsappBtnText}>WhatsApp</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
-          <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
-          <Text style={styles.callNowBtnText}>Call Now</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
+            <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
+            <Text style={styles.callNowBtnText}>Call Now</Text>
+          </TouchableOpacity>
 
-                  {quoteStatus === 'initial' && (
+          {quoteStatus === 'initial' && (
             <TouchableOpacity
               style={styles.sendQuoteBtn}
               onPress={() => setShowQuoteModal(true)}
@@ -581,20 +588,18 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
               </Text>
             </TouchableOpacity>
           )}
+        </div>
       </View>
 
-      {/* LIGHTBOX PHOTO MODAL */}
-      {activePhotoModal && (
-        <Modal transparent animationType="fade" visible={Boolean(activePhotoModal)}>
-          <View style={styles.lightboxBackdrop}>
-            <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setActivePhotoModal(null)}>
-              <X className="w-6 h-6 text-white" />
-            </TouchableOpacity>
-
-            <Image source={{ uri: activePhotoModal }} style={styles.lightboxImage} resizeMode="contain" />
-          </View>
-        </Modal>
-      )}
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={photoGallery}
+        initialIndex={galleryInitialIndex}
+        title={car.name}
+        category="Wedding Cars"
+      />
 
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
@@ -1180,15 +1185,12 @@ paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderColor: '#EFE7DE',
-    paddingHorizontal: 12,
     paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
+    zIndex: 40,
   },
   whatsappBtn: {
     flex: 1,

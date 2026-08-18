@@ -43,6 +43,7 @@ import { PhotographyStudio } from './PhotographyListingPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { QuotationScreen } from './QuotationScreen';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
 import {
   getWeddingBookingByVendorId,
   saveOrUpdateWeddingBooking,
@@ -69,7 +70,8 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
 }) => {
   const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'videos'>('photos');
   const [isReadMore, setIsReadMore] = useState(false);
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
@@ -175,14 +177,32 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
     return name.slice(0, 3).toUpperCase();
   };
 
-  // Sample photo gallery array
+  // Curated 24 authentic high-resolution wedding photography gallery
   const photoGallery = [
     studio.image,
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1510076857177-7470076d4098?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85',
   ];
 
   const handleShare = () => {
@@ -367,7 +387,10 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
                   <TouchableOpacity
                     key={index}
                     style={styles.gridPhotoWrapper}
-                    onPress={() => setActivePhotoModal(imgUrl)}
+                    onPress={() => {
+                      setGalleryInitialIndex(index);
+                      setIsGalleryOpen(true);
+                    }}
                     activeOpacity={0.9}
                   >
                     <Image source={{ uri: imgUrl }} style={styles.gridPhoto} resizeMode="cover" />
@@ -377,7 +400,10 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
                 {/* 4th slot with "+20 More Photos" overlay */}
                 <TouchableOpacity
                   style={styles.gridPhotoWrapper}
-                  onPress={() => setActivePhotoModal(photoGallery[3] || studio.image)}
+                  onPress={() => {
+                    setGalleryInitialIndex(3);
+                    setIsGalleryOpen(true);
+                  }}
                   activeOpacity={0.9}
                 >
                   <Image source={{ uri: photoGallery[3] || studio.image }} style={styles.gridPhoto} resizeMode="cover" />
@@ -495,73 +521,72 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
 
       {/* FIXED BOTTOM ACTION BAR */}
       <View style={styles.fixedBottomBar}>
-        <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
-          <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
-          <Text style={styles.whatsappBtnText}>WhatsApp</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
-          <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
-          <Text style={styles.callNowBtnText}>Call Now</Text>
-        </TouchableOpacity>
-
-        {quoteStatus === 'initial' && (
-          <TouchableOpacity
-            style={styles.sendQuoteBtn}
-            onPress={() => setShowQuoteModal(true)}
-            activeOpacity={0.85}
-          >
-            <Send className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.sendQuoteBtnText}>Request Quote</Text>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
+          <TouchableOpacity style={styles.whatsappBtn} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <MessageCircle className="w-4 h-4 text-[#15803D] mr-1.5" />
+            <Text style={styles.whatsappBtnText}>WhatsApp</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'requested' && (
-          <TouchableOpacity
-            style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]}
-            disabled
-            activeOpacity={1}
-          >
-            <Clock className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.sendQuoteBtnText}>Pending Response</Text>
+          <TouchableOpacity style={styles.callNowBtn} onPress={handleCall} activeOpacity={0.8}>
+            <Phone className="w-4 h-4 text-[#2A2425] mr-1.5" />
+            <Text style={styles.callNowBtnText}>Call Now</Text>
           </TouchableOpacity>
-        )}
 
-        {quoteStatus === 'response_ready' && (
-          <TouchableOpacity
-            style={[styles.sendQuoteBtn, { backgroundColor: '#10B981' }]}
-            onPress={() => setShowQuotationScreen(true)}
-            activeOpacity={0.85}
-          >
-            <FileText className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.sendQuoteBtnText}>View Quote</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'initial' && (
+            <TouchableOpacity
+              style={styles.sendQuoteBtn}
+              onPress={() => setShowQuoteModal(true)}
+              activeOpacity={0.85}
+            >
+              <Send className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.sendQuoteBtnText}>Request Quote</Text>
+            </TouchableOpacity>
+          )}
 
-        {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
-          <TouchableOpacity
-            style={[styles.sendQuoteBtn, { backgroundColor: '#581420' }]}
-            onPress={() => setShowInvoiceModal(true)}
-            activeOpacity={0.85}
-          >
-            <FileText className="w-4 h-4 text-white mr-1.5" />
-            <Text style={styles.sendQuoteBtnText}>View Invoice</Text>
-          </TouchableOpacity>
-        )}
+          {quoteStatus === 'requested' && (
+            <TouchableOpacity
+              style={[styles.sendQuoteBtn, { backgroundColor: '#F59E0B' }]}
+              disabled
+              activeOpacity={1}
+            >
+              <Clock className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.sendQuoteBtnText}>Pending Response</Text>
+            </TouchableOpacity>
+          )}
+
+          {quoteStatus === 'response_ready' && (
+            <TouchableOpacity
+              style={[styles.sendQuoteBtn, { backgroundColor: '#10B981' }]}
+              onPress={() => setShowQuotationScreen(true)}
+              activeOpacity={0.85}
+            >
+              <FileText className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.sendQuoteBtnText}>View Quote</Text>
+            </TouchableOpacity>
+          )}
+
+          {(quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' || quoteStatus === 'fully_paid') && (
+            <TouchableOpacity
+              style={[styles.sendQuoteBtn, { backgroundColor: '#581420' }]}
+              onPress={() => setShowInvoiceModal(true)}
+              activeOpacity={0.85}
+            >
+              <FileText className="w-4 h-4 text-white mr-1.5" />
+              <Text style={styles.sendQuoteBtnText}>View Invoice</Text>
+            </TouchableOpacity>
+          )}
+        </div>
       </View>
 
-      {/* LIGHTBOX PHOTO MODAL */}
-      {activePhotoModal && (
-        <Modal transparent animationType="fade" visible={Boolean(activePhotoModal)}>
-          <View style={styles.lightboxBackdrop}>
-            <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setActivePhotoModal(null)}>
-              <X className="w-6 h-6 text-white" />
-            </TouchableOpacity>
-
-            <Image source={{ uri: activePhotoModal }} style={styles.lightboxImage} resizeMode="contain" />
-          </View>
-        </Modal>
-      )}
+      {/* DRAGGABLE / SWIPEABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={photoGallery}
+        initialIndex={galleryInitialIndex}
+        title={studio.name}
+        category="Photography"
+      />
 
       {/* REQUEST QUOTE BOTTOM-SHEET POPUP */}
       <RequestQuoteModal
@@ -1146,15 +1171,12 @@ paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderColor: '#EFE7DE',
-    paddingHorizontal: 12,
     paddingVertical: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
     shadowOpacity: 0.08,
     shadowRadius: 6,
+    zIndex: 40,
   },
   whatsappBtn: {
     flex: 1,

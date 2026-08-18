@@ -69,6 +69,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}

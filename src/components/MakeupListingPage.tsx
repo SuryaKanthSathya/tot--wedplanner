@@ -775,14 +775,17 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={styles.modalBackdrop}
+            className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 backdrop-blur-[2px] cursor-pointer"
+            onClick={() => setActiveFilterModal(null)}
           >
             <motion.div
-              initial={{ y: 100, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 100, opacity: 0 }}
+              initial={{ y: 80, opacity: 0, scale: 0.96 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 80, opacity: 0, scale: 0.96 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               style={styles.modalSheet}
+              className="cursor-default"
+              onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <View style={styles.filterModalHeader}>
@@ -1535,16 +1538,18 @@ const styles = StyleSheet.create({
     color: '#2A2425',
   },
   cardViewBtn: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 16,
-    height: 32,
-    borderRadius: 16,
+    backgroundColor: '#F5EEE6',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardViewBtnText: {
-    color: '#FFFFFF',
-    fontSize: 11,
+    color: '#581420',
+    fontSize: 10.5,
     fontWeight: '700',
   },
   floatingCompareBtn: {

@@ -2875,7 +2875,7 @@ const VenueCardItem = React.memo<VenueCardItemProps>(({
               onPress={() => onSelectVenue(venue)}
               activeOpacity={0.85}
             >
-              <Eye className="w-3.5 h-3.5 text-white mr-1.5" />
+              <Eye className="w-3.5 h-3.5 text-[#581420] mr-1" />
               <Text style={styles.viewDetailsBtnText}>View Details</Text>
             </TouchableOpacity>
           </View>
@@ -3145,15 +3145,16 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={styles.modalBackdrop}
+            className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 backdrop-blur-[2px] cursor-pointer"
             onClick={() => setActiveFilterModal(null)}
           >
             <motion.div
-              initial={{ y: 120, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 120, opacity: 0 }}
+              initial={{ y: 80, opacity: 0, scale: 0.96 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 80, opacity: 0, scale: 0.96 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               style={styles.modalSheet}
+              className="cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
               <View style={styles.filterModalHeader}>
@@ -3477,16 +3478,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     display: 'flex',
-    alignItems: 'center',
   },
   modalSheet: {
-    width: '100%',
-    maxWidth: 500,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     width: '90%',
-    maxWidth: 450,
-    
+    maxWidth: 480,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 30,
@@ -3701,17 +3698,19 @@ const styles = StyleSheet.create({
     color: '#581420',
   },
   viewDetailsBtn: {
-    backgroundColor: '#581420',
+    backgroundColor: '#F5EEE6',
+    borderWidth: 1,
+    borderColor: '#E8DFD5',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 18,
+    paddingHorizontal: 11,
+    paddingVertical: 5,
+    borderRadius: 12,
   },
   viewDetailsBtnText: {
-    color: '#FFFFFF',
+    color: '#581420',
     fontWeight: '700',
-    fontSize: 12,
+    fontSize: 11,
   },
   emptyContainer: {
     alignItems: 'center',
