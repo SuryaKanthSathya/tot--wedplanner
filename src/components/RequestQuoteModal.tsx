@@ -315,13 +315,23 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
     }
     if (selectedServices.length === 0) {
       setValidationError(
-        isEntertainment
+        isVenue
+          ? 'Please select at least one venue requirement / amenity.'
+          : isInvitations
+          ? 'Please select at least one invitation service / style.'
+          : isCatering
+          ? 'Please select at least one catering feast option.'
+          : isMehendi
+          ? 'Please select at least one mehendi service.'
+          : isCars
+          ? 'Please select at least one luxury car service.'
+          : isEntertainment
           ? 'Please select at least one entertainment service.'
           : isDecor
-            ? 'Please select at least one decor service.'
-            : isMakeup
-              ? 'Please select at least one makeup service.'
-              : 'Please select at least one photography service.'
+          ? 'Please select at least one decor service.'
+          : isMakeup
+          ? 'Please select at least one makeup service.'
+          : 'Please select at least one service option.'
       );
       return;
     }
