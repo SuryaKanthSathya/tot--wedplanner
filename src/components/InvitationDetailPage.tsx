@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Modal,
   Linking,
-} from 'react-native';
+} from 'react-native-web';
 import {
   ChevronLeft,
   Share2,
@@ -305,14 +305,14 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
 
               <Text style={styles.subtitleText}>{invite.category}</Text>
               <Text style={styles.subtitleText}>
-                {invite.tier} • {invite.location}
+                {invite.tier || 'Signature'} • {invite.location || invite.city}
               </Text>
 
               <View style={styles.ratingRow}>
                 <Star size={12} color="#FBBF24" fill="#FBBF24" />
                 <Text style={styles.ratingText}>
-                  {invite.rating.toFixed(1)}{' '}
-                  <Text style={styles.reviewsCount}>({invite.reviewsCount} Reviews)</Text>
+                  {(invite.rating || 4.8).toFixed(1)}{' '}
+                  <Text style={styles.reviewsCount}>({invite.reviewsCount || 150} Reviews)</Text>
                 </Text>
               </View>
             </View>
@@ -322,7 +322,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           <View style={styles.quickInfoBox}>
             <View style={styles.quickInfoItem}>
               <Award size={16} color="#4B5563" />
-              <Text style={styles.quickInfoVal}>{invite.experience}</Text>
+              <Text style={styles.quickInfoVal}>{invite.experience || '7+ Years'}</Text>
               <Text style={styles.quickInfoLbl}>Years Exp.</Text>
             </View>
 
@@ -350,7 +350,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
               <Clock size={16} color="#10B981" />
               <Text style={styles.quickInfoVal}>Delivery</Text>
               <Text style={[styles.quickInfoLbl, { color: '#10B981' }]}>
-                {invite.turnaroundTime}
+                {invite.turnaroundTime || '5 - 7 Days'}
               </Text>
             </View>
           </View>
@@ -358,16 +358,16 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           {/* ABOUT */}
           <Text style={styles.sectionTitle}>About {invite.name.split(' ').slice(0, 3).join(' ')}</Text>
           <Text style={styles.descriptionText}>
-            {invite.description}
-            {'\n\n'}Specializing in {invite.category.toLowerCase()} with{' '}
-            {invite.experience} of experience, catering to couples across Tamil Nadu. Minimum order of{' '}
-            {invite.minOrderQuantity} with a delivery time of {invite.turnaroundTime}.
+            {invite.description || 'Bespoke luxury wedding invitations, digital video invites, and gold foil stationery crafted for unforgettable wedding announcements.'}
+            {'\n\n'}Specializing in {(invite.category || 'wedding invitations').toLowerCase()} with{' '}
+            {invite.experience || '7+ Years'} of experience, catering to couples across Tamil Nadu. Minimum order of{' '}
+            {invite.minOrderQuantity || '50 Units'} with a delivery time of {invite.turnaroundTime || '5 - 7 Days'}.
           </Text>
 
           {/* MEDIA TABS */}
           <View style={styles.mediaTabs}>
             <View style={styles.mediaTabActiveContainer}>
-              <Text style={styles.mediaTabActive}>Photos ({invite.portfolio.length})</Text>
+              <Text style={styles.mediaTabActive}>Photos ({(invite.portfolio || portfolioImages).length})</Text>
               <View style={styles.mediaTabActiveIndicator} />
             </View>
             <Text style={styles.mediaTabInactive}>Videos</Text>
@@ -385,26 +385,26 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[1])}
+              onPress={() => setActivePhotoModal(portfolioImages[1] || portfolioImages[0])}
             >
-              <Image source={{ uri: portfolioImages[1] }} style={styles.photoImg} resizeMode="cover" />
+              <Image source={{ uri: portfolioImages[1] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[2])}
+              onPress={() => setActivePhotoModal(portfolioImages[2] || portfolioImages[0])}
             >
-              <Image source={{ uri: portfolioImages[2] }} style={styles.photoImg} resizeMode="cover" />
+              <Image source={{ uri: portfolioImages[2] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.photoGridItem}
-              onPress={() => setActivePhotoModal(portfolioImages[3])}
+              onPress={() => setActivePhotoModal(portfolioImages[3] || portfolioImages[0])}
             >
-              <Image source={{ uri: portfolioImages[3] }} style={styles.photoImg} resizeMode="cover" />
+              <Image source={{ uri: portfolioImages[3] || portfolioImages[0] }} style={styles.photoImg} resizeMode="cover" />
               <View style={styles.morePhotosOverlay}>
                 <Text style={styles.morePhotosText}>
-                  +{Math.max(0, invite.portfolio.length - 3)}
+                  +{Math.max(0, (invite.portfolio || portfolioImages).length - 3)}
                 </Text>
                 <Text style={styles.morePhotosSubtext}>More Photos</Text>
               </View>
@@ -415,15 +415,15 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           <View style={styles.tagsRow}>
             <View style={styles.tagItem}>
               <MapPin size={12} color="#7D6E70" />
-              <Text style={styles.tagText}>{invite.location}, Tamil Nadu</Text>
+              <Text style={styles.tagText}>{invite.location || invite.city}, Tamil Nadu</Text>
             </View>
             <View style={styles.tagItem}>
               <Package size={12} color="#7D6E70" />
-              <Text style={styles.tagText}>Min: {invite.minOrderQuantity}</Text>
+              <Text style={styles.tagText}>Min: {invite.minOrderQuantity || '50 Units'}</Text>
             </View>
             <View style={styles.tagItem}>
               <Sparkles size={12} color="#7D6E70" />
-              <Text style={styles.tagText}>{invite.customizationOptions.split(',')[0]}</Text>
+              <Text style={styles.tagText}>{(invite.customizationOptions || 'Full Custom Colors & Monograms').split(',')[0]}</Text>
             </View>
           </View>
 
@@ -439,7 +439,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
               </Text>
               <Text style={styles.badgeTitle}>Google Reviews</Text>
               <Text style={styles.badgeVal}>
-                {invite.rating}★
+                {invite.rating || 4.9}★
               </Text>
             </View>
             <View style={styles.badgeCard}>
@@ -466,7 +466,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.packagesScroll}
           >
-            {invite.features.map((feat, idx) => (
+            {(invite.features || ['Luxury Box Invites', '3D Animated Video', 'Save The Date']).map((feat, idx) => (
               <TouchableOpacity
                 key={idx}
                 style={styles.packagePill}
@@ -476,7 +476,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
                 <Text style={styles.packagePillText}>{feat}</Text>
               </TouchableOpacity>
             ))}
-            {invite.specialties.slice(0, 2).map((spec, idx) => (
+            {(invite.specialties || ['Gold Foil Stamping', 'Custom Monograms']).slice(0, 2).map((spec, idx) => (
               <TouchableOpacity
                 key={`s-${idx}`}
                 style={styles.packagePill}

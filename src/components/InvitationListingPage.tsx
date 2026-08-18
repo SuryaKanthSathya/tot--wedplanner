@@ -7,7 +7,7 @@ import {
   Image,
   StyleSheet,
   TextInput,
-} from 'react-native';
+} from 'react-native-web';
 import {
   ArrowLeft,
   Star,
@@ -34,21 +34,38 @@ export type { InvitationItem };
 export const INVITATIONS_DATA: InvitationItem[] = [
   {
     id: 'pkg_inv_1',
-    name: 'Paper & Peonies',
+    name: 'Paper & Peonies Luxury Invites',
     category: 'Custom Digital & Physical Invites',
-    city: 'All Cities',
-    location: 'Worldwide Delivery',
+    city: 'Chennai',
+    location: 'Nungambakkam, Chennai',
     rating: 4.9,
     reviewsCount: 289,
     startingPrice: '₹15,000 onwards',
     priceValue: 15000,
-    turnaroundTime: '1-2 Weeks',
+    tier: 'Signature',
+    minOrderQuantity: '50 Invites',
+    turnaroundTime: '1 - 2 Weeks',
     image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
-    description: 'Custom designed, eco-friendly digital and physical invitations.',
+    description: 'Custom designed, eco-friendly digital and physical invitations crafted with artisanal gold foil, embossed couple monograms, and luxury unboxing experience.',
     experience: '7+ Years',
-    minimumOrder: '50 Invites',
-    printingTypes: 'Foil Stamping, Letterpress, Digital',
-    services: ['Digital Invites', 'Boxed Invites', 'E-Invites', 'Save the Date'],
+    customizationOptions: 'Full Digital & Physical Box Customization, Gold Foil Monograms',
+    specialties: ['Digital Invites', 'Boxed Invites', 'E-Invites', 'Save the Date Cards'],
+    features: ['Digital Invites', 'Gold Foil Stamping', 'Save the Date Cards'],
+    portfolio: [
+      '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
+      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
+    ],
+    packages: [
+      {
+        title: 'Bespoke Digital & Physical Suite',
+        price: '₹15,000 onwards',
+        description: 'Includes animated WhatsApp video invite + 50 luxury gold foil printed cards + digital RSVP portal.',
+      },
+    ],
+    phone: '+91 91501 97966',
+    whatsapp: '919150197966',
   },
   {
     id: 'inv-1',
