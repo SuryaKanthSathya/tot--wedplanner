@@ -972,7 +972,8 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredStudios.map((studio) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredStudios.map((studio) => {
             const isSaved = Boolean(savedDecorIds[studio.id]);
             return (
               <motion.div
@@ -1070,7 +1071,8 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
                 </TouchableOpacity>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
       </ScrollView>
 
@@ -1516,7 +1518,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   cardImageOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0,0,0,0.25)',
   },
   cardTierBadge: {

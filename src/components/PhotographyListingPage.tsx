@@ -952,14 +952,16 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredStudios.map((studio) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredStudios.map((studio) => {
             const isBookmarked = Boolean(bookmarkedIds[studio.id]);
             return (
               <motion.div
                 key={studio.id}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full mb-3.5"
+                className="w-full mb-3.5 cursor-pointer"
+                onClick={() => setSelectedStudio(studio)}
               >
                 <View style={styles.studioCard}>
                   {/* Left Photo */}
@@ -1041,7 +1043,8 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
                 </View>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
 
         <View style={{ height: 40 }} />

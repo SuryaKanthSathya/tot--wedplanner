@@ -26,6 +26,7 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  useWindowDimensions,
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -119,6 +120,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   onLogout,
   onNavigateToCoupleOnboarding,
 }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
   const [forcePlannerCreated, setForcePlannerCreated] = useState(false);
   const isPlannerCreated = forcePlannerCreated || Boolean(
     weddingProfile && (weddingProfile.brideName || weddingProfile.marriageType)
@@ -834,10 +837,38 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       />
     );
   }
-
   return (
-    <View style={styles.container}>
-      {activeTab === 'my-wedding' ? (
+    <View style={[styles.container, { flexDirection: isDesktop ? 'row' : 'column' }]}>
+      {isDesktop && !hideTabBar && (
+        <View style={styles.desktopSidebar}>
+          <Text style={styles.sidebarLogoText}>Tale of Two</Text>
+          
+          <TouchableOpacity style={styles.sidebarItem} onPress={() => setActiveTab('home')}>
+            <Home className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-500'}`} />
+            <Text style={[styles.sidebarItemText, activeTab === 'home' && styles.sidebarItemTextActive]}>Home</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.sidebarItem} onPress={() => {
+            if (!isPlannerCreated) {
+              setSelectedFeatureName('My Wedding');
+              setShowExploreModal(true);
+            } else {
+              setActiveTab('my-wedding');
+            }
+          }}>
+            <Sparkles className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-500'}`} />
+            <Text style={[styles.sidebarItemText, activeTab === 'my-wedding' && styles.sidebarItemTextActive]}>My Wedding</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.sidebarItem} onPress={() => setActiveTab('profile')}>
+            <User className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-500'}`} />
+            <Text style={[styles.sidebarItemText, activeTab === 'profile' && styles.sidebarItemTextActive]}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <View style={[{ flex: 1, backgroundColor: '#FAF6EE' }, isDesktop && { maxWidth: 1000, marginHorizontal: 'auto', width: '100%', borderWidth: 1, borderColor: '#EBE2D7', borderRadius: 24, marginVertical: 16, overflow: 'hidden' }]}>
+        {activeTab === 'my-wedding' ? (
         <MyWeddingTabScreen
           userName={userName}
           weddingProfile={weddingProfile}
@@ -1160,13 +1191,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             </Text>
 
             {/* 2 Side-by-side Cards */}
-            <View style={styles.helpCardsRow}>
+            <View style={[styles.helpCardsRow, { gap: 0, justifyContent: 'space-between' }]}>
               {/* Card 1: Plan My Entire Wedding */}
               <motion.div
                 whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.94 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="flex-1 cursor-pointer"
+                className="cursor-pointer"
+                style={{ width: '48%' }}
                 onClick={() => handleOptionPress('Plan My Entire Wedding')}
               >
                 <View style={[styles.helpCard, { width: '100%' }]}>
@@ -1187,7 +1219,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                 whileHover={{ scale: 1.04, y: -2 }}
                 whileTap={{ scale: 0.94 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="flex-1 cursor-pointer"
+                className="cursor-pointer"
+                style={{ width: '48%' }}
                 onClick={() => handleOptionPress('Find Individual Vendors')}
               >
                 <View style={[styles.helpCard, { width: '100%' }]}>
@@ -1239,7 +1272,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             return (
               <View style={{ marginTop: 12, marginBottom: 8 }}>
                 <Text style={[styles.servicesTitle, { marginBottom: 8 }]}>Destination Wedding</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingRight: 16 }}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {venueCollections.map((item, index) => (
                     <button
                       key={index}
@@ -1256,6 +1289,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                         border: 'none',
                         padding: 0,
                         margin: 0,
+                        marginRight: index < venueCollections.length - 1 ? 14 : 0,
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
@@ -1448,15 +1482,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       )}
 
       {/* ================= BOTTOM TAB BAR ================= */}
-      {!hideTabBar && (
+      {!isDesktop && !hideTabBar && (
         <View style={styles.bottomTabBar}>
           <TouchableOpacity
             style={styles.tabItem}
             onPress={() => setActiveTab('home')}
           >
             <Home
-              className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'
-                }`}
+              className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'}`}
             />
             <Text
               style={[
@@ -1480,8 +1513,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             }}
           >
             <Sparkles
-              className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'
-                }`}
+              className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-400'}`}
             />
             <Text
               style={[
@@ -1500,8 +1532,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             }}
           >
             <User
-              className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'
-                }`}
+              className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-400'}`}
             />
             <Text
               style={[
@@ -1514,6 +1545,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           </TouchableOpacity>
         </View>
       )}
+      </View>
 
 
       {/* ================= PROFILE DETAILS & MY BOOKINGS POPUP MODAL ================= */}
@@ -1836,6 +1868,41 @@ const styles = StyleSheet.create({
   helpCardsRow: {
     flexDirection: 'row',
     gap: 10,
+  },
+
+  desktopSidebar: {
+    width: 260,
+    backgroundColor: '#FAF6EE',
+    borderRightWidth: 1,
+    borderColor: '#EBE2D7',
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+    gap: 16,
+  },
+  sidebarLogoText: {
+    fontFamily: "'Cormorant Garamond', Georgia, serif",
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#581420',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  sidebarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: 12,
+    gap: 12,
+  },
+  sidebarItemText: {
+    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#524C4D',
+  },
+  sidebarItemTextActive: {
+    color: '#581420',
+    fontWeight: '700',
   },
   helpCard: {
     flex: 1,

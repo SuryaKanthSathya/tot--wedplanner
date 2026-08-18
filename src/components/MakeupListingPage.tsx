@@ -1030,10 +1030,16 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredStudios.map((studio) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredStudios.map((studio) => {
             const isBookmarked = Boolean(bookmarkedIds[studio.id]);
             return (
-              <View key={studio.id} style={styles.cardContainer}>
+              <TouchableOpacity
+                key={studio.id}
+                style={styles.cardContainer}
+                activeOpacity={0.9}
+                onPress={() => setSelectedStudio(studio)}
+              >
                 {/* IMAGE CONTAINER */}
                 <View style={styles.cardImgWrapper}>
                   <Image source={{ uri: studio.image }} style={styles.cardImg} />
@@ -1089,9 +1095,10 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
                     </TouchableOpacity>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             );
-          })
+          })}
+          </div>
         )}
       </ScrollView>
 

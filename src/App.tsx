@@ -64,31 +64,28 @@ export default function App() {
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
+    backgroundColor: '#FAF6EE',
   },
   appContainerDesktop: {
     minHeight: '100vh' as any,
-    backgroundColor: '#1f1e1c',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
+    width: '100%',
   },
   appContainerMobile: {
     width: '100%',
     minHeight: '100vh' as any,
-    backgroundColor: '#FAF6EE',
-    padding: 0,
   },
   mainCanvas: {
     flex: 1,
     width: '100%',
   },
   mainCanvasDesktop: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    maxHeight: '100vh' as any,
+    width: '100%',
+    height: '100vh' as any,
+    maxWidth: 1200,
+    marginHorizontal: 'auto',
+    backgroundColor: '#FAF6EE',
   },
   mainCanvasMobile: {
     height: '100%',
   },
 });
-

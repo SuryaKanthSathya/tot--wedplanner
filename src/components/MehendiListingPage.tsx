@@ -632,14 +632,16 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredArtists.map((artist) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredArtists.map((artist) => {
             const isBookmarked = Boolean(bookmarkedIds[artist.id]);
             return (
               <motion.div
                 key={artist.id}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full mb-3.5"
+                className="w-full mb-3.5 cursor-pointer"
+                onClick={() => setSelectedArtist(artist)}
               >
                 <View style={styles.artistCard}>
                   {/* Left Photo */}
@@ -721,7 +723,8 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
                 </View>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
 
         <View style={{ height: 40 }} />

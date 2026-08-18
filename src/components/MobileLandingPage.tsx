@@ -356,6 +356,7 @@ const styles = StyleSheet.create({
   textContent: {
     marginVertical: 'auto',
     gap: 12,
+    alignItems: 'center',
   },
   headingText: {
     fontFamily: "'Cormorant Garamond', Georgia, serif",
@@ -363,23 +364,24 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 36,
     letterSpacing: -0.2,
-    textAlign: 'left',
+    textAlign: 'center',
   },
   bodyText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
     fontSize: 12.5,
     fontWeight: '400',
     lineHeight: 18,
-    textAlign: 'left',
+    textAlign: 'center',
     color: '#635B5C',
   },
   actionsWrapper: {
     width: '100%',
     gap: 12,
     paddingTop: 4,
+    alignItems: 'center',
   },
   primaryButton: {
-    width: '100%',
+    width: '75%',
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 14,
@@ -390,6 +392,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 10,
+    alignSelf: 'center',
   },
   primaryButtonText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
@@ -420,15 +423,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAF6EE',
   },
   exactCardContainerDesktop: {
-    maxWidth: 330,
-    height: 680,
-    maxHeight: '92vh' as any,
-    borderRadius: 28,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#e2ddd5',
-    marginHorizontal: 'auto',
-    boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.65)',
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   exactCardContainerMobile: {
     height: '100%',

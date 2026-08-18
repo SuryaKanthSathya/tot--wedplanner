@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, useWindowDimensions } from 'react-native';
 import { ChevronLeft, Heart, Calendar, Users } from 'lucide-react';
 import { motion } from 'motion/react';
 
@@ -108,9 +108,13 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     image: '/src/assets/images/rituals_category.webp',
   };
 
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   return (
-    <View style={styles.container}>
-      {/* Top Header */}
+    <View style={[{ flex: 1, backgroundColor: '#FAF6EE' }]}>
+      <View style={[styles.container, isDesktop && { maxWidth: 1000, marginHorizontal: 'auto', borderWidth: 1, borderColor: '#EBE2D7', borderRadius: 24, overflow: 'hidden', marginVertical: 16 }]}>
+        {/* ================= HEADER ================= */}
       <View style={styles.headerRow}>
         <TouchableOpacity
           style={styles.iconButton}
@@ -257,11 +261,13 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
           </motion.div>
         )}
       </ScrollView>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  onboardingContent: {},
   container: {
     width: '100%',
     height: '100%',

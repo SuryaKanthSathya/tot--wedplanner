@@ -674,7 +674,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
             <Text style={styles.emptySub}>Try adjusting your search or category filters.</Text>
           </View>
         ) : (
-          filteredInvites.map((invite) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredInvites.map((invite) => {
             const isSaved = Boolean(savedInviteIds[invite.id]);
             return (
               <motion.div key={invite.id} whileHover={{ y: -2 }} className="w-full mb-4">
@@ -755,7 +756,8 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
                 </TouchableOpacity>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
       </ScrollView>
 

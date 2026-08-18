@@ -724,14 +724,16 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredCaterers.map((caterer) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredCaterers.map((caterer) => {
             const isBookmarked = Boolean(bookmarkedIds[caterer.id]);
             return (
               <motion.div
                 key={caterer.id}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full mb-3.5"
+                className="w-full mb-3.5 cursor-pointer"
+                onClick={() => setSelectedCaterer(caterer)}
               >
                 <View style={styles.catererCard}>
                   {/* Left Photo */}
@@ -813,7 +815,8 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
                 </View>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
 
         <View style={{ height: 40 }} />

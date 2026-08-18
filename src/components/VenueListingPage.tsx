@@ -3098,7 +3098,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
             <Text style={styles.emptySub}>Try adjusting your search query or city filters.</Text>
           </View>
         ) : (
-          displayedVenues.map((venue) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {displayedVenues.map((venue) => {
             const isSaved = Boolean(savedVenueIds[venue.id]);
             return (
               <VenueCardItem
@@ -3109,7 +3110,8 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                 onToggleSavedVenue={onToggleSavedVenue}
               />
             );
-          })
+          })}
+          </div>
         )}
 
         {displayedVenues.length < filteredVenues.length && (

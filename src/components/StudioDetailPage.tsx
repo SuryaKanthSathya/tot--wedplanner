@@ -71,6 +71,7 @@ export const StudioDetailPage: React.FC<StudioDetailPageProps> = ({
   const [isReadMore, setIsReadMore] = useState(false);
   const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);

@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   formFieldsStack: {
-    width: '100%',
+    width: '85%',
+    alignSelf: 'center',
     gap: 12,
     marginTop: 4,
   },
@@ -256,7 +257,8 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   primaryButton: {
-    width: '100%',
+    width: '85%',
+    alignSelf: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 14,

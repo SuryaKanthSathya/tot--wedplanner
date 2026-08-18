@@ -388,7 +388,8 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
             </TouchableOpacity>
           </View>
         ) : (
-          filteredCars.map((car) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {filteredCars.map((car) => {
             const isBookmarked = Boolean(bookmarkedIds[car.id]);
             return (
               <motion.div
@@ -477,7 +478,8 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
                 </View>
               </motion.div>
             );
-          })
+          })}
+          </div>
         )}
 
         <View style={{ height: 40 }} />

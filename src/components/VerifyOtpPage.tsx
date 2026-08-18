@@ -393,7 +393,8 @@ const styles: any = StyleSheet.create({
     paddingBottom: 4,
   },
   primaryButton: {
-    width: '100%',
+    width: '85%',
+    alignSelf: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 14,
