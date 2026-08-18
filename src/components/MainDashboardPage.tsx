@@ -12,7 +12,6 @@ import { CateringListingPage } from './CateringListingPage';
 import { MehendiListingPage } from './MehendiListingPage';
 import { MyQuotesTabScreen } from './MyQuotesTabScreen';
 import { CollectionsPage } from './CollectionsPage';
-import { EInvitesScreen } from './EInvitesScreen';
 import { RitualsFlow } from './RitualsFlow';
 import { FindVendorsPage } from './FindVendorsPage';
 import { NotificationsModal } from './NotificationsModal';
@@ -158,6 +157,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
   const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
   const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
+  const [openedFromFindVendors, setOpenedFromFindVendors] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
   const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
@@ -529,8 +529,13 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       return;
     }
     if (featureName === 'Plan My Entire Wedding') {
-      window.scrollTo(0, 0);
-      setShowDestinationWeddingFlow(true);
+      if (onNavigateToCoupleOnboarding) {
+        onNavigateToCoupleOnboarding();
+      } else {
+        setSelectedFeatureName(featureName);
+        setShowExploreModal(true);
+      }
+      return;
     }
     if (featureName === 'Mehendi') {
       setShowMehendiListing(true);
@@ -546,19 +551,12 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     }
     if (featureName === 'Find Individual Vendors') {
       setShowFindVendorsPage(true);
+      setOpenedFromFindVendors(true);
       return;
     }
-    if (featureName === 'Plan My Entire Wedding') {
-      if (onNavigateToCoupleOnboarding) {
-        onNavigateToCoupleOnboarding();
-      } else {
-        setSelectedFeatureName(featureName);
-        setShowExploreModal(true);
-      }
-    } else {
-      setSelectedFeatureName(featureName);
-      setShowExploreModal(true);
-    }
+    
+    setSelectedFeatureName(featureName);
+    setShowExploreModal(true);
   };
 
   // Extract first name for greeting
@@ -578,12 +576,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <PhotographyListingPage
         onBack={() => {
           setShowPhotographyListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedStudioIds={savedStudioIds}
         onToggleSavedStudio={toggleSavedStudio}
         onNavigateToQuotesTab={() => {
           setShowPhotographyListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -596,12 +598,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <MakeupListingPage
         onBack={() => {
           setShowMakeupListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedMakeupIds={savedMakeupIds}
         onToggleSavedMakeup={toggleSavedMakeup}
         onNavigateToQuotesTab={() => {
           setShowMakeupListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -614,12 +620,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <DecorListingPage
         onBack={() => {
           setShowDecorListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedDecorIds={savedDecorIds}
         onToggleSavedDecor={toggleSavedDecor}
         onNavigateToQuotesTab={() => {
           setShowDecorListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -641,12 +651,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <VenueListingPage
         onBack={() => {
           setShowVenueListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedVenueIds={savedVenueIds}
         onToggleSavedVenue={toggleSavedVenue}
         onNavigateToQuotesTab={() => {
           setShowVenueListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -659,12 +673,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <EntertainmentListingPage
         onBack={() => {
           setShowEntertainmentListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedEntIds={savedEntIds}
         onToggleSavedEnt={toggleSavedEnt}
         onNavigateToQuotesTab={() => {
           setShowEntertainmentListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -677,12 +695,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <CarsListingPage
         onBack={() => {
           setShowCarsListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedCarIds={savedCarIds}
         onToggleSavedCar={toggleSavedCar}
         onNavigateToQuotesTab={() => {
           setShowCarsListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -695,12 +717,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <InvitationListingPage
         onBack={() => {
           setShowInvitationListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedInviteIds={savedInviteIds}
         onToggleSavedInvite={toggleSavedInvite}
         onNavigateToQuotesTab={() => {
           setShowInvitationListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -713,7 +739,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <DestinationWeddingFlow
         onBack={() => {
           setShowDestinationWeddingFlow(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
@@ -732,12 +760,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <MehendiListingPage
         onBack={() => {
           setShowMehendiListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedMehendiIds={savedMehendiIds}
         onToggleSavedMehendi={toggleSavedMehendi}
         onNavigateToQuotesTab={() => {
           setShowMehendiListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -750,12 +782,16 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <CateringListingPage
         onBack={() => {
           setShowCateringListing(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         savedCateringIds={savedCateringIds}
         onToggleSavedCatering={toggleSavedCatering}
         onNavigateToQuotesTab={() => {
           setShowCateringListing(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         bookingSource="individual"
@@ -768,10 +804,14 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       <RitualsFlow
         onBack={() => {
           setShowRitualsFlow(false);
-          setShowFindVendorsPage(true);
+          if (openedFromFindVendors) {
+            setShowFindVendorsPage(true);
+          }
         }}
         onNavigateToQuotesTab={() => {
           setShowRitualsFlow(false);
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
           setActiveTab('quotes');
         }}
         savedRitualsIds={savedRitualsIds}
@@ -783,8 +823,12 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showFindVendorsPage) {
     return (
       <FindVendorsPage
-        onBack={() => setShowFindVendorsPage(false)}
+        onBack={() => {
+          setShowFindVendorsPage(false);
+          setOpenedFromFindVendors(false);
+        }}
         onSelectCategory={(category) => {
+          setOpenedFromFindVendors(true);
           handleOptionPress(category);
         }}
       />

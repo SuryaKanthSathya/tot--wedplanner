@@ -13,9 +13,37 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
   onSelectCategory,
 }) => {
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
-  const [brideGroomNames, setBrideGroomNames] = useState('');
-  const [weddingDate, setWeddingDate] = useState('');
-  const [guestCount, setGuestCount] = useState('');
+  const [brideGroomNames, setBrideGroomNames] = useState(() => {
+    try {
+      const p = localStorage.getItem('wedding_profile');
+      if (p) {
+        const parsed = JSON.parse(p);
+        if (parsed.brideName && parsed.groomName) return `${parsed.brideName} & ${parsed.groomName}`;
+        if (parsed.brideName) return parsed.brideName;
+      }
+    } catch {}
+    return '';
+  });
+  const [weddingDate, setWeddingDate] = useState(() => {
+    try {
+      const p = localStorage.getItem('wedding_profile');
+      if (p) {
+        const parsed = JSON.parse(p);
+        if (parsed.weddingDate) return parsed.weddingDate;
+      }
+    } catch {}
+    return '';
+  });
+  const [guestCount, setGuestCount] = useState(() => {
+    try {
+      const p = localStorage.getItem('wedding_profile');
+      if (p) {
+        const parsed = JSON.parse(p);
+        if (parsed.guestCount) return parsed.guestCount;
+      }
+    } catch {}
+    return '';
+  });
   const categories = [
     {
       id: 'Photography',
@@ -84,7 +112,17 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     <View style={styles.container}>
       {/* Top Header */}
       <View style={styles.headerRow}>
-        <TouchableOpacity style={styles.iconButton} onPress={onBack} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => {
+            if (isOnboardingComplete) {
+              setIsOnboardingComplete(false);
+            } else {
+              onBack();
+            }
+          }}
+          activeOpacity={0.7}
+        >
           <ChevronLeft className="w-6 h-6 text-[#2A2425]" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Find Vendors</Text>

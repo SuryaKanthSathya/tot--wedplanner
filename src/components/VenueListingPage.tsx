@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -2788,6 +2788,103 @@ interface VenueListingPageProps {
   };
 }
 
+interface VenueCardItemProps {
+  venue: VenueItem;
+  isSaved: boolean;
+  onSelectVenue: (venue: VenueItem) => void;
+  onToggleSavedVenue: (id: string) => void;
+}
+
+const VenueCardItem = React.memo<VenueCardItemProps>(({
+  venue,
+  isSaved,
+  onSelectVenue,
+  onToggleSavedVenue,
+}) => {
+  return (
+    <div className="w-full mb-4 transition-transform duration-150 hover:-translate-y-0.5">
+      <TouchableOpacity
+        style={styles.cardContainer}
+        onPress={() => onSelectVenue(venue)}
+        activeOpacity={0.9}
+      >
+        {/* CARD IMAGE */}
+        <View style={styles.imageWrapper}>
+          <Image source={{ uri: venue.image }} style={styles.cardImage} resizeMode="cover" />
+
+          <View style={styles.badgeRow}>
+            <View style={styles.tierTag}>
+              <Sparkles className="w-3 h-3 text-amber-600 mr-1" />
+              <Text style={styles.tierTagText}>{venue.tier}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.bookmarkBtn}
+              onPress={(e) => {
+                e.stopPropagation();
+                onToggleSavedVenue(venue.id);
+              }}
+            >
+              <Heart
+                className={`w-4 h-4 ${isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'}`}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.ratingBadge}>
+            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
+            <Text style={styles.ratingText}>{venue.rating}</Text>
+            <Text style={styles.reviewsText}>({venue.reviewsCount})</Text>
+          </View>
+        </View>
+
+        {/* CARD DETAILS */}
+        <View style={styles.cardBody}>
+          <Text style={styles.venueName} numberOfLines={1}>{venue.name}</Text>
+
+          <View style={styles.locationRow}>
+            <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
+            <Text style={styles.locationText}>{venue.location}, {venue.city}</Text>
+          </View>
+
+          <View style={styles.capacityRow}>
+            <Users className="w-3.5 h-3.5 text-stone-500 mr-1" />
+            <Text style={styles.capacityText}>{venue.capacity}</Text>
+          </View>
+
+          {/* FEATURE CHIPS */}
+          <View style={styles.featuresRow}>
+            {(venue.features || venue.amenities || ['Central AC Hall', 'Valet Parking', 'Dining Space']).slice(0, 3).map((feat, idx) => (
+              <View key={idx} style={styles.featureChip}>
+                <Text style={styles.featureChipText}>{feat}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.cardDivider} />
+
+          {/* PRICE & VIEW DETAILS BUTTON */}
+          <View style={styles.cardFooter}>
+            <View>
+              <Text style={styles.priceLabel}>STARTING PRICE</Text>
+              <Text style={styles.priceValue}>{venue.startingPrice}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.viewDetailsBtn}
+              onPress={() => onSelectVenue(venue)}
+              activeOpacity={0.85}
+            >
+              <Eye className="w-3.5 h-3.5 text-white mr-1.5" />
+              <Text style={styles.viewDetailsBtnText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </div>
+  );
+});
+
 export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   onBack,
   savedVenueIds = {},
@@ -2806,44 +2903,58 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
   const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const savedVenuesList = VENUES_DATA.filter((v) => Boolean(savedVenueIds[v.id]));
+  const [visibleCount, setVisibleCount] = useState<number>(16);
   const [showCompareModal, setShowCompareModal] = useState(false);
 
-  const filteredVenues = VENUES_DATA.filter((venue) => {
-    const matchesCity =
-      selectedCity === 'All Cities' ||
-      selectedCity === 'All' ||
-      venue.city.toLowerCase() === selectedCity.toLowerCase() ||
-      venue.location.toLowerCase().includes(selectedCity.toLowerCase()) ||
-      selectedCity.toLowerCase().includes(venue.city.toLowerCase());
+  const savedVenuesList = useMemo(() => {
+    return VENUES_DATA.filter((v) => Boolean(savedVenueIds[v.id]));
+  }, [savedVenueIds]);
 
-    const matchesCategory =
-      selectedCategory === 'All Types' ||
-      venue.category.toLowerCase().includes(selectedCategory.toLowerCase());
+  const filteredVenues = useMemo(() => {
+    return VENUES_DATA.filter((venue) => {
+      const matchesCity =
+        selectedCity === 'All Cities' ||
+        selectedCity === 'All' ||
+        venue.city.toLowerCase() === selectedCity.toLowerCase() ||
+        venue.location.toLowerCase().includes(selectedCity.toLowerCase()) ||
+        selectedCity.toLowerCase().includes(venue.city.toLowerCase());
 
-    const matchesSearch =
-      searchQuery.trim() === '' ||
-      venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      venue.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      venue.category.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === 'All Types' ||
+        venue.category.toLowerCase().includes(selectedCategory.toLowerCase());
 
-    const matchesRating =
-      selectedRating === 'All'
-        ? true
-        : selectedRating === '4.8'
-          ? venue.rating >= 4.8
-          : venue.rating >= 4.9;
+      const matchesSearch =
+        searchQuery.trim() === '' ||
+        venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        venue.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        venue.category.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesTier = selectedTier === 'All' ? true : venue.tier === selectedTier;
+      const matchesRating =
+        selectedRating === 'All'
+          ? true
+          : selectedRating === '4.8'
+            ? venue.rating >= 4.8
+            : venue.rating >= 4.9;
 
-    let matchesBudget = true;
-    if (selectedBudget === 'under-2l') matchesBudget = venue.priceValue < 200000;
-    else if (selectedBudget === '2l-3.5l') matchesBudget = venue.priceValue >= 200000 && venue.priceValue <= 350000;
-    else if (selectedBudget === '3.5l-5l') matchesBudget = venue.priceValue > 350000 && venue.priceValue <= 500000;
-    else if (selectedBudget === 'above-5l') matchesBudget = venue.priceValue > 500000;
+      const matchesTier = selectedTier === 'All' ? true : venue.tier === selectedTier;
 
-    return matchesCity && matchesCategory && matchesSearch && matchesRating && matchesTier && matchesBudget;
-  });
+      let matchesBudget = true;
+      if (selectedBudget === 'under-2l') matchesBudget = venue.priceValue < 200000;
+      else if (selectedBudget === '2l-3.5l') matchesBudget = venue.priceValue >= 200000 && venue.priceValue <= 350000;
+      else if (selectedBudget === '3.5l-5l') matchesBudget = venue.priceValue > 350000 && venue.priceValue <= 500000;
+      else if (selectedBudget === 'above-5l') matchesBudget = venue.priceValue > 500000;
+
+      return matchesCity && matchesCategory && matchesSearch && matchesRating && matchesTier && matchesBudget;
+    });
+  }, [selectedCity, selectedCategory, searchQuery, selectedRating, selectedTier, selectedBudget]);
+
+  const displayedVenues = useMemo(() => {
+    return filteredVenues.slice(0, visibleCount);
+  }, [filteredVenues, visibleCount]);
+
+  const handleLoadMore = useCallback(() => {
+    setVisibleCount((prev) => Math.min(prev + 16, filteredVenues.length));
+  }, [filteredVenues.length]);
 
   if (selectedVenue) {
     return (
@@ -2901,7 +3012,10 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
             style={styles.searchInput}
             placeholder="Search Mandapam, Resort, City or Hotel..."
             value={searchQuery}
-            onChangeText={setSearchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              setVisibleCount(16);
+            }}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')}>
@@ -2965,9 +3079,18 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         style={{ flex: 1, overflowY: 'auto' } as any}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        onScroll={(e: any) => {
+          const { layoutMeasurement, contentOffset, contentSize } = e.nativeEvent;
+          if (layoutMeasurement && contentOffset && contentSize) {
+            if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 500) {
+              if (visibleCount < filteredVenues.length) {
+                handleLoadMore();
+              }
+            }
+          }
+        }}
+        scrollEventThrottle={32}
       >
-        {/* The large cover image has been removed per user's new layout requirement. 
-            The page will just list the venues directly under the header. */}
         {filteredVenues.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Building2 className="w-12 h-12 text-stone-300 mb-2" />
@@ -2975,92 +3098,41 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
             <Text style={styles.emptySub}>Try adjusting your search query or city filters.</Text>
           </View>
         ) : (
-          filteredVenues.map((venue) => {
+          displayedVenues.map((venue) => {
             const isSaved = Boolean(savedVenueIds[venue.id]);
             return (
-              <motion.div key={venue.id} whileHover={{ y: -2 }} className="w-full mb-4">
-                <TouchableOpacity
-                  style={styles.cardContainer}
-                  onPress={() => setSelectedVenue(venue)}
-                  activeOpacity={0.9}
-                >
-                  {/* CARD IMAGE */}
-                  <View style={styles.imageWrapper}>
-                    <Image source={{ uri: venue.image }} style={styles.cardImage} resizeMode="cover" />
-
-                    <View style={styles.badgeRow}>
-                      <View style={styles.tierTag}>
-                        <Sparkles className="w-3 h-3 text-amber-600 mr-1" />
-                        <Text style={styles.tierTagText}>{venue.tier}</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.bookmarkBtn}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          onToggleSavedVenue(venue.id);
-                        }}
-                      >
-                        <Heart
-                          className={`w-4 h-4 ${isSaved ? 'text-[#581420] fill-[#581420]' : 'text-stone-700'
-                            }`}
-                        />
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.ratingBadge}>
-                      <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 mr-1" />
-                      <Text style={styles.ratingText}>{venue.rating}</Text>
-                      <Text style={styles.reviewsText}>({venue.reviewsCount})</Text>
-                    </View>
-                  </View>
-
-                  {/* CARD DETAILS */}
-                  <View style={styles.cardBody}>
-                    <Text style={styles.venueName} numberOfLines={1}>{venue.name}</Text>
-
-                    <View style={styles.locationRow}>
-                      <MapPin className="w-3.5 h-3.5 text-[#581420] mr-1" />
-                      <Text style={styles.locationText}>{venue.location}, {venue.city}</Text>
-                    </View>
-
-                    <View style={styles.capacityRow}>
-                      <Users className="w-3.5 h-3.5 text-stone-500 mr-1" />
-                      <Text style={styles.capacityText}>{venue.capacity}</Text>
-                    </View>
-
-                    {/* FEATURE CHIPS */}
-                    <View style={styles.featuresRow}>
-                      {venue.features.slice(0, 3).map((feat, idx) => (
-                        <View key={idx} style={styles.featureChip}>
-                          <Text style={styles.featureChipText}>{feat}</Text>
-                        </View>
-                      ))}
-                    </View>
-
-                    <View style={styles.cardDivider} />
-
-                    {/* PRICE & VIEW DETAILS BUTTON */}
-                    <View style={styles.cardFooter}>
-                      <View>
-                        <Text style={styles.priceLabel}>STARTING PRICE</Text>
-                        <Text style={styles.priceValue}>{venue.startingPrice}</Text>
-                      </View>
-
-                      <TouchableOpacity
-                        style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedVenue(venue)}
-                        activeOpacity={0.85}
-                      >
-                        <Eye className="w-3.5 h-3.5 text-white mr-1.5" />
-                        <Text style={styles.viewDetailsBtnText}>View Details</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              </motion.div>
+              <VenueCardItem
+                key={venue.id}
+                venue={venue}
+                isSaved={isSaved}
+                onSelectVenue={setSelectedVenue}
+                onToggleSavedVenue={onToggleSavedVenue}
+              />
             );
           })
+        )}
+
+        {displayedVenues.length < filteredVenues.length && (
+          <TouchableOpacity
+            style={{
+              paddingVertical: 12,
+              paddingHorizontal: 16,
+              borderRadius: 10,
+              backgroundColor: '#F3ECE4',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: 4,
+              marginBottom: 20,
+              borderWidth: 1,
+              borderColor: '#E2D5C3',
+            }}
+            onPress={handleLoadMore}
+            activeOpacity={0.8}
+          >
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#581420' }}>
+              Load More Venues ({filteredVenues.length - displayedVenues.length} more)
+            </Text>
+          </TouchableOpacity>
         )}
       </ScrollView>
 
