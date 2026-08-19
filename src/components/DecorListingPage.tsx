@@ -97,7 +97,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     priceValue: 200000,
     tier: 'Signature',
     coreSpecialty: 'Floral & Mandap Decor',
-    image: '/src/assets/images/royal_mandap_decor.jpg',
+    image: '/images/royal_mandap_decor.jpg',
     description: 'Bespoke floral arrangements and thematic styling for your big day.',
     experience: '10+ Years',
     teamSize: '20+ Decorators',
@@ -114,7 +114,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,50,000 onwards',
     priceValue: 150000,
     tier: 'Signature',
-    image: '/src/assets/images/royal_mandap_decor_pure.jpg',
+    image: '/images/royal_mandap_decor_pure.jpg',
     description:
       'Specialising in grand traditional South Indian wedding mandaps with fresh jasmine, marigolds, carved temple pillars, and regal stage backdrop design for high-profile weddings across Tamil Nadu.',
     experience: '14+ Years',
@@ -127,10 +127,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Traditional Brass Urli Floaters',
     ],
     portfolio: [
-      '/src/assets/images/royal_mandap_decor_pure.jpg',
-      '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/royal_mandap_decor_pure.jpg',
+      '/images/jasmine_ceiling_decor_pure.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -143,7 +143,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹2,20,000 onwards',
     priceValue: 220000,
     tier: 'Signature',
-    image: '/src/assets/images/pastel_reception_stage.jpg',
+    image: '/images/pastel_reception_stage.jpg',
     description:
       'Pioneers of luxury reception stages featuring mint green drapes, lush tropical greenery leaf arches, white floral hanging chandeliers, and vintage cream velvet chaise lounge seating.',
     experience: '11+ Years',
@@ -156,10 +156,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Lush Botanical Stage Front & Uplighting',
     ],
     portfolio: [
-      '/src/assets/images/pastel_reception_stage.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/pastel_reception_stage.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -172,7 +172,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹85,000 onwards',
     priceValue: 85000,
     tier: 'Premium',
-    image: '/src/assets/images/haldi_setup_decor_pure.jpg',
+    image: '/images/haldi_setup_decor_pure.jpg',
     description:
       'Vibrant event setup specialists creating joyful Haldi setups with yellow drapes and marigolds, colorful Mehendi swings, and energetic Sangeet concert lighting in Madurai and Southern districts.',
     experience: '9+ Years',
@@ -185,10 +185,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Photobooth & Floral Wall',
     ],
     portfolio: [
-      '/src/assets/images/haldi_setup_decor_pure.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
+      '/images/haldi_setup_decor_pure.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
     ],
   },
   {
@@ -201,7 +201,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹3,00,000 onwards',
     priceValue: 300000,
     tier: 'Signature',
-    image: '/src/assets/images/beach_resort_decor.jpg',
+    image: '/images/beach_resort_decor.jpg',
     description:
       'Exquisite outdoor destination mandap specialists famous for vibrant pink and orange silk draped oceanfront mandaps, rose and marigold top canopy roofs, and winding rose petal grass aisle pathways.',
     experience: '12+ Years',
@@ -214,10 +214,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Starry Fairy Light Evening Canopy',
     ],
     portfolio: [
-      '/src/assets/images/beach_resort_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/beach_resort_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -230,7 +230,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,10,000 onwards',
     priceValue: 110000,
     tier: 'Premium',
-    image: '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
+    image: '/images/jasmine_ceiling_decor_pure.jpg',
     description:
       'Traditional heritage floral artists specializing in authentic South Indian banana pith, lotus, tuberose, and jasmine pillars with carved wooden mandap structures.',
     experience: '10+ Years',
@@ -243,10 +243,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Lakeside Traditional Stage',
     ],
     portfolio: [
-      '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
-      '/src/assets/images/royal_mandap_decor_pure.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/jasmine_ceiling_decor_pure.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/royal_mandap_decor_pure.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -259,7 +259,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,80,000 onwards',
     priceValue: 180000,
     tier: 'Signature',
-    image: '/src/assets/images/palace_reception_decor.jpg',
+    image: '/images/palace_reception_decor.jpg',
     description:
       'High-end grand stage designers for large palace weddings and convention centers. Famous for intricate 3D architectural backdrops, crystal chandeliers, and concert-grade intelligent moving lights.',
     experience: '13+ Years',
@@ -272,10 +272,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Opulent Crimson & Gold Stage',
     ],
     portfolio: [
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
     ],
   },
   {
@@ -288,7 +288,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,20,000 onwards',
     priceValue: 120000,
     tier: 'Premium',
-    image: '/src/assets/images/palace_reception_decor.jpg',
+    image: '/images/palace_reception_decor.jpg',
     description:
       'Specialising in rich velvet drapes, antique brass lamp pillars, custom floral mandap roofs, and elegant dining table centerpieces across Tiruppur and Erode regions.',
     experience: '8+ Years',
@@ -301,10 +301,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Gold Urli Entrance Decor',
     ],
     portfolio: [
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
     ],
   },
   {
@@ -317,7 +317,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹2,80,000 onwards',
     priceValue: 280000,
     tier: 'Signature',
-    image: '/src/assets/images/royal_mandap_decor_pure.jpg',
+    image: '/images/royal_mandap_decor_pure.jpg',
     description:
       'Crafting mesmerizing lotus floating pond mandaps, banana tree entrance gateways, and hand-strung tuberose garlands for authentic Vedic South Indian ceremonies.',
     experience: '16+ Years',
@@ -330,10 +330,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Rose & Mogra Swing',
     ],
     portfolio: [
-      '/src/assets/images/royal_mandap_decor_pure.jpg',
-      '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/royal_mandap_decor_pure.jpg',
+      '/images/jasmine_ceiling_decor_pure.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -346,7 +346,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,95,000 onwards',
     priceValue: 195000,
     tier: 'Premium',
-    image: '/src/assets/images/pastel_reception_stage.jpg',
+    image: '/images/pastel_reception_stage.jpg',
     description:
       'Specializing in contemporary blush pink, lavender, and champagne gold floral installations, fairy-light ceiling tunnels, and mirror pathway stages for grand receptions.',
     experience: '10+ Years',
@@ -359,10 +359,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Crystal Candle Wall',
     ],
     portfolio: [
-      '/src/assets/images/pastel_reception_stage.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/pastel_reception_stage.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
     ],
   },
   {
@@ -375,7 +375,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,70,000 onwards',
     priceValue: 170000,
     tier: 'Signature',
-    image: '/src/assets/images/palace_reception_decor.jpg',
+    image: '/images/palace_reception_decor.jpg',
     description:
       'Creating temple architecture inspired mandaps with golden gopuram motifs, silk tapestry backdrops, and fragrant marigold-jasmine floral carpets.',
     experience: '15+ Years',
@@ -388,10 +388,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Royal Peacock Floral Wall',
     ],
     portfolio: [
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/royal_mandap_decor_pure.jpg',
-      '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/royal_mandap_decor_pure.jpg',
+      '/images/jasmine_ceiling_decor_pure.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
     ],
   },
   {
@@ -404,7 +404,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹65,000 onwards',
     priceValue: 65000,
     tier: 'Essential',
-    image: '/src/assets/images/sangeet_stage_decor.jpg',
+    image: '/images/sangeet_stage_decor.jpg',
     description:
       'Vibrant and joyful budget-friendly setups for pre-wedding ceremonies including Haldi, Mehendi, Poolside Sangeet, and intimate home engagement decor.',
     experience: '6+ Years',
@@ -417,10 +417,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Floral Photo Frame',
     ],
     portfolio: [
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/haldi_setup_decor_pure.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/haldi_setup_decor_pure.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
     ],
   },
   {
@@ -433,7 +433,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹2,60,000 onwards',
     priceValue: 260000,
     tier: 'Signature',
-    image: '/src/assets/images/beach_resort_decor.jpg',
+    image: '/images/beach_resort_decor.jpg',
     description:
       'Romantic oceanfront resort wedding styling with driftwood arches, white tropical orchids, bamboo torch pathways, and warm festoon lighting.',
     experience: '11+ Years',
@@ -446,10 +446,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Candlelit Beach Walkway',
     ],
     portfolio: [
-      '/src/assets/images/beach_resort_decor.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/beach_resort_decor.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -462,7 +462,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹2,10,000 onwards',
     priceValue: 210000,
     tier: 'Signature',
-    image: '/src/assets/images/palace_reception_decor.jpg',
+    image: '/images/palace_reception_decor.jpg',
     description:
       'Regal ballroom wedding designers famous for grand velvet drapes, cascading crystal drops, mirrored dance floors, and golden throne stage arrangements.',
     experience: '12+ Years',
@@ -475,10 +475,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Royal Golden Throne Backing',
     ],
     portfolio: [
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -491,7 +491,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹90,000 onwards',
     priceValue: 90000,
     tier: 'Essential',
-    image: '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
+    image: '/images/rustic_outdoor_mandap_pure.jpg',
     description:
       'Sustainable and eco-conscious event decor using natural bamboo pillars, fresh eucalyptus leaves, seasonal local blooms, and reusable cloth drapes.',
     experience: '7+ Years',
@@ -504,10 +504,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Intimate Garden Stage',
     ],
     portfolio: [
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/pastel_reception_stage.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/pastel_reception_stage.jpg',
     ],
   },
   {
@@ -520,7 +520,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹3,50,000 onwards',
     priceValue: 350000,
     tier: 'Signature',
-    image: '/src/assets/images/modern_canopy_decor.jpg',
+    image: '/images/modern_canopy_decor.jpg',
     description:
       'Ultra-luxurious Chettinad palace wedding transformations featuring antique brass urlis, handcrafted lotus installations, 10,000+ fresh flower strands, and regal stage backdrops.',
     experience: '18+ Years',
@@ -533,10 +533,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Royal Elephant Motif Mandap',
     ],
     portfolio: [
-      '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/jasmine_ceiling_decor_pure.jpg',
-      '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
+      '/images/modern_canopy_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/jasmine_ceiling_decor_pure.jpg',
+      '/images/rustic_outdoor_mandap_pure.jpg',
     ],
   },
   {
@@ -549,7 +549,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,40,000 onwards',
     priceValue: 140000,
     tier: 'Premium',
-    image: '/src/assets/images/sangeet_stage_decor.jpg',
+    image: '/images/sangeet_stage_decor.jpg',
     description:
       'Lighting design and floral stage masters known for warm golden ambient washes, LED screen backdrop integrations, and fragrant floral entrance tunnels.',
     experience: '9+ Years',
@@ -562,10 +562,10 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Gilded Floral Mandala',
     ],
     portfolio: [
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/palace_reception_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/palace_reception_decor.jpg',
+      '/images/sangeet_stage_decor.jpg',
+      '/images/palace_reception_decor.jpg',
     ],
   },
 ];

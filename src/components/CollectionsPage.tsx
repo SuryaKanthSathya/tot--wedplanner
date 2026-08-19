@@ -19,8 +19,8 @@ const COLLECTIONS_DATA = [
     "category": "4 Star & Above Hotels, Banquet Halls",
     "isPremium": true,
     "images": [
-      "/src/assets/images/beach_resort_decor.jpg",
-      "/src/assets/images/modern_canopy_decor.jpg"
+      "/images/beach_resort_decor.jpg",
+      "/images/modern_canopy_decor.jpg"
     ],
     "contactPhone": "+919876543210"
   },
@@ -37,8 +37,8 @@ const COLLECTIONS_DATA = [
     "category": "4 Star & Above Hotels, Banquet Halls",
     "isPremium": false,
     "images": [
-      "/src/assets/images/palace_reception_decor.jpg",
-      "/src/assets/images/pastel_reception_stage.jpg"
+      "/images/palace_reception_decor.jpg",
+      "/images/pastel_reception_stage.jpg"
     ],
     "contactPhone": "+919876543211"
   },
@@ -55,8 +55,8 @@ const COLLECTIONS_DATA = [
     "category": "5 Star Hotels, Luxury Venues",
     "isPremium": true,
     "images": [
-      "/src/assets/images/sangeet_stage_decor.jpg",
-      "/src/assets/images/royal_mandap_decor.jpg"
+      "/images/sangeet_stage_decor.jpg",
+      "/images/royal_mandap_decor.jpg"
     ],
     "contactPhone": "+919876543212"
   },
@@ -408,32 +408,32 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
         newVenue.name = `Oceanfront Beach Resort ${index + 1}`;
         newVenue.location = `ECR, Chennai`;
         newVenue.images = [
-          "/src/assets/images/beach_resort_decor.jpg",
-          "/src/assets/images/modern_canopy_decor.jpg"
+          "/images/beach_resort_decor.jpg",
+          "/images/modern_canopy_decor.jpg"
         ];
         newVenue.category = "Beach Resorts, Lawns";
       } else if (title.includes('open ground') || title.includes('palace')) {
         newVenue.name = `Grand Imperial Lawn ${index + 1}`;
         newVenue.location = `Outer Ring Road, Chennai`;
         newVenue.images = [
-          "/src/assets/images/rustic_outdoor_mandap.jpg",
-          "/src/assets/images/modern_canopy_decor.jpg"
+          "/images/rustic_outdoor_mandap.jpg",
+          "/images/modern_canopy_decor.jpg"
         ];
         newVenue.category = "Open Grounds, Large Lawns";
       } else if (title.includes('mountain')) {
         newVenue.name = `Hilltop Resort & Spa ${index + 1}`;
         newVenue.location = `Ooty, Nilgiris`;
         newVenue.images = [
-          "/src/assets/images/rustic_outdoor_mandap.jpg",
-          "/src/assets/images/modern_canopy_decor.jpg"
+          "/images/rustic_outdoor_mandap.jpg",
+          "/images/modern_canopy_decor.jpg"
         ];
         newVenue.category = "Mountain Resorts, Lawns";
       } else if (title.includes('resort')) {
         newVenue.name = `Luxury Wedding Resort ${index + 1}`;
         newVenue.location = `ECR, Chennai`;
         newVenue.images = [
-          "/src/assets/images/beach_resort_decor.jpg",
-          "/src/assets/images/modern_canopy_decor.jpg"
+          "/images/beach_resort_decor.jpg",
+          "/images/modern_canopy_decor.jpg"
         ];
         newVenue.category = "4 Star & Above Resorts, Lawns";
       } else if (title.includes('island')) {

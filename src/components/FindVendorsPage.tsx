@@ -96,7 +96,7 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
       id: 'Mehendi',
       name: 'Mehendi',
       vendorsCount: '54 Vendors',
-      image: '/src/assets/images/mehendi_category_1786688929519.jpg',
+      image: '/images/mehendi_category_1786688929519.jpg',
     },
     {
       id: 'Catering',
@@ -120,13 +120,13 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
       id: 'Invitations',
       name: 'Invitation',
       vendorsCount: '68 Vendors',
-      image: '/src/assets/images/invitation_category.jpg',
+      image: '/images/invitation_category.jpg',
     },
     {
       id: 'Cars',
       name: 'Cars',
       vendorsCount: '45 Vendors',
-      image: '/src/assets/images/cars_category.webp',
+      image: '/images/cars_category.webp',
     },
   ];
 
@@ -134,7 +134,7 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     id: 'Rituals',
     name: 'Rituals',
     vendorsCount: '12 Vendors',
-    image: '/src/assets/images/rituals_category.webp',
+    image: '/images/rituals_category.webp',
   };
 
   const { width } = useWindowDimensions();

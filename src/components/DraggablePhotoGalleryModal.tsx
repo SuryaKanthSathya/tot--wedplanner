@@ -174,7 +174,7 @@ export const DraggablePhotoGalleryModal: React.FC<DraggablePhotoGalleryModalProp
                   alt={`${title} - Photo ${currentIndex + 1}`}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src =
-                      '/src/assets/images/exact_wedding_couple_1786457746200.jpg';
+                      '/images/exact_wedding_couple_1786457746200.jpg';
                   }}
                   className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl pointer-events-none border border-white/10"
                 />
@@ -225,7 +225,7 @@ export const DraggablePhotoGalleryModal: React.FC<DraggablePhotoGalleryModalProp
                     alt={`Thumbnail ${idx + 1}`}
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).src =
-                        '/src/assets/images/exact_wedding_couple_1786457746200.jpg';
+                        '/images/exact_wedding_couple_1786457746200.jpg';
                     }}
                     className="w-full h-full object-cover"
                     loading="lazy"

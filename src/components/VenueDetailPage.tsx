@@ -239,11 +239,11 @@ export const VenueDetailPage: React.FC<VenueDetailPageProps> = ({
 
   // Curated 24 luxury venue & banquet hall photos
   const heroImages = [
-    venue.image || '/src/assets/images/beach_resort_decor.jpg',
-    '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
-    '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-    '/src/assets/images/modern_canopy_decor.jpg',
-    '/src/assets/images/pastel_reception_stage.jpg',
+    venue.image || '/images/beach_resort_decor.jpg',
+    '/images/guest_banquet_hall_stage_1786471284070.jpg',
+    '/images/wedding_banquet_hall_pic_1786470818992.jpg',
+    '/images/modern_canopy_decor.jpg',
+    '/images/pastel_reception_stage.jpg',
     'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
