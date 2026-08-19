@@ -39,7 +39,7 @@ export const ENTERTAINMENT_DATA: EntertainmentItem[] = [
     priceValue: 50000,
     tier: 'Signature',
     performanceDuration: '3-4 Hours',
-    image: '/src/assets/images/sangeet_stage_decor.jpg',
+    image: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
     description: 'Top-tier DJs and live bands to keep your guests dancing all night.',
     experience: '5+ Years',
     teamSize: '3-5 Performers',
@@ -47,7 +47,7 @@ export const ENTERTAINMENT_DATA: EntertainmentItem[] = [
     specialties: ['Live Band', 'Wedding DJ', 'MC & Anchor', 'Stage Lighting'],
     features: ['Live Band', 'DJ Sound Setup', 'Stage Lighting'],
     portfolio: [
-      '/src/assets/images/sangeet_stage_decor.jpg',
+      'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80',
       'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80',
     ],

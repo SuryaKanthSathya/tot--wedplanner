@@ -132,13 +132,26 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
     }, 2500);
   };
 
-  const portfolioImages = [
-    artist.image || 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+  const ALL_MEHENDI_IMAGES = [
+    '/images/mehendi/mehendi_arabic_style_1786617685166.jpg',
+    '/images/mehendi/mehendi_artist_applying_1786617553765.jpg',
+    '/images/mehendi/mehendi_bridal_hands_1786616994272.jpg',
+    '/images/mehendi/mehendi_bridal_portrait_1786617928334.jpg',
+    '/images/mehendi/mehendi_cone_application_1786617733536.jpg',
+    '/images/mehendi/mehendi_floral_design_1786617638464.jpg',
+    '/images/mehendi/mehendi_intricate_palms_1786617718285.jpg',
+    '/images/mehendi/mehendi_jewelry_bangles_1786617751591.jpg',
+    '/images/mehendi/mehendi_mandala_design_1786617958168.jpg',
+    '/images/mehendi/mehendi_modern_minimalist_1786617671026.jpg',
+    '/images/mehendi/mehendi_peacock_motif_1786617762239.jpg',
+    '/images/mehendi/mehendi_traditional_feet_1786617653822.jpg',
+    '/images/mehendi/mehendi_wedding_celebration_1786617700517.jpg',
   ];
+  const portfolioImages = (() => {
+    const primaryImage = artist.image || ALL_MEHENDI_IMAGES[0];
+    const remaining = ALL_MEHENDI_IMAGES.filter((img) => img !== primaryImage);
+    return [primaryImage, ...remaining.slice(0, 4)];
+  })();
 
   const packagesList = [
     {
@@ -267,7 +280,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
                   src={portfolioImages[0]}
                   alt={artist.name}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85';
+                    (e.target as HTMLImageElement).src = ALL_MEHENDI_IMAGES[0];
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -280,7 +293,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
                   src={portfolioImages[1] || portfolioImages[0]}
                   alt={`${artist.name} 2`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85';
+                    (e.target as HTMLImageElement).src = ALL_MEHENDI_IMAGES[1];
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -296,7 +309,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
                   src={portfolioImages[2] || portfolioImages[0]}
                   alt={`${artist.name} 3`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85';
+                    (e.target as HTMLImageElement).src = ALL_MEHENDI_IMAGES[2];
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -312,7 +325,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
                   src={portfolioImages[3] || portfolioImages[0]}
                   alt={`${artist.name} 4`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85';
+                    (e.target as HTMLImageElement).src = ALL_MEHENDI_IMAGES[3];
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -328,7 +341,7 @@ export const ArtistDetailPage: React.FC<ArtistDetailPageProps> = ({
                   src={portfolioImages[4] || portfolioImages[0]}
                   alt={`${artist.name} 5`}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85';
+                    (e.target as HTMLImageElement).src = ALL_MEHENDI_IMAGES[4];
                   }}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

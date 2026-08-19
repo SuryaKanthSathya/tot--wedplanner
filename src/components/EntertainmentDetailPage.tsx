@@ -187,7 +187,6 @@ export const EntertainmentDetailPage: React.FC<EntertainmentDetailPageProps> = (
   // Curated 24 live wedding entertainment, DJ & stage photos
   const photoGallery = [
     artist.image,
-    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=85',
