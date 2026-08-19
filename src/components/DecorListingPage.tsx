@@ -159,7 +159,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       '/src/assets/images/pastel_reception_stage.jpg',
       '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -187,7 +187,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     portfolio: [
       '/src/assets/images/haldi_setup_decor_pure.jpg',
       '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
     ],
   },
@@ -217,7 +217,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       '/src/assets/images/beach_resort_decor.jpg',
       '/src/assets/images/palace_reception_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
     ],
   },
   {
@@ -259,7 +259,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹1,80,000 onwards',
     priceValue: 180000,
     tier: 'Signature',
-    image: '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
+    image: '/src/assets/images/palace_reception_decor.jpg',
     description:
       'High-end grand stage designers for large palace weddings and convention centers. Famous for intricate 3D architectural backdrops, crystal chandeliers, and concert-grade intelligent moving lights.',
     experience: '13+ Years',
@@ -272,8 +272,8 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Opulent Crimson & Gold Stage',
     ],
     portfolio: [
-      '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/palace_reception_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
     ],
@@ -302,8 +302,8 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     ],
     portfolio: [
       '/src/assets/images/palace_reception_decor.jpg',
-      '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
     ],
   },
@@ -361,7 +361,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     portfolio: [
       '/src/assets/images/pastel_reception_stage.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
       '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
     ],
   },
@@ -404,7 +404,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹65,000 onwards',
     priceValue: 65000,
     tier: 'Essential',
-    image: '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+    image: '/src/assets/images/sangeet_stage_decor.jpg',
     description:
       'Vibrant and joyful budget-friendly setups for pre-wedding ceremonies including Haldi, Mehendi, Poolside Sangeet, and intimate home engagement decor.',
     experience: '6+ Years',
@@ -417,7 +417,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Floral Photo Frame',
     ],
     portfolio: [
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/haldi_setup_decor_pure.jpg',
       '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
@@ -448,7 +448,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     portfolio: [
       '/src/assets/images/beach_resort_decor.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
       '/src/assets/images/palace_reception_decor.jpg',
     ],
   },
@@ -462,7 +462,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     startingPrice: '₹2,10,000 onwards',
     priceValue: 210000,
     tier: 'Signature',
-    image: '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+    image: '/src/assets/images/palace_reception_decor.jpg',
     description:
       'Regal ballroom wedding designers famous for grand velvet drapes, cascading crystal drops, mirrored dance floors, and golden throne stage arrangements.',
     experience: '12+ Years',
@@ -475,9 +475,9 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
       'Royal Golden Throne Backing',
     ],
     portfolio: [
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
-      '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/palace_reception_decor.jpg',
     ],
   },
@@ -506,7 +506,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     portfolio: [
       '/src/assets/images/rustic_outdoor_mandap_pure.jpg',
       '/src/assets/images/modern_canopy_decor.jpg',
-      '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
       '/src/assets/images/pastel_reception_stage.jpg',
     ],
   },
@@ -563,8 +563,8 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     ],
     portfolio: [
       '/src/assets/images/sangeet_stage_decor.jpg',
-      '/src/assets/images/wedding_banquet_hall_pic_1786470818992.jpg',
-      '/src/assets/images/guest_banquet_hall_stage_1786471284070.jpg',
+      '/src/assets/images/palace_reception_decor.jpg',
+      '/src/assets/images/sangeet_stage_decor.jpg',
       '/src/assets/images/palace_reception_decor.jpg',
     ],
   },
