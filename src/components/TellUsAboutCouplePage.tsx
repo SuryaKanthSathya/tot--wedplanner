@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
+import hinduCoupleImg from '../assets/images/hindu_couple_arch_1786467605789.jpg';
 import christianCoupleImg from '../assets/images/christian_couple_arch_1786467622108.jpg';
 import muslimCoupleImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
 import intercasteCoupleImg from '../assets/images/intercaste_couple_arch_new_1786468081966.jpg';
+import intercasteSymbolsImg from '../assets/images/intercaste_symbols_religions.webp';
 import templeImg from '../assets/images/kanchipuram_temple_1786470394211.jpg';
 import churchImg from '../assets/images/christian_couple_arch_1786467622108.jpg';
 import masjidImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
+import whiteBanquetImg from '../assets/images/white_banquet_illustration_1786471427275.jpg';
+import goldRupeeBagImg from '../assets/images/gold_rupee_money_bag_1786503761184.jpg';
+import palaceHeritageImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
+import mahabalipuramImg from '../assets/images/mahabalipuram_shore_temple_1786470287462.jpg';
+import chennaiImg from '../assets/images/chennai_landmark_pic_1786469508338.jpg';
+import coimbatoreImg from '../assets/images/coimbatore_adiyogi_shiva_1786470303170.jpg';
+import dharmapuriImg from '../assets/images/dharmapuri_hogenakkal_falls_1786470329010.jpg';
+import dindigulImg from '../assets/images/dindigul_kodaikanal_lake_1786470315614.jpg';
+import kanchipuramImg from '../assets/images/kanchipuram_temple_1786470394211.jpg';
+import kanniyakumariImg from '../assets/images/kanniyakumari_landmark_pic_1786469622086.jpg';
+import maduraiImg from '../assets/images/madurai_landmark_pic_1786469701562.jpg';
+import nagapattinamImg from '../assets/images/nagapattinam_velankanni_1786470407162.jpg';
+import ootyImg from '../assets/images/ooty_nilgiris_tea_pic_1786469767982.jpg';
+import ramanathapuramImg from '../assets/images/ramanathapuram_pamban_bridge_1786470340546.jpg';
+import salemImg from '../assets/images/salem_yercaud_hills_1786470445272.jpg';
+import tenkasiImg from '../assets/images/tenkasi_courtallam_falls_1786470431410.jpg';
+import thanjavurImg from '../assets/images/thanjavur_big_temple_pic_1786469751090.jpg';
+import trichyImg from '../assets/images/trichy_rockfort_temple_1786470354684.jpg';
+import tiruvannamalaiImg from '../assets/images/tiruvannamalai_temple_1786470366794.jpg';
+import velloreImg from '../assets/images/vellore_golden_temple_1786470382427.jpg';
+import gingeeImg from '../assets/images/gingee_fort_viluppuram_1786470418118.jpg';
 import {
   View,
   Text,
@@ -65,19 +88,19 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Chengalpattu, Tamil Nadu',
     district: 'Chengalpattu',
     famousPlace: 'Mahabalipuram Shore Temple & Beach',
-    image: '/src/assets/images/mahabalipuram_shore_temple_1786470287462.jpg',
+    image: mahabalipuramImg,
   },
   {
     name: 'Chennai, Tamil Nadu',
     district: 'Chennai',
     famousPlace: 'Ripon Building & Marina Beach',
-    image: '/src/assets/images/chennai_landmark_pic_1786469508338.jpg',
+    image: chennaiImg,
   },
   {
     name: 'Coimbatore, Tamil Nadu',
     district: 'Coimbatore',
     famousPlace: 'Adiyogi Shiva & Marudhamalai Temple',
-    image: '/src/assets/images/coimbatore_adiyogi_shiva_1786470303170.jpg',
+    image: coimbatoreImg,
   },
   {
     name: 'Cuddalore, Tamil Nadu',
@@ -89,13 +112,13 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Dharmapuri, Tamil Nadu',
     district: 'Dharmapuri',
     famousPlace: 'Hogenakkal Waterfalls & Kaveri River',
-    image: '/src/assets/images/dharmapuri_hogenakkal_falls_1786470329010.jpg',
+    image: dharmapuriImg,
   },
   {
     name: 'Dindigul, Tamil Nadu',
     district: 'Dindigul',
     famousPlace: 'Kodaikanal Lake & Palani Murugan Temple',
-    image: '/src/assets/images/dindigul_kodaikanal_lake_1786470315614.jpg',
+    image: dindigulImg,
   },
   {
     name: 'Erode, Tamil Nadu',
@@ -113,13 +136,13 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Kanchipuram, Tamil Nadu',
     district: 'Kanchipuram',
     famousPlace: 'Kanchi Silk Heritage & Ekambareswarar Temple',
-    image: '/src/assets/images/kanchipuram_temple_1786470394211.jpg',
+    image: kanchipuramImg,
   },
   {
     name: 'Kanniyakumari, Tamil Nadu',
     district: 'Kanniyakumari',
     famousPlace: 'Thiruvalluvar Statue & Vivekananda Rock Beach',
-    image: '/src/assets/images/kanniyakumari_landmark_pic_1786469622086.jpg',
+    image: kanniyakumariImg,
   },
   {
     name: 'Karur, Tamil Nadu',
@@ -137,7 +160,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Madurai, Tamil Nadu',
     district: 'Madurai',
     famousPlace: 'Meenakshi Amman Temple & Nayakar Palace',
-    image: '/src/assets/images/madurai_landmark_pic_1786469701562.jpg',
+    image: maduraiImg,
   },
   {
     name: 'Mayiladuthurai, Tamil Nadu',
@@ -149,7 +172,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Nagapattinam, Tamil Nadu',
     district: 'Nagapattinam',
     famousPlace: 'Velankanni Basilica Shrine & Coastal Heritage',
-    image: '/src/assets/images/nagapattinam_velankanni_1786470407162.jpg',
+    image: nagapattinamImg,
   },
   {
     name: 'Namakkal, Tamil Nadu',
@@ -161,7 +184,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Nilgiris (Ooty), Tamil Nadu',
     district: 'Nilgiris',
     famousPlace: 'Ooty Tea Gardens & Mountain Railway',
-    image: '/src/assets/images/ooty_nilgiris_tea_pic_1786469767982.jpg',
+    image: ootyImg,
   },
   {
     name: 'Perambalur, Tamil Nadu',
@@ -179,7 +202,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Ramanathapuram, Tamil Nadu',
     district: 'Ramanathapuram',
     famousPlace: 'Pamban Sea Bridge & Rameshwaram Temple',
-    image: '/src/assets/images/ramanathapuram_pamban_bridge_1786470340546.jpg',
+    image: ramanathapuramImg,
   },
   {
     name: 'Ranipet, Tamil Nadu',
@@ -191,25 +214,25 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Salem, Tamil Nadu',
     district: 'Salem',
     famousPlace: 'Yercaud Shevaroy Hills & Mettur Dam',
-    image: '/src/assets/images/salem_yercaud_hills_1786470445272.jpg',
+    image: salemImg,
   },
   {
     name: 'Sivaganga, Tamil Nadu',
     district: 'Sivaganga',
     famousPlace: 'Chettinad Heritage Palace Architecture',
-    image: '/src/assets/images/tn_heritage_palace_pic_1786469719545.jpg',
+    image: palaceHeritageImg,
   },
   {
     name: 'Tenkasi, Tamil Nadu',
     district: 'Tenkasi',
     famousPlace: 'Courtallam Waterfalls & Kasi Viswanathar Temple',
-    image: '/src/assets/images/tenkasi_courtallam_falls_1786470431410.jpg',
+    image: tenkasiImg,
   },
   {
     name: 'Thanjavur, Tamil Nadu',
     district: 'Thanjavur',
     famousPlace: 'Brihadishvara Temple (Big Temple)',
-    image: '/src/assets/images/thanjavur_big_temple_pic_1786469751090.jpg',
+    image: thanjavurImg,
   },
   {
     name: 'Theni, Tamil Nadu',
@@ -227,7 +250,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Tiruchirappalli (Trichy), Tamil Nadu',
     district: 'Tiruchirappalli',
     famousPlace: 'Rockfort Temple & Srirangam Ranganathar',
-    image: '/src/assets/images/trichy_rockfort_temple_1786470354684.jpg',
+    image: trichyImg,
   },
   {
     name: 'Tirunelveli, Tamil Nadu',
@@ -257,7 +280,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Tiruvannamalai, Tamil Nadu',
     district: 'Tiruvannamalai',
     famousPlace: 'Annamalaiyar Temple & Arunachala Hill',
-    image: '/src/assets/images/tiruvannamalai_temple_1786470366794.jpg',
+    image: tiruvannamalaiImg,
   },
   {
     name: 'Tiruvarur, Tamil Nadu',
@@ -269,13 +292,13 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'Vellore, Tamil Nadu',
     district: 'Vellore',
     famousPlace: 'Vellore Fort & Sripuram Golden Temple',
-    image: '/src/assets/images/vellore_golden_temple_1786470382427.jpg',
+    image: velloreImg,
   },
   {
     name: 'Viluppuram, Tamil Nadu',
     district: 'Viluppuram',
     famousPlace: 'Gingee Historic Fort Citadel',
-    image: '/src/assets/images/gingee_fort_viluppuram_1786470418118.jpg',
+    image: gingeeImg,
   },
   {
     name: 'Virudhunagar, Tamil Nadu',
@@ -287,7 +310,7 @@ const TAMIL_NADU_DISTRICTS_RAW: DistrictItem[] = [
     name: 'kayalpatinam, Tamil Nadu',
     district: 'kayalpatinam',
     famousPlace: 'kayalpatinam beach & Kaveri River',
-    image: '/src/assets/images/kayalpatinam_beach_1786470329010.jpg',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
   },
 ];
 
@@ -446,11 +469,12 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
   };
 
   // Dynamic theme image mapping for Couple step
-  const themeImages: Record<string, string> = {
-    Hindu: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
-    Christian: '/src/assets/images/christian_couple_arch_1786467622108.jpg',
-    Muslim: '/src/assets/images/muslim_couple_arch_1786467635401.jpg',
-    Intercaste: '/src/assets/images/intercaste_couple_arch_new_1786468081966.jpg',
+  const getCoupleThemePhoto = () => {
+    const type = (marriageType || '').toLowerCase();
+    if (type.includes('christian')) return christianCoupleImg;
+    if (type.includes('muslim')) return muslimCoupleImg;
+    if (type.includes('intercaste')) return intercasteCoupleImg;
+    return hinduCoupleImg || exactWeddingCoupleImg;
   };
 
   // Find currently selected district details or default
@@ -463,7 +487,7 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
       name: selectedLocation || 'Tamil Nadu, India',
       district: 'Tamil Nadu',
       famousPlace: 'Grand Chettinad Heritage Palace & Wedding Venue',
-      image: '/src/assets/images/tn_heritage_palace_pic_1786469719545.jpg',
+      image: palaceHeritageImg,
     };
 
   const filteredDistricts = TAMIL_NADU_DISTRICTS.filter((item) =>
@@ -496,13 +520,14 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
   };
 
   const getProfileCouplePhoto = () => {
-    if (marriageType === 'Christian Wedding' || marriageType === 'Christian') {
+    const type = (marriageType || '').toLowerCase();
+    if (type.includes('christian')) {
       return christianCoupleImg;
     }
-    if (marriageType === 'Muslim Wedding' || marriageType === 'Muslim') {
+    if (type.includes('muslim')) {
       return muslimCoupleImg;
     }
-    if (marriageType === 'Intercaste / Special Marriage' || marriageType === 'Intercaste') {
+    if (type.includes('intercaste')) {
       return intercasteCoupleImg;
     }
     return exactWeddingCoupleImg;
@@ -931,13 +956,14 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             </label>
 
             {/* Dynamic Couple Theme Image */}
-            <View style={styles.dynamicImageWrapper}>
-              <Image
-                source={{ uri: themeImages[marriageType] || themeImages.Hindu }}
-                style={styles.themedImage}
-                resizeMode="cover"
+            <div className="w-full h-56 sm:h-64 rounded-2xl overflow-hidden border border-[#E2DDD5] shadow-md mt-4 bg-[#FAF1E8] relative">
+              <img
+                src={getCoupleThemePhoto()}
+                alt="Wedding Couple Theme"
+                className="w-full h-full object-cover object-[center_20%]"
+                loading="lazy"
               />
-            </View>
+            </div>
           </View>
         )}
 
@@ -1030,19 +1056,20 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             </TouchableOpacity>
 
             {/* Dynamic District Landmark Image */}
-            <View style={styles.landmarkImageWrapper}>
-              <Image
-                source={{ uri: selectedDistrictInfo.image }}
-                style={styles.landmarkImage}
-                resizeMode="cover"
+            <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-[#E2DDD5] shadow-md mt-4 relative bg-[#FAF1E8]">
+              <img
+                src={selectedDistrictInfo.image}
+                alt={selectedDistrictInfo.famousPlace}
+                className="w-full h-full object-cover"
+                loading="lazy"
               />
               {/* Landmark Title Badge */}
-              <View style={styles.landmarkBadge}>
+              <div className="absolute bottom-2.5 left-2.5 right-2.5 bg-black/60 backdrop-blur-xs py-1.5 px-3 rounded-xl">
                 <Text style={styles.landmarkBadgeText}>
                   📍 {selectedDistrictInfo.famousPlace}
                 </Text>
-              </View>
-            </View>
+              </div>
+            </div>
           </View>
         )}
 
@@ -1150,13 +1177,14 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             </View>
 
             {/* Grand White Wedding Banquet Hall Venue Illustration Photo */}
-            <View style={styles.banquetImageWrapper}>
-              <Image
-                source={{ uri: '/src/assets/images/white_banquet_illustration_1786471427275.jpg' }}
-                style={styles.banquetImage}
-                resizeMode="cover"
+            <div className="w-full h-48 sm:h-52 rounded-2xl overflow-hidden border border-[#E2DDD5] shadow-md mt-4 bg-[#FAF1E8] relative">
+              <img
+                src={whiteBanquetImg}
+                alt="Wedding Banquet Hall"
+                className="w-full h-full object-cover"
+                loading="lazy"
               />
-            </View>
+            </div>
           </View>
         )}
 
@@ -1248,13 +1276,14 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             </View>
 
             {/* Money Bag Graphic Illustration */}
-            <View style={styles.moneyBagWrapper}>
-              <Image
-                source={{ uri: '/src/assets/images/gold_rupee_money_bag_1786503761184.jpg' }}
-                style={styles.moneyBagImage}
-                resizeMode="contain"
+            <div className="w-full h-44 sm:h-48 rounded-2xl overflow-hidden flex items-center justify-center mt-2 relative">
+              <img
+                src={goldRupeeBagImg}
+                alt="Wedding Budget"
+                className="w-auto h-full max-h-44 object-contain"
+                loading="lazy"
               />
-            </View>
+            </div>
           </View>
         )}
 
@@ -1265,17 +1294,33 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
             <div className="w-full grid grid-cols-2 gap-3.5 my-2">
               {[
                 {
-                  id: marriageType === 'Christian' ? 'Church' : marriageType === 'Muslim' ? 'Masjid' : 'Temple',
-                  label: marriageType === 'Christian' ? 'Church' : marriageType === 'Muslim' ? 'Masjid' : 'Temple',
-                  image: marriageType === 'Christian' 
-                    ? churchImg
-                    : marriageType === 'Muslim'
-                    ? masjidImg
-                    : templeImg,
-                  desc: marriageType === 'Christian' 
-                    ? 'Classic Church Altar & Elegant Setup' 
-                    : marriageType === 'Muslim'
-                    ? 'Beautiful Masjid & Nikah Setup'
+                  id: (marriageType || '').toLowerCase().includes('christian')
+                    ? 'Church'
+                    : (marriageType || '').toLowerCase().includes('muslim')
+                    ? 'Masjid'
+                    : (marriageType || '').toLowerCase().includes('intercaste')
+                    ? 'Intercaste'
+                    : 'Temple',
+                  label: (marriageType || '').toLowerCase().includes('christian')
+                    ? 'Church'
+                    : (marriageType || '').toLowerCase().includes('muslim')
+                    ? 'Masjid'
+                    : (marriageType || '').toLowerCase().includes('intercaste')
+                    ? 'Intercaste'
+                    : 'Temple',
+                  image: (marriageType || '').toLowerCase().includes('christian')
+                    ? nagapattinamImg
+                    : (marriageType || '').toLowerCase().includes('muslim')
+                    ? 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=600&q=80'
+                    : (marriageType || '').toLowerCase().includes('intercaste')
+                    ? intercasteSymbolsImg
+                    : thanjavurImg,
+                  desc: (marriageType || '').toLowerCase().includes('christian')
+                    ? 'Classic Church Altar & Sacred Vows'
+                    : (marriageType || '').toLowerCase().includes('muslim')
+                    ? 'Sacred Nikah & Elegant Stage'
+                    : (marriageType || '').toLowerCase().includes('intercaste')
+                    ? 'Multi-faith Blended Celebration'
                     : 'Sacred Temple Mandap & Divine Rituals',
                 },
                 {
@@ -1287,7 +1332,7 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
                 {
                   id: 'Luxury',
                   label: 'Luxury',
-                  image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=80',
+                  image: palaceHeritageImg,
                   desc: 'Grand Palace & Chandelier Ballroom',
                 },
                 {
@@ -1324,16 +1369,12 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
                     )}
 
                     {/* Real High-Quality Photo Image */}
-                    <div className="w-full h-24 rounded-xl overflow-hidden mb-2 relative shadow-inner bg-[#EFEAE2]">
+                    <div className="w-full aspect-[16/10] min-h-[110px] rounded-xl overflow-hidden mb-2 relative shadow-xs bg-[#FAF1E8] border border-[#EAE4DC]">
                       <img
                         src={styleOpt.image}
                         alt={styleOpt.label}
-                        className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => {
-                          // Fallback if network blocks Unsplash CDN
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
+                        className="w-full h-full object-cover object-center transition-transform duration-300 hover:scale-105"
+                        loading="lazy"
                       />
                     </div>
 

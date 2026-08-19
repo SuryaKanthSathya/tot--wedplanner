@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,7 @@ import {
   Cross,
 } from 'lucide-react';
 import { RitualsDetailPage } from './RitualsDetailPage';
+import { getInitialRoute, setAppRoute, parseHashRoute } from '../utils/routeManager';
 
 export type ReligionType = 'Hindu' | 'Muslim' | 'Christian';
 
@@ -489,7 +490,40 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
   const [showRatingDropdown, setShowRatingDropdown] = useState(false);
   const [showTierDropdown, setShowTierDropdown] = useState(false);
 
-  const [selectedVendor, setSelectedVendor] = useState<RitualsVendor | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedVendor, setSelectedVendor] = useState<RitualsVendor | null>(() => {
+    if (initialRoute.subpage === 'rituals' && initialRoute.detailId) {
+      return RITUALS_VENDORS_DATA.find((v) => v.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openVendorDetail = (v: RitualsVendor) => {
+    setSelectedVendor(v);
+    setAppRoute({ screen: 'dashboard', subpage: 'rituals', detailId: v.id });
+  };
+
+  const closeVendorDetail = () => {
+    setSelectedVendor(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'rituals', detailId: null });
+  };
+
+  // Sync hash changes for ritual vendor detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'rituals') {
+        if (route.detailId) {
+          const match = RITUALS_VENDORS_DATA.find((v) => v.id === route.detailId);
+          if (match) setSelectedVendor(match);
+        } else {
+          setSelectedVendor(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   const titles: Record<ReligionType, string> = {
     Hindu: 'Hindu Wedding Rituals',
@@ -530,7 +564,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
       <RitualsDetailPage
         vendor={selectedVendor}
         religion={religion}
-        onBack={() => setSelectedVendor(null)}
+        onBack={closeVendorDetail}
         isBookmarked={Boolean(savedRitualsIds[selectedVendor.id])}
         onToggleBookmark={onToggleSavedRitual}
         bookingSource={bookingSource}
@@ -687,7 +721,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
                     whileTap={{ scale: 0.98 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                     className="w-full cursor-pointer flex"
-                    onClick={() => setSelectedVendor(vendor)}
+                    onClick={() => openVendorDetail(vendor)}
                   >
                     <View style={listStyles.cardContainer}>
                       <View style={listStyles.cardImgWrapper}>
@@ -728,7 +762,7 @@ const RitualsListingPage: React.FC<RitualsListingPageProps> = ({
                         </View>
                         <View style={listStyles.cardPriceRow}>
                           <Text style={listStyles.cardPriceValue}>{vendor.startingPrice}</Text>
-                          <TouchableOpacity style={listStyles.cardViewBtn} onPress={() => setSelectedVendor(vendor)} activeOpacity={0.85}>
+                          <TouchableOpacity style={listStyles.cardViewBtn} onPress={() => openVendorDetail(vendor)} activeOpacity={0.85}>
                             <Text style={listStyles.cardViewBtnText}>View Details</Text>
                           </TouchableOpacity>
                         </View>
@@ -765,19 +799,43 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
   initialReligion = null,
   bookingSource = 'entire_wedding',
 }) => {
-  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(initialReligion);
+  const [selectedReligion, setSelectedReligion] = useState<ReligionType | null>(() => {
+    if (initialReligion) return initialReligion;
+    const route = getInitialRoute();
+    if (route.subpage === 'rituals' && route.detailId) {
+      const match = RITUALS_VENDORS_DATA.find((v) => v.id === route.detailId);
+      if (match) return match.religion;
+    }
+    try {
+      const saved = localStorage.getItem('tot_active_religion');
+      if (saved === 'Hindu' || saved === 'Muslim' || saved === 'Christian') return saved as ReligionType;
+    } catch (e) {}
+    return null;
+  });
+
+  const handleSelectReligion = (r: ReligionType) => {
+    setSelectedReligion(r);
+    try {
+      localStorage.setItem('tot_active_religion', r);
+    } catch (e) {}
+  };
+
+  const handleBackFromListing = () => {
+    try {
+      localStorage.removeItem('tot_active_religion');
+    } catch (e) {}
+    if (initialReligion) {
+      onBack();
+    } else {
+      setSelectedReligion(null);
+    }
+  };
 
   if (selectedReligion) {
     return (
       <RitualsListingPage
         religion={selectedReligion}
-        onBack={() => {
-          if (initialReligion) {
-            onBack();
-          } else {
-            setSelectedReligion(null);
-          }
-        }}
+        onBack={handleBackFromListing}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={onToggleSavedRitual}
@@ -789,7 +847,7 @@ export const RitualsFlow: React.FC<RitualsFlowProps> = ({
   return (
     <ReligionSelectionScreen
       onBack={onBack}
-      onSelectReligion={(r) => setSelectedReligion(r)}
+      onSelectReligion={handleSelectReligion}
     />
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, useWindowDimensions } from 'react-native';
 import { ChevronLeft, Heart, Calendar, Users } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -44,6 +44,35 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
     } catch {}
     return '';
   });
+
+  const [weddingDateRaw, setWeddingDateRaw] = useState('');
+  const dateInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    setWeddingDateRaw(raw);
+    if (!raw) { setWeddingDate(''); return; }
+    try {
+      const [year, month, day] = raw.split('-');
+      const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+      setWeddingDate(dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }));
+    } catch { setWeddingDate(raw); }
+  };
+
+  const triggerDatePicker = () => {
+    try {
+      if (dateInputRef.current) {
+        if (typeof (dateInputRef.current as any).showPicker === 'function') {
+          (dateInputRef.current as any).showPicker();
+        } else {
+          dateInputRef.current.focus();
+          dateInputRef.current.click();
+        }
+      }
+    } catch {
+      try { dateInputRef.current?.focus(); dateInputRef.current?.click(); } catch {}
+    }
+  };
   const categories = [
     {
       id: 'Photography',
@@ -168,16 +197,38 @@ export const FindVendorsPage: React.FC<FindVendorsPageProps> = ({
 
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Wedding Date</Text>
-                <View style={styles.inputWrapper}>
-                  <Calendar className="w-4 h-4 text-stone-400 absolute left-3 top-3.5" />
-                  <TextInput
-                    style={styles.input}
-                    placeholder="MM/DD/YYYY"
-                    placeholderTextColor="#A09B98"
-                    value={weddingDate}
-                    onChangeText={setWeddingDate}
+                <div
+                  onClick={triggerDatePicker}
+                  onPointerDown={triggerDatePicker}
+                  className="relative flex items-center justify-between w-full h-[46px] px-3 bg-white border border-[#E8DFD5] rounded-xl cursor-pointer hover:border-[#581420] transition-colors"
+                >
+                  <span className={`text-[14px] font-medium select-none ${weddingDate ? 'text-[#2A2425]' : 'text-[#A09B98]'}`}>
+                    {weddingDate || 'Select wedding date'}
+                  </span>
+                  <Calendar className="w-4 h-4 text-[#581420] pointer-events-none flex-shrink-0" />
+                  <input
+                    ref={dateInputRef}
+                    type="date"
+                    min={new Date().toISOString().split('T')[0]}
+                    value={weddingDateRaw}
+                    onChange={handleDateChange}
+                    onClick={(e) => {
+                      try {
+                        if (typeof (e.currentTarget as any).showPicker === 'function') {
+                          (e.currentTarget as any).showPicker();
+                        }
+                      } catch {}
+                    }}
+                    onFocus={(e) => {
+                      try {
+                        if (typeof (e.currentTarget as any).showPicker === 'function') {
+                          (e.currentTarget as any).showPicker();
+                        }
+                      } catch {}
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
                   />
-                </View>
+                </div>
               </View>
 
               <View style={styles.inputGroup}>

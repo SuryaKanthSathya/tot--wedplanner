@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ChevronLeft,
@@ -512,23 +512,66 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
   onComplete,
   onExploreVenues,
 }) => {
-  const [step, setStep] = useState<number>(6);
+  const getDraft = () => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('tot_destination_wedding_draft') : null;
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  };
+
+  const draft = getDraft();
+
+  const [step, setStep] = useState<number>(draft?.step ?? 6);
 
   // Form selections state
-  const [selectedDestination, setSelectedDestination] = useState<string>('Ooty');
-  const [selectedExperience, setSelectedExperience] = useState<string>('');
-  const [selectedVenue, setSelectedVenue] = useState<string>('');
+  const [selectedDestination, setSelectedDestination] = useState<string>(draft?.selectedDestination || 'Ooty');
+  const [selectedExperience, setSelectedExperience] = useState<string>(draft?.selectedExperience || '');
+  const [selectedVenue, setSelectedVenue] = useState<string>(draft?.selectedVenue || '');
   
   // Wedding details
-  const [weddingDate, setWeddingDate] = useState<string>('');
-  const [guestCount, setGuestCount] = useState<string>('');
-  const [duration, setDuration] = useState<string>('');
-  const [events, setEvents] = useState<string>('');
+  const [weddingDate, setWeddingDate] = useState<string>(draft?.weddingDate || '');
+  const [guestCount, setGuestCount] = useState<string>(draft?.guestCount || '');
+  const [duration, setDuration] = useState<string>(draft?.duration || '');
+  const [events, setEvents] = useState<string>(draft?.events || '');
   
-  const [selectedBudget, setSelectedBudget] = useState<string>('');
-  const [selectedStyle, setSelectedStyle] = useState<string>('');
+  const [selectedBudget, setSelectedBudget] = useState<string>(draft?.selectedBudget || '');
+  const [selectedStyle, setSelectedStyle] = useState<string>(draft?.selectedStyle || '');
   const [expandedDetail, setExpandedDetail] = useState<string | null>(null);
-  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
+  const [selectedPackages, setSelectedPackages] = useState<string[]>(draft?.selectedPackages || []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        'tot_destination_wedding_draft',
+        JSON.stringify({
+          step,
+          selectedDestination,
+          selectedExperience,
+          selectedVenue,
+          weddingDate,
+          guestCount,
+          duration,
+          events,
+          selectedBudget,
+          selectedStyle,
+          selectedPackages,
+        })
+      );
+    } catch (e) {}
+  }, [
+    step,
+    selectedDestination,
+    selectedExperience,
+    selectedVenue,
+    weddingDate,
+    guestCount,
+    duration,
+    events,
+    selectedBudget,
+    selectedStyle,
+    selectedPackages,
+  ]);
 
   const togglePackage = (type: string) => {
     setSelectedPackages(prev => 
@@ -538,11 +581,17 @@ export const DestinationWeddingFlow: React.FC<DestinationWeddingFlowProps> = ({
 
   // Handle Back arrow
   const handleBack = () => {
+    try {
+      localStorage.removeItem('tot_destination_wedding_draft');
+    } catch (e) {}
     onBack();
   };
 
   // Handle final completion in Screen 7
   const handleFinishFlow = () => {
+    try {
+      localStorage.removeItem('tot_destination_wedding_draft');
+    } catch (e) {}
     const data: DestinationWeddingData = {
       destination: selectedDestination,
       experience: selectedExperience,

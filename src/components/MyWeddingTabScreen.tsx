@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   TextInput,
+  useWindowDimensions,
 } from 'react-native';
 import { motion, AnimatePresence } from 'motion/react';
 import { PhotographyListingPage } from './PhotographyListingPage';
@@ -66,8 +67,10 @@ import {
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import venuePalaceImg from '../assets/images/tn_heritage_palace_pic_1786469719545.jpg';
 import stageEntertainmentImg from '../assets/images/guest_banquet_hall_stage_1786471284070.jpg';
-import mehendiFullForearmsImg from '../assets/images/mehendi_full_forearms.svg';
+import mehendiCategoryImg from '../assets/images/mehendi_category_1786688929519.jpg';
 import decorMandapImg from '../assets/images/royal_mandap_decor_pure.jpg';
+import invitationCategoryImg from '../assets/images/invitation_category.jpg';
+import carsCategoryImg from '../assets/images/cars_category.webp';
 import christianPastorImg from '../assets/images/christian_pastor.jpg';
 import hinduIyerImg from '../assets/images/hindu_iyer.jpg';
 import muslimImamImg from '../assets/images/muslim_imam.jpg';
@@ -95,13 +98,13 @@ const SERVICES_DATA = [
     id: 'mehendi',
     name: 'Mehendi',
     vendors: '54 Vendors',
-    image: mehendiFullForearmsImg,
+    image: mehendiCategoryImg,
   },
   {
     id: 'catering',
     name: 'Catering',
     vendors: '91 Vendors',
-    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=800&auto=format&fit=crop',
   },
   {
     id: 'venue',
@@ -119,19 +122,13 @@ const SERVICES_DATA = [
     id: 'invitation',
     name: 'Invitation',
     vendors: '68 Vendors',
-    image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=600&auto=format&fit=crop',
+    image: invitationCategoryImg,
   },
   {
     id: 'cars',
     name: 'Cars',
     vendors: '45 Vendors',
-    image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=600&auto=format&fit=crop',
-  },
-  {
-    id: 'pooja',
-    name: 'Pooja',
-    vendors: '32 Vendors',
-    image: 'https://images.unsplash.com/photo-1608023136037-628d070b42f1?q=80&w=600&auto=format&fit=crop',
+    image: carsCategoryImg,
   },
 ];
 
@@ -479,6 +476,9 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onHideTabBar,
   onOpenQuotesTab,
 }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   const [activeSegment, setActiveSegmentState] = useState<'overview' | 'payment'>(() => {
     try {
       const saved = localStorage.getItem('tot_my_wedding_segment');
@@ -946,164 +946,158 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       <View style={[styles.container, { backgroundColor: '#FAF7F2' }]}>
         <ScrollView
           style={styles.scrollContainer}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 40 }}
+          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 40, alignItems: 'center' }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Top Back Header */}
-          <View style={{ marginBottom: 12 }}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => setShowServicesView(false)}
-              style={styles.backArrowBtn}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <ChevronLeft className="w-6 h-6 text-[#2A2425]" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Title & Subtitle */}
-          <View style={{ marginBottom: 20 }}>
-            <Text style={styles.servicesHeaderTitle}>Wedding Services</Text>
-            <Text style={styles.servicesHeaderSubtitle}>Choose the best for your wedding</Text>
-          </View>
-
-          {/* Toast feedback */}
-          <AnimatePresence>
-            {addedToast && (
-              <motion.div
-                initial={{ opacity: 0, y: -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                style={{
-                  marginBottom: 14,
-                  paddingHorizontal: 14,
-                  paddingVertical: 9,
-                  backgroundColor: '#581420',
-                  borderRadius: 12,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                } as any}
+          <div className="w-full max-w-4xl mx-auto flex flex-col">
+            {/* Top Back Header */}
+            <View style={{ marginBottom: 12 }}>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => setShowServicesView(false)}
+                style={styles.backArrowBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Text style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 12.5, color: '#FFFFFF', fontWeight: '600' }}>
-                  ✓ {addedToast}
-                </Text>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <ChevronLeft className="w-6 h-6 text-[#2A2425]" />
+              </TouchableOpacity>
+            </View>
 
-          {/* 3-Column Grid for items 1-9 */}
-          <View style={styles.servicesGrid3Col}>
-            {SERVICES_DATA.slice(0, 9).map((service) => (
-              <motion.div
-                key={service.id}
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer"
-                style={{ width: '30%', marginBottom: 20, alignItems: 'center' }}
-                onClick={() => {
-                  const sid = service.id.toLowerCase();
-                  const sname = service.name.toLowerCase();
+            {/* Title & Subtitle */}
+            <View style={{ marginBottom: 20 }}>
+              <Text style={styles.servicesHeaderTitle}>Wedding Services</Text>
+              <Text style={styles.servicesHeaderSubtitle}>Choose the best for your wedding</Text>
+            </View>
 
-                  if (sid === 'photography' || sname.includes('photo')) {
-                    setShowServicesView(false);
-                    setShowPhotographyListing(true);
-                    return;
-                  }
-                  if (sid === 'makeup' || sname.includes('makeup')) {
-                    setShowServicesView(false);
-                    setShowMakeupListing(true);
-                    return;
-                  }
-                  if (sid === 'decor' || sname.includes('decor')) {
-                    setShowServicesView(false);
-                    setShowDecorListing(true);
-                    return;
-                  }
-                  if (sid === 'venue' || sname.includes('venue')) {
-                    setShowServicesView(false);
-                    setShowVenueListing(true);
-                    return;
-                  }
-                  if (sid === 'entertainment' || sname.includes('entertainment')) {
-                    setShowServicesView(false);
-                    setShowEntertainmentListing(true);
-                    return;
-                  }
-                  if (sid === 'invitation' || sname.includes('invit')) {
-                    setShowServicesView(false);
-                    setShowInvitationListing(true);
-                    return;
-                  }
-                  if (sid === 'mehendi' || sname.includes('mehendi')) {
-                    setShowServicesView(false);
-                    setShowMehendiListing(true);
-                    return;
-                  }
-                  if (sid === 'catering' || sname.includes('cater')) {
-                    setShowServicesView(false);
-                    setShowCateringListing(true);
-                    return;
-                  }
-                  if (sid === 'cars' || sname.includes('car')) {
-                    setShowServicesView(false);
-                    setShowCarsListing(true);
-                    return;
-                  }
-                  if (sid === 'rituals' || sid === 'ritual' || sname.includes('ritual') || sname.includes('pooja') || sname.includes('iyer') || sname.includes('pastor') || sname.includes('imam')) {
-                    setShowServicesView(false);
-                    setShowRitualsListing(true);
-                    return;
-                  }
+            {/* Toast feedback */}
+            <AnimatePresence>
+              {addedToast && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    marginBottom: 14,
+                    paddingHorizontal: 14,
+                    paddingVertical: 9,
+                    backgroundColor: '#581420',
+                    borderRadius: 12,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  } as any}
+                >
+                  <Text style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 12.5, color: '#FFFFFF', fontWeight: '600' }}>
+                    ✓ {addedToast}
+                  </Text>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                  if (!checklist.some((c) => c.title.toLowerCase().includes(service.name.toLowerCase()))) {
-                    updateChecklist((prev) => [
-                      ...prev,
-                      { id: Date.now().toString(), title: service.name, category: service.name, completed: false },
-                    ]);
-                    setAddedToast(`Added ${service.name} to checklist`);
-                  } else {
-                    setAddedToast(`${service.name} is in checklist`);
-                  }
-                  setTimeout(() => setAddedToast(null), 2000);
-                }}
-              >
-                <View style={styles.serviceItemContainer}>
-                  <Image
-                    source={typeof service.image === 'string' ? { uri: service.image } : service.image}
-                    style={styles.serviceGridImage}
-                    resizeMode="cover"
-                  />
+            {/* Services Grid (All 9 or 10 items in a clean, unified luxury grid) */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 sm:gap-6 w-full mb-10">
+              {[
+                ...SERVICES_DATA,
+                ...(!isIntercaste ? [poojaService] : []),
+              ].map((service) => (
+                <motion.div
+                  key={service.id}
+                  whileHover={{ y: -4, scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  className="cursor-pointer flex flex-col items-center group w-full"
+                  onClick={() => {
+                    const sid = service.id.toLowerCase();
+                    const sname = service.name.toLowerCase();
+
+                    if (sid === 'photography' || sname.includes('photo')) {
+                      setShowServicesView(false);
+                      setShowPhotographyListing(true);
+                      return;
+                    }
+                    if (sid === 'makeup' || sname.includes('makeup')) {
+                      setShowServicesView(false);
+                      setShowMakeupListing(true);
+                      return;
+                    }
+                    if (sid === 'decor' || sname.includes('decor')) {
+                      setShowServicesView(false);
+                      setShowDecorListing(true);
+                      return;
+                    }
+                    if (sid === 'venue' || sname.includes('venue')) {
+                      setShowServicesView(false);
+                      setShowVenueListing(true);
+                      return;
+                    }
+                    if (sid === 'entertainment' || sname.includes('entertainment')) {
+                      setShowServicesView(false);
+                      setShowEntertainmentListing(true);
+                      return;
+                    }
+                    if (sid === 'invitation' || sname.includes('invit')) {
+                      setShowServicesView(false);
+                      setShowInvitationListing(true);
+                      return;
+                    }
+                    if (sid === 'mehendi' || sname.includes('mehendi')) {
+                      setShowServicesView(false);
+                      setShowMehendiListing(true);
+                      return;
+                    }
+                    if (sid === 'catering' || sname.includes('cater')) {
+                      setShowServicesView(false);
+                      setShowCateringListing(true);
+                      return;
+                    }
+                    if (sid === 'cars' || sname.includes('car')) {
+                      setShowServicesView(false);
+                      setShowCarsListing(true);
+                      return;
+                    }
+                    if (
+                      sid === 'rituals' ||
+                      sid === 'ritual' ||
+                      sid === 'pooja' ||
+                      sid === 'iyer' ||
+                      sid === 'pastor' ||
+                      sid === 'imam' ||
+                      sname.includes('ritual') ||
+                      sname.includes('pooja') ||
+                      sname.includes('iyer') ||
+                      sname.includes('pastor') ||
+                      sname.includes('imam')
+                    ) {
+                      setShowServicesView(false);
+                      setShowRitualsListing(true);
+                      return;
+                    }
+
+                    if (!checklist.some((c) => c.title.toLowerCase().includes(service.name.toLowerCase()))) {
+                      updateChecklist((prev) => [
+                        ...prev,
+                        { id: Date.now().toString(), title: service.name, category: service.name, completed: false },
+                      ]);
+                      setAddedToast(`Added ${service.name} to checklist`);
+                    } else {
+                      setAddedToast(`${service.name} is in checklist`);
+                    }
+                    setTimeout(() => setAddedToast(null), 2000);
+                  }}
+                >
+                  <div className="w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm border border-[#EAE4DC] bg-[#FAF1E8] mb-2.5">
+                    <img
+                      src={typeof service.image === 'string' ? service.image : (service.image as any)}
+                      alt={service.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                  </div>
                   <Text style={styles.serviceGridCardTitle}>{service.name}</Text>
                   <Text style={styles.serviceGridCardVendors}>{service.vendors}</Text>
-                </View>
-              </motion.div>
-            ))}
-          </View>
-
-          {/* 10th Card: Pooja/Iyer/Pastor/Imam (Centered at bottom, hidden for Intercaste) */}
-          {!isIntercaste && (
-            <View style={{ alignItems: 'center', marginTop: 2, marginBottom: 20 }}>
-              <motion.div
-                whileTap={{ scale: 0.95 }}
-                className="cursor-pointer"
-                style={{ width: '64%', alignItems: 'center' }}
-                onClick={() => {
-                  setShowServicesView(false);
-                  setShowRitualsListing(true);
-                }}
-              >
-                <View style={styles.poojaItemContainer}>
-                  <Image
-                    source={typeof poojaService.image === 'string' ? { uri: poojaService.image } : poojaService.image}
-                    style={styles.poojaGridImage}
-                    resizeMode="cover"
-                  />
-                  <Text style={styles.serviceGridCardTitle}>{poojaService.name}</Text>
-                  <Text style={styles.serviceGridCardVendors}>{poojaService.vendors}</Text>
-                </View>
-              </motion.div>
-            </View>
-          )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </ScrollView>
       </View>
     );
@@ -1112,60 +1106,68 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   return (
     <View style={styles.container}>
       {/* ================= HEADER ================= */}
-      <View style={styles.topHeader}>
-        <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn}>
-          <Menu className="w-5 h-5 text-[#2A2425]" />
-        </TouchableOpacity>
+      <View style={[styles.topHeader, isDesktop && { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 16 }]}>
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {!isDesktop && (
+              <TouchableOpacity activeOpacity={0.7} style={styles.iconBtn} onPress={() => onNavigateToHome?.()}>
+                <Menu className="w-5 h-5 text-[#2A2425]" />
+              </TouchableOpacity>
+            )}
+            <Text style={[styles.headerTitle, isDesktop && { fontSize: 26, textAlign: 'left' }]}>My Wedding</Text>
+          </div>
 
-        <Text style={styles.headerTitle}>My Wedding</Text>
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          style={styles.iconBtn}
-          onPress={() => setShowNotificationsModal(true)}
-        >
-          <Bell className="w-5 h-5 text-[#2A2425]" />
-          {unreadNotifCount > 0 && (
-            <View style={styles.bellBadge}>
-              <Text style={styles.bellBadgeText}>
-                {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={styles.iconBtn}
+            onPress={() => setShowNotificationsModal(true)}
+          >
+            <Bell className="w-5 h-5 text-[#2A2425]" />
+            {unreadNotifCount > 0 && (
+              <View style={styles.bellBadge}>
+                <Text style={styles.bellBadgeText}>
+                  {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </div>
       </View>
 
       {/* ================= SEGMENT CONTROLS BAR ================= */}
-      <View style={styles.segmentTabBar}>
-        <TouchableOpacity
-          style={[styles.segmentTabItem, activeSegment === 'overview' && styles.segmentTabItemActive]}
-          onPress={() => setActiveSegment('overview')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.segmentTabText, activeSegment === 'overview' && styles.segmentTabTextActive]}>
-            Wedding Overview
-          </Text>
-        </TouchableOpacity>
+      <div className="w-full max-w-md mx-auto px-4 mb-2">
+        <View style={styles.segmentTabBar}>
+          <TouchableOpacity
+            style={[styles.segmentTabItem, activeSegment === 'overview' && styles.segmentTabItemActive]}
+            onPress={() => setActiveSegment('overview')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.segmentTabText, activeSegment === 'overview' && styles.segmentTabTextActive]}>
+              Wedding Overview
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.segmentTabItem, activeSegment === 'payment' && styles.segmentTabItemActive]}
-          onPress={() => setActiveSegment('payment')}
-          activeOpacity={0.8}
-        >
-          <Text style={[styles.segmentTabText, activeSegment === 'payment' && styles.segmentTabTextActive]}>
-            Payments & Invoices
-          </Text>
-          {weddingBookings.some((b) => b.remainingAmount > 0) && (
-            <View style={styles.tabBadgeDot} />
-          )}
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={[styles.segmentTabItem, activeSegment === 'payment' && styles.segmentTabItemActive]}
+            onPress={() => setActiveSegment('payment')}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.segmentTabText, activeSegment === 'payment' && styles.segmentTabTextActive]}>
+              Payments & Invoices
+            </Text>
+            {weddingBookings.some((b) => b.remainingAmount > 0) && (
+              <View style={styles.tabBadgeDot} />
+            )}
+          </TouchableOpacity>
+        </View>
+      </div>
 
       <ScrollView
         style={{ flex: 1, width: '100%' }}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { alignItems: 'center' }]}
         showsVerticalScrollIndicator={false}
       >
+        <div className="w-full max-w-4xl mx-auto flex flex-col gap-4">
         {/* ================= 1. PAYMENT TAB CONTENT ================= */}
         {activeSegment === 'payment' && (
           <View style={{ gap: 14, width: '100%' }}>
@@ -1554,6 +1556,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
             </motion.div>
           </View>
         )}
+        </div>
       </ScrollView>
 
       {/* Services Modal if opened */}
@@ -1836,11 +1839,12 @@ const styles: any = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#EFE2E6',
-    padding: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 150,
+    minHeight: 120,
   },
   countdownLeft: {
     flex: 1,
@@ -1879,14 +1883,20 @@ const styles: any = StyleSheet.create({
     color: '#635B5C',
   },
   countdownRightImage: {
-    width: 130,
-    height: 120,
+    width: 100,
+    height: 100,
+    borderRadius: 16,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#EFE2E6',
   },
   coupleImageStyle: {
     width: '100%',
     height: '100%',
+    borderRadius: 16,
   },
   progressCard: {
     width: '100%',
@@ -2160,17 +2170,16 @@ const styles: any = StyleSheet.create({
   },
   serviceGridCardTitle: {
     fontFamily: "'Cormorant Garamond', Georgia, serif",
-    fontSize: 14.5,
+    fontSize: 16,
     fontWeight: '700',
     color: '#221D1E',
-    marginTop: 7,
     textAlign: 'center',
   },
   serviceGridCardVendors: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 11,
+    fontSize: 12,
     color: '#8A817C',
-    marginTop: 1,
+    marginTop: 2,
     textAlign: 'center',
   },
   myQuotesCard: {
@@ -2268,8 +2277,6 @@ const styles: any = StyleSheet.create({
   segmentTabBar: {
     flexDirection: 'row',
     backgroundColor: '#FAF5EE',
-    marginHorizontal: 16,
-    marginBottom: 10,
     borderRadius: 14,
     padding: 4,
     borderWidth: 1,
