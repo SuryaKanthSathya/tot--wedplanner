@@ -288,33 +288,18 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
     }, 3500);
   };
 
-  // Curated 24 luxury bridal makeup photos
-  const portfolioImages = [
-    studio.image,
-    'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=1200&q=85',
+  const fallbackMakeup = [
     'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1503236823255-94609f598e71?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1596704017254-9b121068fb31?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=1200&q=85',
   ];
+  
+  const portfolioImages = [
+    ...(studio.portfolio || [studio.image]),
+    ...fallbackMakeup
+  ].slice(0, 5);
 
   const handleShare = () => {
     if (navigator.share) {
@@ -569,7 +554,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
           {/* MEDIA TABS */}
           <View style={styles.mediaTabs}>
             <View style={styles.mediaTabActiveContainer}>
-              <Text style={styles.mediaTabActive}>Photos (26)</Text>
+              <Text style={styles.mediaTabActive}>Photos ({portfolioImages.length})</Text>
               <View style={styles.mediaTabActiveIndicator} />
             </View>
             <Text style={styles.mediaTabInactive}>Videos</Text>
@@ -589,10 +574,12 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
             </TouchableOpacity>
             <TouchableOpacity style={styles.photoGridItem} onPress={() => { setGalleryInitialIndex(3); setIsGalleryOpen(true); }}>
               <Image source={{ uri: portfolioImages[3] }} style={styles.photoImg} />
-              <View style={styles.morePhotosOverlay}>
-                <Text style={styles.morePhotosText}>+20</Text>
-                <Text style={styles.morePhotosSubtext}>More Photos</Text>
-              </View>
+              {portfolioImages.length > 4 && (
+                <View style={styles.morePhotosOverlay}>
+                  <Text style={styles.morePhotosText}>+{portfolioImages.length - 4}</Text>
+                  <Text style={styles.morePhotosSubtext}>More Photos</Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 

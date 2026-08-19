@@ -18,6 +18,8 @@ import {
   setAppRoute,
   parseHashRoute,
 } from '../utils/routeManager';
+import momentStudioImage from '../assets/images/hindu_couple_arch_1786467605789.jpg';
+
 import {
   ChevronLeft,
   Search,
@@ -127,7 +129,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     priceValue: 150000,
     tier: 'Signature',
     deliveryTime: '3-4 Weeks',
-    image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
+    image: momentStudioImage,
     description: 'Award-winning team specializing in candid moments and cinematic wedding films.',
     experience: '8+ Years',
     teamSize: '5-8 Professionals',
