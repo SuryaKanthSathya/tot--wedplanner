@@ -1,0 +1,312 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 900" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient: Soft warm pastel pink and peach -->
+    <linearGradient id="pastelBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF0E6"/>
+      <stop offset="45%" stop-color="#FCE1D6"/>
+      <stop offset="80%" stop-color="#F7C9D6"/>
+      <stop offset="100%" stop-color="#EFB3C6"/>
+    </linearGradient>
+
+    <!-- Arm Skin Shadows & Highlights -->
+    <linearGradient id="skinGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCE3D2"/>
+      <stop offset="50%" stop-color="#F5CEB5"/>
+      <stop offset="100%" stop-color="#E2A684"/>
+    </linearGradient>
+
+    <linearGradient id="skinGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDEAD9"/>
+      <stop offset="50%" stop-color="#F2C8AD"/>
+      <stop offset="100%" stop-color="#DF9C78"/>
+    </linearGradient>
+
+    <!-- Henna Dark Brown Tint -->
+    <linearGradient id="hennaDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B190B"/>
+      <stop offset="100%" stop-color="#230E05"/>
+    </linearGradient>
+
+    <!-- Pattern definitions for Jaali / Checkered Henna -->
+    <pattern id="jaaliGrid" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path d="M 0 0 L 12 12 M 12 0 L 0 12" stroke="#3B190B" stroke-width="1.2"/>
+      <circle cx="6" cy="6" r="1.5" fill="#3B190B"/>
+    </pattern>
+
+    <pattern id="dotGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="4" r="1" fill="#3B190B"/>
+    </pattern>
+
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="10" dy="15" stdDeviation="12" flood-color="#8C4E5E" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background Canvas -->
+  <rect width="700" height="900" fill="url(#pastelBg)"/>
+
+  <!-- Soft ambient light overlay -->
+  <circle cx="200" cy="200" r="350" fill="#FFFFFF" opacity="0.25"/>
+
+  <!-- GROUP FOR BOTH ARMS AT 42 DEGREE DIAGONAL ANGLE -->
+  <g transform="translate(100, 80) rotate(-42, 350, 450)" filter="url(#softShadow)">
+
+    <!-- ==================== ARM 1 (UPPER / RIGHT ARM) ==================== -->
+    <g id="upperArm">
+      <!-- Arm & Forearm Outline -->
+      <path d="
+        M 380 900
+        L 380 480
+        C 380 420 375 360 365 300
+        C 355 240 335 200 310 170
+        C 295 152 280 145 260 140
+        L 225 210
+        C 245 235 255 270 260 320
+        C 268 380 270 450 272 520
+        L 275 900
+        Z
+      " fill="url(#skinGrad1)"/>
+
+      <!-- Palm & Fingers Base -->
+      <!-- Thumb -->
+      <path d="M 260 140 C 235 110 205 95 180 100 C 165 105 160 125 175 140 C 200 160 220 185 225 210 Z" fill="url(#skinGrad1)"/>
+      <!-- Index Finger -->
+      <path d="M 260 140 C 265 100 275 40 280 10 C 283 -5 298 -5 302 10 C 305 45 308 105 310 140 Z" fill="url(#skinGrad1)"/>
+      <!-- Middle Finger -->
+      <path d="M 310 140 C 315 90 325 25 332 -10 C 335 -25 350 -25 354 -10 C 358 25 355 90 350 145 Z" fill="url(#skinGrad1)"/>
+      <!-- Ring Finger -->
+      <path d="M 350 145 C 355 100 368 40 375 10 C 378 -5 392 -5 395 10 C 398 40 392 100 385 155 Z" fill="url(#skinGrad1)"/>
+      <!-- Pinky Finger -->
+      <path d="M 385 155 C 392 120 405 70 412 40 C 415 28 428 28 430 40 C 430 70 415 130 400 175 Z" fill="url(#skinGrad1)"/>
+      <!-- Palm Fill Base -->
+      <path d="M 260 140 Q 330 130 400 175 Q 380 270 310 300 Q 255 270 260 140 Z" fill="url(#skinGrad1)"/>
+
+      <!-- HENNA DESIGNS ON UPPER ARM -->
+      <!-- Finger Tip Caps & Micro Patterns -->
+      <!-- Index -->
+      <path d="M 278 20 C 280 5 298 5 300 20 L 302 45 L 276 45 Z" fill="url(#hennaDark)"/>
+      <line x1="275" y1="55" x2="303" y2="55" stroke="#3B190B" stroke-width="2"/>
+      <line x1="274" y1="65" x2="304" y2="65" stroke="#3B190B" stroke-width="2"/>
+      <rect x="274" y="70" width="31" height="25" fill="url(#jaaliGrid)"/>
+
+      <!-- Middle -->
+      <path d="M 330 0 C 332 -15 352 -15 354 0 L 356 30 L 328 30 Z" fill="url(#hennaDark)"/>
+      <line x1="327" y1="40" x2="357" y2="40" stroke="#3B190B" stroke-width="2"/>
+      <line x1="326" y1="50" x2="358" y2="50" stroke="#3B190B" stroke-width="2"/>
+      <rect x="325" y="55" width="34" height="30" fill="url(#jaaliGrid)"/>
+
+      <!-- Ring -->
+      <path d="M 373 20 C 375 5 393 5 395 20 L 396 45 L 371 45 Z" fill="url(#hennaDark)"/>
+      <line x1="370" y1="55" x2="397" y2="55" stroke="#3B190B" stroke-width="2"/>
+      <line x1="369" y1="65" x2="398" y2="65" stroke="#3B190B" stroke-width="2"/>
+      <rect x="368" y="70" width="31" height="25" fill="url(#jaaliGrid)"/>
+
+      <!-- Pinky -->
+      <path d="M 410 48 C 412 33 428 33 430 48 L 428 70 L 407 70 Z" fill="url(#hennaDark)"/>
+      <rect x="405" y="80" width="22" height="20" fill="url(#jaaliGrid)"/>
+
+      <!-- Thumb Henna -->
+      <path d="M 172 120 C 165 110 175 105 182 110 L 195 130 L 180 140 Z" fill="url(#hennaDark)"/>
+
+      <!-- PALM HENNA DESIGN (Complex Jaali + Mandalas + Paisley) -->
+      <g stroke="#3B190B" stroke-width="1.8" fill="none">
+        <!-- Main Palm Arch -->
+        <path d="M 260 170 Q 330 150 395 190" stroke-width="3"/>
+        <path d="M 262 178 Q 330 158 393 198"/>
+        
+        <!-- Jaali Grid on Palm Center -->
+        <path d="M 265 190 C 270 240 310 270 380 220" stroke-width="2"/>
+        <path d="M 268 200 Q 320 280 370 230" stroke-width="2"/>
+
+        <!-- Semi-Circle Lotus Mandala Motif in Palm -->
+        <path d="M 280 230 A 40 40 0 0 0 350 250" fill="url(#hennaDark)"/>
+        <circle cx="315" cy="240" r="20" fill="#FCE3D2" stroke="#3B190B" stroke-width="2"/>
+        <circle cx="315" cy="240" r="10" fill="#3B190B"/>
+        
+        <!-- Scallop Lotus Petals around Palm Mandala -->
+        <path d="M 270 220 C 275 205 290 205 295 220 C 300 205 315 205 320 220 C 325 205 340 205 345 220 C 350 205 365 205 370 220" stroke-width="2.2"/>
+      </g>
+
+      <!-- WRIST BAND (Thick Cuff & Geometric Rows) -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 260 300 Q 320 310 365 300" stroke-width="4"/>
+        <path d="M 260 312 Q 320 322 366 312" stroke-width="2"/>
+        <path d="M 260 325 Q 320 335 367 325" stroke-width="2"/>
+
+        <!-- Cuff Checkerboard Row -->
+        <path d="M 260 330 L 368 330 L 368 355 L 260 355 Z" fill="url(#jaaliGrid)"/>
+
+        <path d="M 261 360 Q 320 370 369 360" stroke-width="2"/>
+        <path d="M 261 370 Q 320 380 370 370" stroke-width="4"/>
+      </g>
+
+      <!-- FOREARM SECTION 1: Paisley & Lotus Arches -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <!-- Scallop Arches -->
+        <path d="M 262 385 C 275 370 295 370 305 385 C 315 370 335 370 345 385 C 355 370 372 370 375 385" stroke-width="2.5"/>
+        
+        <!-- Large Forearm Jaali Box -->
+        <path d="M 262 400 L 375 400 L 376 490 L 263 490 Z" fill="url(#jaaliGrid)"/>
+        <path d="M 262 400 L 375 400 L 376 490 L 263 490 Z" stroke-width="3"/>
+
+        <!-- Chevron / Diagonal Divider Rows -->
+        <path d="M 263 500 Q 320 515 376 500" stroke-width="4"/>
+        <path d="M 263 510 Q 320 525 376 510" stroke-width="2"/>
+        <path d="M 263 520 Q 320 535 377 520" stroke-width="2"/>
+      </g>
+
+      <!-- FOREARM SECTION 2: Mandalas & Dome Arches -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <!-- Central Mandala Dome on Forearm -->
+        <path d="M 280 540 A 45 45 0 0 1 360 540" fill="url(#hennaDark)"/>
+        <circle cx="320" cy="540" r="25" fill="#FCE3D2" stroke="#3B190B" stroke-width="2"/>
+        <circle cx="320" cy="540" r="12" fill="#3B190B"/>
+
+        <!-- Grid under dome -->
+        <path d="M 264 570 L 377 570 L 378 660 L 265 660 Z" fill="url(#jaaliGrid)"/>
+        <path d="M 264 570 L 377 570 L 378 660 L 265 660 Z" stroke-width="3"/>
+      </g>
+
+      <!-- FOREARM BASE: Distinctive Lotus Border at Elbow Cutoff -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 266 675 Q 320 690 378 675" stroke-width="4"/>
+        <path d="M 266 685 Q 320 700 378 685" stroke-width="2"/>
+        
+        <!-- Lotus Petal Scallop Cuff Band at Elbow -->
+        <path d="
+          M 266 695
+          C 272 725 288 725 294 695
+          C 300 725 316 725 322 695
+          C 328 725 344 725 350 695
+          C 356 725 372 725 378 695
+        " fill="url(#hennaDark)"/>
+
+        <!-- Lotus Petal Inner Highlights -->
+        <path d="M 280 702 C 280 715 285 715 285 702" stroke="#FCE3D2" stroke-width="1.5"/>
+        <path d="M 308 702 C 308 715 313 715 313 702" stroke="#FCE3D2" stroke-width="1.5"/>
+        <path d="M 336 702 C 336 715 341 715 341 702" stroke="#FCE3D2" stroke-width="1.5"/>
+        <path d="M 364 702 C 364 715 369 715 369 702" stroke="#FCE3D2" stroke-width="1.5"/>
+      </g>
+    </g>
+
+
+    <!-- ==================== ARM 2 (LOWER / LEFT ARM) ==================== -->
+    <g id="lowerArm" transform="translate(-110, 110)">
+      <!-- Arm & Forearm Outline -->
+      <path d="
+        M 380 900
+        L 380 480
+        C 380 420 375 360 365 300
+        C 355 240 335 200 310 170
+        C 295 152 280 145 260 140
+        L 225 210
+        C 245 235 255 270 260 320
+        C 268 380 270 450 272 520
+        L 275 900
+        Z
+      " fill="url(#skinGrad2)"/>
+
+      <!-- Palm & Fingers Base -->
+      <!-- Thumb -->
+      <path d="M 260 140 C 235 110 205 95 180 100 C 165 105 160 125 175 140 C 200 160 220 185 225 210 Z" fill="url(#skinGrad2)"/>
+      <!-- Index Finger -->
+      <path d="M 260 140 C 265 100 275 40 280 10 C 283 -5 298 -5 302 10 C 305 45 308 105 310 140 Z" fill="url(#skinGrad2)"/>
+      <!-- Middle Finger -->
+      <path d="M 310 140 C 315 90 325 25 332 -10 C 335 -25 350 -25 354 -10 C 358 25 355 90 350 145 Z" fill="url(#skinGrad2)"/>
+      <!-- Ring Finger -->
+      <path d="M 350 145 C 355 100 368 40 375 10 C 378 -5 392 -5 395 10 C 398 40 392 100 385 155 Z" fill="url(#skinGrad2)"/>
+      <!-- Pinky Finger -->
+      <path d="M 385 155 C 392 120 405 70 412 40 C 415 28 428 28 430 40 C 430 70 415 130 400 175 Z" fill="url(#skinGrad2)"/>
+      <!-- Palm Fill Base -->
+      <path d="M 260 140 Q 330 130 400 175 Q 380 270 310 300 Q 255 270 260 140 Z" fill="url(#skinGrad2)"/>
+
+      <!-- HENNA DESIGNS ON LOWER ARM -->
+      <!-- Finger Tip Caps -->
+      <path d="M 278 20 C 280 5 298 5 300 20 L 302 45 L 276 45 Z" fill="url(#hennaDark)"/>
+      <line x1="275" y1="55" x2="303" y2="55" stroke="#3B190B" stroke-width="2"/>
+      <rect x="274" y="70" width="31" height="25" fill="url(#jaaliGrid)"/>
+
+      <path d="M 330 0 C 332 -15 352 -15 354 0 L 356 30 L 328 30 Z" fill="url(#hennaDark)"/>
+      <line x1="327" y1="40" x2="357" y2="40" stroke="#3B190B" stroke-width="2"/>
+      <rect x="325" y="55" width="34" height="30" fill="url(#jaaliGrid)"/>
+
+      <path d="M 373 20 C 375 5 393 5 395 20 L 396 45 L 371 45 Z" fill="url(#hennaDark)"/>
+      <line x1="370" y1="55" x2="397" y2="55" stroke="#3B190B" stroke-width="2"/>
+      <rect x="368" y="70" width="31" height="25" fill="url(#jaaliGrid)"/>
+
+      <path d="M 410 48 C 412 33 428 33 430 48 L 428 70 L 407 70 Z" fill="url(#hennaDark)"/>
+      <rect x="405" y="80" width="22" height="20" fill="url(#jaaliGrid)"/>
+
+      <path d="M 172 120 C 165 110 175 105 182 110 L 195 130 L 180 140 Z" fill="url(#hennaDark)"/>
+
+      <!-- PALM HENNA DESIGN -->
+      <g stroke="#3B190B" stroke-width="1.8" fill="none">
+        <path d="M 260 170 Q 330 150 395 190" stroke-width="3"/>
+        <path d="M 262 178 Q 330 158 393 198"/>
+        
+        <path d="M 265 190 C 270 240 310 270 380 220" stroke-width="2"/>
+        <path d="M 268 200 Q 320 280 370 230" stroke-width="2"/>
+
+        <path d="M 280 230 A 40 40 0 0 0 350 250" fill="url(#hennaDark)"/>
+        <circle cx="315" cy="240" r="20" fill="#FDEAD9" stroke="#3B190B" stroke-width="2"/>
+        <circle cx="315" cy="240" r="10" fill="#3B190B"/>
+        
+        <path d="M 270 220 C 275 205 290 205 295 220 C 300 205 315 205 320 220 C 325 205 340 205 345 220 C 350 205 365 205 370 220" stroke-width="2.2"/>
+      </g>
+
+      <!-- WRIST BAND -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 260 300 Q 320 310 365 300" stroke-width="4"/>
+        <path d="M 260 312 Q 320 322 366 312" stroke-width="2"/>
+        <path d="M 260 325 Q 320 335 367 325" stroke-width="2"/>
+
+        <path d="M 260 330 L 368 330 L 368 355 L 260 355 Z" fill="url(#jaaliGrid)"/>
+
+        <path d="M 261 360 Q 320 370 369 360" stroke-width="2"/>
+        <path d="M 261 370 Q 320 380 370 370" stroke-width="4"/>
+      </g>
+
+      <!-- FOREARM SECTION 1 -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 262 385 C 275 370 295 370 305 385 C 315 370 335 370 345 385 C 355 370 372 370 375 385" stroke-width="2.5"/>
+        
+        <path d="M 262 400 L 375 400 L 376 490 L 263 490 Z" fill="url(#jaaliGrid)"/>
+        <path d="M 262 400 L 375 400 L 376 490 L 263 490 Z" stroke-width="3"/>
+
+        <path d="M 263 500 Q 320 515 376 500" stroke-width="4"/>
+        <path d="M 263 510 Q 320 525 376 510" stroke-width="2"/>
+        <path d="M 263 520 Q 320 535 377 520" stroke-width="2"/>
+      </g>
+
+      <!-- FOREARM SECTION 2 -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 280 540 A 45 45 0 0 1 360 540" fill="url(#hennaDark)"/>
+        <circle cx="320" cy="540" r="25" fill="#FDEAD9" stroke="#3B190B" stroke-width="2"/>
+        <circle cx="320" cy="540" r="12" fill="#3B190B"/>
+
+        <path d="M 264 570 L 377 570 L 378 660 L 265 660 Z" fill="url(#jaaliGrid)"/>
+        <path d="M 264 570 L 377 570 L 378 660 L 265 660 Z" stroke-width="3"/>
+      </g>
+
+      <!-- FOREARM BASE: Lotus Border at Elbow -->
+      <g stroke="#3B190B" stroke-width="2" fill="none">
+        <path d="M 266 675 Q 320 690 378 675" stroke-width="4"/>
+        <path d="M 266 685 Q 320 700 378 685" stroke-width="2"/>
+        
+        <path d="
+          M 266 695
+          C 272 725 288 725 294 695
+          C 300 725 316 725 322 695
+          C 328 725 344 725 350 695
+          C 356 725 372 725 378 695
+        " fill="url(#hennaDark)"/>
+
+        <path d="M 280 702 C 280 715 285 715 285 702" stroke="#FDEAD9" stroke-width="1.5"/>
+        <path d="M 308 702 C 308 715 313 715 313 702" stroke="#FDEAD9" stroke-width="1.5"/>
+        <path d="M 336 702 C 336 715 341 715 341 702" stroke="#FDEAD9" stroke-width="1.5"/>
+        <path d="M 364 702 C 364 715 369 715 369 702" stroke="#FDEAD9" stroke-width="1.5"/>
+      </g>
+    </g>
+
+  </g>
+</svg>
