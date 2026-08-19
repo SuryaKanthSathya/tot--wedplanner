@@ -18,6 +18,12 @@ import { TellUsAboutCouplePage } from './TellUsAboutCouplePage';
 import { ColorTheme, ViewMode } from '../types';
 import { THEMES } from '../constants/themes';
 import { clearAllQuotesAndSavedData } from '../utils/quotesManager';
+import {
+  getInitialRoute,
+  setAppRoute,
+  clearAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 
 interface MobileLandingPageProps {
   viewMode: ViewMode;
@@ -39,12 +45,30 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const theme = THEMES[currentTheme];
-  const [activeScreen, setActiveScreen] = useState<'landing' | 'create-account' | 'verify-otp' | 'dashboard' | 'tell-us-about-couple'>('landing');
-  const [initialDashboardTab, setInitialDashboardTab] = useState<'home' | 'my-wedding'>('home');
-  const [userName, setUserName] = useState<string>('');
-  const [userMobile, setUserMobile] = useState<string>('');
-  const [userEmail, setUserEmail] = useState<string>('');
-  const [userId, setUserId] = useState<string>('');
+  const initialRoute = getInitialRoute();
+  const [activeScreen, setActiveScreen] = useState<'landing' | 'create-account' | 'verify-otp' | 'dashboard' | 'tell-us-about-couple'>(
+    initialRoute.screen || 'landing'
+  );
+  const [initialDashboardTab, setInitialDashboardTab] = useState<'home' | 'my-wedding' | 'quotes' | 'profile'>(
+    initialRoute.tab || 'home'
+  );
+
+  const getSavedUserData = () => {
+    try {
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('wedding_app_user_data') : null;
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error('Error restoring saved user data:', e);
+    }
+    return null;
+  };
+
+  const initialUserData = getSavedUserData();
+
+  const [userName, setUserName] = useState<string>(initialUserData?.userName || '');
+  const [userMobile, setUserMobile] = useState<string>(initialUserData?.userMobile || '');
+  const [userEmail, setUserEmail] = useState<string>(initialUserData?.userEmail || '');
+  const [userId, setUserId] = useState<string>(initialUserData?.userId || '');
   const [weddingProfile, setWeddingProfile] = useState<{
     marriageType?: string;
     brideName?: string;
@@ -54,7 +78,22 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     guestCount?: string;
     budget?: string;
     weddingStyle?: string;
-  } | null>(null);
+  } | null>(initialUserData?.weddingProfile || null);
+
+  // Sync hash changes (e.g. browser Back / Forward buttons or external links)
+  useEffect(() => {
+    const handleHashSync = () => {
+      const route = parseHashRoute();
+      if (route && route.screen && route.screen !== activeScreen) {
+        setActiveScreen(route.screen);
+      }
+      if (route && route.tab) {
+        setInitialDashboardTab(route.tab);
+      }
+    };
+    window.addEventListener('hashchange', handleHashSync);
+    return () => window.removeEventListener('hashchange', handleHashSync);
+  }, [activeScreen]);
 
   useEffect(() => {
     if (loginSuccessTrigger && loginSuccessTrigger > 0) {
@@ -81,25 +120,9 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
 
       saveUserDataToStorage(finalName, finalMobile, finalEmail, currentId, weddingProfile);
       setActiveScreen('dashboard');
+      setAppRoute({ screen: 'dashboard', tab: 'home' });
     }
   }, [loginSuccessTrigger, loginEmail]);
-
-  // Restore saved registration / couple details from localStorage on initial load
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('wedding_app_user_data');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.userName) setUserName(parsed.userName);
-        if (parsed.userMobile) setUserMobile(parsed.userMobile);
-        if (parsed.userEmail) setUserEmail(parsed.userEmail);
-        if (parsed.userId) setUserId(parsed.userId);
-        if (parsed.weddingProfile) setWeddingProfile(parsed.weddingProfile);
-      }
-    } catch (e) {
-      console.error('Error restoring saved user data:', e);
-    }
-  }, []);
 
   // Save profile state whenever changes occur
   const saveUserDataToStorage = (
@@ -130,6 +153,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
 
   const handleGetStartedPress = () => {
     setActiveScreen('create-account');
+    setAppRoute({ screen: 'create-account' });
   };
 
   const handleCreateAccountSubmit = (data: { name: string; mobile: string; email: string }) => {
@@ -143,6 +167,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     setUserId(generatedId);
     saveUserDataToStorage(newName, newMobile, newEmail, generatedId, weddingProfile);
     setActiveScreen('verify-otp');
+    setAppRoute({ screen: 'verify-otp' });
   };
 
   const handleVerifySuccess = () => {
@@ -150,6 +175,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     setUserId(currentId);
     saveUserDataToStorage(userName, userMobile, userEmail, currentId, weddingProfile);
     setActiveScreen('dashboard');
+    setAppRoute({ screen: 'dashboard', tab: 'home' });
   };
 
   const handleCoupleContinue = (data: any) => {
@@ -162,6 +188,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     saveUserDataToStorage(updatedName, userMobile, userEmail, userId, data);
     setInitialDashboardTab('my-wedding');
     setActiveScreen('dashboard');
+    setAppRoute({ screen: 'dashboard', tab: 'my-wedding' });
   };
 
   const handleLogout = () => {
@@ -171,6 +198,7 @@ export const MobileLandingPage: React.FC<MobileLandingPageProps> = ({
     setUserId('');
     setWeddingProfile(null);
     clearAllQuotesAndSavedData();
+    clearAppRoute();
     setActiveScreen('landing');
   };
 

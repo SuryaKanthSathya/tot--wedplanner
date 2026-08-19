@@ -37,6 +37,7 @@ import {
   ChevronDown,
   User,
   FileText,
+  LayoutGrid,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
@@ -44,6 +45,7 @@ import { CarItem } from '../constants/CarsData';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
+import { LuxuryToast } from './LuxuryToast';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -243,30 +245,17 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
   return (
     <View style={styles.container}>
       {/* Toast Notification */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            style={styles.toastContainer}
-          >
-            <Text style={styles.toastText}>{toastMessage}</Text>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LuxuryToast message={toastMessage} />
 
       <ScrollView
         style={{ flex: 1, overflowY: 'auto' } as any}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 90 }}
       >
-        {/* HERO COVER IMAGE & NAVIGATION BUTTONS */}
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: car.image }} style={styles.heroImage} resizeMode="cover" />
-
-          {/* Top Overlaid Action Bar */}
-          <View style={styles.topOverlayBar}>
+        {/* HERO SECTION WITH LUXURY 5-PHOTO MOSAIC (DESKTOP) & MOBILE COVER */}
+        <div className="relative w-full bg-[#FAF7F2] border-b border-[#E8DEC2]/40">
+          {/* Top Overlaid Action Bar - Pinned to screen top-left & top-right */}
+          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between pointer-events-auto">
             <TouchableOpacity style={styles.overlayCircleBtnDark} onPress={onBack} activeOpacity={0.8}>
               <ChevronLeft className="w-6 h-6 text-white" />
             </TouchableOpacity>
@@ -288,8 +277,137 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
                 <Share2 className="w-5 h-5 text-[#2A2425]" />
               </TouchableOpacity>
             </View>
-          </View>
-        </View>
+          </div>
+
+          {/* DESKTOP 5-PHOTO LUXURY MOSAIC GRID */}
+          <div className="hidden md:block w-full max-w-6xl mx-auto pt-16 pb-4 px-4 sm:px-6">
+            <div className="grid grid-cols-4 grid-rows-2 gap-2.5 h-[420px] lg:h-[480px] rounded-2xl overflow-hidden shadow-sm relative">
+              {/* Main Featured Large Photo (Left 50%) */}
+              <div
+                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(0);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[0]}
+                  alt={car.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 2 (Top Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[1] || photoGallery[0]}
+                  alt={`${car.name} 2`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 3 (Top Right preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(2);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[2] || photoGallery[0]}
+                  alt={`${car.name} 3`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 4 (Bottom Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(3);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[3] || photoGallery[0]}
+                  alt={`${car.name} 4`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 5 (Bottom Right preview with "View All" Button) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(4);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[4] || photoGallery[0]}
+                  alt={`${car.name} 5`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+
+                {/* Floating "Show all photos" Pill Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryInitialIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                  className="absolute bottom-3 right-3 z-10 bg-white/90 hover:bg-white text-[#2A2425] text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all border border-stone-200"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-[#581420]" />
+                  <span>Show all {photoGallery.length} photos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE HERO VIEW (< md screens) */}
+          <div className="block md:hidden relative w-full overflow-hidden flex flex-col items-center justify-center pt-14 pb-2 px-3">
+            <div
+              className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm cursor-pointer"
+              onClick={() => {
+                setGalleryInitialIndex(0);
+                setIsGalleryOpen(true);
+              }}
+            >
+              <img
+                src={car.image}
+                alt={car.name}
+                className="w-full h-full object-cover"
+              />
+              <button className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <Camera className="w-3 h-3 text-white" />
+                <span>1 / {photoGallery.length}</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* OVERLAPPING MAIN STUDIO INFO CARD */}
         <View style={styles.mainContentCard}>
@@ -636,7 +754,7 @@ export const CarsDetailPage: React.FC<CarsDetailPageProps> = ({
           setShowInvoiceModal(true);
         }}
         onBack={onBack}
-        onShowToast={handleShowToast}
+        onShowToast={(msg) => setToastMessage(msg)}
       />
 
       {/* INVOICE & MILESTONES PAYMENT MODAL */}
@@ -747,15 +865,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mainContentCard: {
-    marginTop: -28,
+    marginTop: 0,
     backgroundColor: '#FAF7F2',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     width: '100%',
     maxWidth: 800,
     alignSelf: 'center',
-paddingHorizontal: 16,
-    paddingTop: 18,
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   carHeaderRow: {
     flexDirection: 'row',

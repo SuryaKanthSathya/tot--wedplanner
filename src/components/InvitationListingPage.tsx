@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,11 @@ import {
   StyleSheet,
   TextInput,
 } from 'react-native-web';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ArrowLeft,
   Star,
@@ -45,17 +50,17 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     tier: 'Signature',
     minOrderQuantity: '50 Invites',
     turnaroundTime: '1 - 2 Weeks',
-    image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
+    image: 'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1200&q=85',
     description: 'Custom designed, eco-friendly digital and physical invitations crafted with artisanal gold foil, embossed couple monograms, and luxury unboxing experience.',
     experience: '7+ Years',
     customizationOptions: 'Full Digital & Physical Box Customization, Gold Foil Monograms',
     specialties: ['Digital Invites', 'Boxed Invites', 'E-Invites', 'Save the Date Cards'],
     features: ['Digital Invites', 'Gold Foil Stamping', 'Save the Date Cards'],
     portfolio: [
-      '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=1200&q=85',
     ],
     packages: [
       {
@@ -93,10 +98,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Luxury Box', 'Gold Monogram', 'Dry Fruit Compartment'],
     portfolio: [
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
     ],
     packages: [
       {
@@ -134,10 +139,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Traditional Paisley', 'Gold Stamping', 'Bilingual Tamil/English'],
     portfolio: [
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1531685250784-7569952593d2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1595053826286-2e59ef7905d4?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -168,10 +173,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['3D Video Invite', 'WhatsApp Instant Share', 'Maps Integration'],
     portfolio: [
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -202,10 +207,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Custom Caricatures', 'Storyline Illustration', 'Art Cardstock'],
     portfolio: [
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -236,10 +241,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Plantable Seed Paper', '100% Organic Cotton', 'Zero Waste'],
     portfolio: [
-      'https://images.pexels.com/photos/6044187/pexels-photo-6044187.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1586075010620-2254924c7f07?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -270,10 +275,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Clear Acrylic Plaque', 'Metallic Gold Ink', 'Velvet Sleeve'],
     portfolio: [
-      'https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/7062561/pexels-photo-7062561.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1595053826286-2e59ef7905d4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -304,10 +309,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Deep Debossed', '600GSM Cotton Paper', '24K Gold Foil Edges'],
     portfolio: [
-      'https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1595053826286-2e59ef7905d4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010634-1b15df308732?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -338,10 +343,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Wax Seal Stamp', 'Velvet Pocket Fold', 'Satin Ribbon'],
     portfolio: [
-      'https://images.pexels.com/photos/5632374/pexels-photo-5632374.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -372,10 +377,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Teakwood Box', 'Laser Carved Lid', 'Brass Dry Fruit Jars'],
     portfolio: [
-      'https://images.pexels.com/photos/6044243/pexels-photo-6044243.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632374/pexels-photo-5632374.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/1456329/pexels-photo-1456329.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044187/pexels-photo-6044187.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -406,10 +411,10 @@ export const INVITATIONS_DATA: InvitationItem[] = [
     ],
     features: ['Wedding Microsite', 'Live Guest RSVP', 'Custom Domain'],
     portfolio: [
-      'https://images.pexels.com/photos/6044116/pexels-photo-6044116.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/6044266/pexels-photo-6044266.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/5632372/pexels-photo-5632372.jpeg?auto=compress&cs=tinysrgb&w=800',
-      'https://images.pexels.com/photos/4099467/pexels-photo-4099467.jpeg?auto=compress&cs=tinysrgb&w=800',
+      'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80',
     ],
     phone: '+91 91501 97966',
     whatsapp: '919150197966',
@@ -497,7 +502,42 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
   const [selectedTier, setSelectedTier] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
-  const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(null);
+  
+  const initialRoute = getInitialRoute();
+  const [selectedInvite, setSelectedInvite] = useState<InvitationItem | null>(() => {
+    if (initialRoute.subpage === 'invitation' && initialRoute.detailId) {
+      return INVITATIONS_DATA.find((i) => i.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openInviteDetail = (invite: InvitationItem) => {
+    setSelectedInvite(invite);
+    setAppRoute({ screen: 'dashboard', subpage: 'invitation', detailId: invite.id });
+  };
+
+  const closeInviteDetail = () => {
+    setSelectedInvite(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'invitation', detailId: null });
+  };
+
+  // Sync hash changes for invitation detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'invitation') {
+        if (route.detailId) {
+          const match = INVITATIONS_DATA.find((i) => i.id === route.detailId);
+          if (match) setSelectedInvite(match);
+        } else {
+          setSelectedInvite(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const savedInvitesList = INVITATIONS_DATA.filter((inv) => Boolean(savedInviteIds[inv.id]));
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -553,19 +593,19 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
     return (
       <InvitationDetailPage
         invite={selectedInvite}
-        onBack={() => setSelectedInvite(null)}
+        onBack={closeInviteDetail}
         isBookmarked={Boolean(savedInviteIds[selectedInvite.id])}
         onToggleBookmark={onToggleSavedInvite}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedInvite(null);
+          closeInviteDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedInvite.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedInvite(null);
+          closeInviteDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -678,12 +718,13 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
             {filteredInvites.map((invite) => {
             const isSaved = Boolean(savedInviteIds[invite.id]);
             return (
-              <motion.div key={invite.id} whileHover={{ y: -2 }} className="w-full mb-4">
-                <TouchableOpacity
-                  style={styles.cardContainer}
-                  onPress={() => setSelectedInvite(invite)}
-                  activeOpacity={0.9}
-                >
+              <motion.div
+                key={invite.id}
+                whileHover={{ y: -2 }}
+                className="w-full mb-4 cursor-pointer"
+                onClick={() => openInviteDetail(invite)}
+              >
+                <View style={styles.cardContainer}>
                   <View style={styles.imageWrapper}>
                     <Image source={{ uri: invite.image }} style={styles.cardImage} resizeMode="cover" />
 
@@ -696,7 +737,9 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
                       <TouchableOpacity
                         style={styles.bookmarkBtn}
                         onPress={(e) => {
-                          e.stopPropagation();
+                          if (e && typeof (e as any).stopPropagation === 'function') {
+                            (e as any).stopPropagation();
+                          }
                           onToggleSavedInvite(invite.id);
                         }}
                       >
@@ -745,7 +788,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
 
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedInvite(invite)}
+                        onPress={() => openInviteDetail(invite)}
                         activeOpacity={0.85}
                       >
                         <Eye className="w-3.5 h-3.5 text-[#581420] mr-1" />
@@ -753,7 +796,7 @@ export const InvitationListingPage: React.FC<InvitationListingPageProps> = ({
                       </TouchableOpacity>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
               </motion.div>
             );
           })}

@@ -18,6 +18,7 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
+import { LuxuryToast } from './LuxuryToast';
 
 interface QuotationScreenProps {
   visible: boolean;
@@ -271,33 +272,33 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
   if (!visible) return null;
 
   return (
-    <View style={styles.modalFullContainer}>
-      <AnimatePresence>
-        {localToast && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 w-max max-w-[90%] text-center"
-          >
-            <Sparkles size={14} className="text-[#C28E38]" />
-            <Text style={{ color: '#FFFFFF' }}>{localToast}</Text>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <AnimatePresence>
+      <div
+        className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-5"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 15 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 15 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+          className="w-full max-w-xl sm:max-w-2xl bg-[#FAF7F2] rounded-3xl border border-stone-200 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <LuxuryToast message={localToast} />
 
-      {/* Header */}
-      <View style={styles.modalHeaderNav}>
-        <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn}>
-          <X size={20} color="#2A2425" />
-        </TouchableOpacity>
-        <Text style={styles.modalHeaderTitle}>
-          {quoteStatus === 'response_ready' ? 'Quotation Details' : 'Confirmed Quotation'}
-        </Text>
-        <View style={{ width: 32 }} />
-      </View>
+          {/* Header */}
+          <View style={styles.modalHeaderNav}>
+            <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn}>
+              <X size={20} color="#2A2425" />
+            </TouchableOpacity>
+            <Text style={styles.modalHeaderTitle}>
+              {quoteStatus === 'response_ready' ? 'Quotation Details' : 'Confirmed Quotation'}
+            </Text>
+            <View style={{ width: 36 }} />
+          </View>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
+          <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.scrollContentContainer}>
         {/* Vendor & Status Header */}
         <View style={styles.quoteCardHeader}>
           <Image source={{ uri: vendorImage }} style={styles.quoteVendorThumb} />
@@ -402,53 +403,55 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
 
       {/* Action Bottom Bar */}
       <View style={styles.quoteModalBottomBar}>
-        {quoteStatus === 'response_ready' ? (
-          <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
-            <TouchableOpacity
-              style={[styles.confirmQuoteBtn, styles.rejectQuoteBtn, { flex: 1 }]}
-              onPress={handleRejectQuote}
-              activeOpacity={0.85}
-            >
-              <Text style={[styles.confirmQuoteBtnText, styles.rejectQuoteBtnText]}>Reject</Text>
-            </TouchableOpacity>
+        <View style={styles.bottomBarInnerContainer}>
+          {quoteStatus === 'response_ready' ? (
+            <View style={{ flexDirection: 'row', gap: 8, width: '100%' }}>
+              <TouchableOpacity
+                style={[styles.confirmQuoteBtn, styles.rejectQuoteBtn, { flex: 1 }]}
+                onPress={handleRejectQuote}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.confirmQuoteBtnText, styles.rejectQuoteBtnText]}>Reject</Text>
+              </TouchableOpacity>
 
+              <TouchableOpacity
+                style={[styles.confirmQuoteBtn, styles.negotiateQuoteBtn, { flex: 1.2 }]}
+                onPress={() => {
+                  setNegotiatePrice(mockQuoteDetails.totalAmount.toString());
+                  setShowNegotiateView(true);
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.confirmQuoteBtnText, styles.negotiateQuoteBtnText]}>Negotiate</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.confirmQuoteBtn, { flex: 1.8 }]}
+                onPress={handleConfirmQuote}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.confirmQuoteBtnText}>Confirm Quote</Text>
+              </TouchableOpacity>
+            </View>
+          ) : quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' ? (
             <TouchableOpacity
-              style={[styles.confirmQuoteBtn, styles.negotiateQuoteBtn, { flex: 1.2 }]}
+              style={styles.confirmQuoteBtn}
               onPress={() => {
-                setNegotiatePrice(mockQuoteDetails.totalAmount.toString());
-                setShowNegotiateView(true);
+                onClose();
+                if (onNavigateToQuotesTab) {
+                  onNavigateToQuotesTab();
+                }
               }}
               activeOpacity={0.85}
             >
-              <Text style={[styles.confirmQuoteBtnText, styles.negotiateQuoteBtnText]}>Negotiate</Text>
+              <Text style={styles.confirmQuoteBtnText}>View Invoice & Pay</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.confirmQuoteBtn, { flex: 1.8 }]}
-              onPress={handleConfirmQuote}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.confirmQuoteBtnText}>Confirm Quote</Text>
+          ) : (
+            <TouchableOpacity style={[styles.confirmQuoteBtn, { backgroundColor: '#15803D' }]} onPress={onClose} activeOpacity={0.85}>
+              <Text style={styles.confirmQuoteBtnText}>Completed</Text>
             </TouchableOpacity>
-          </View>
-        ) : quoteStatus === 'confirmed' || quoteStatus === 'partially_paid' ? (
-          <TouchableOpacity
-            style={styles.confirmQuoteBtn}
-            onPress={() => {
-              onClose();
-              if (onNavigateToQuotesTab) {
-                onNavigateToQuotesTab();
-              }
-            }}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.confirmQuoteBtnText}>View Invoice & Pay</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={[styles.confirmQuoteBtn, { backgroundColor: '#15803D' }]} onPress={onClose} activeOpacity={0.85}>
-            <Text style={styles.confirmQuoteBtnText}>Completed</Text>
-          </TouchableOpacity>
-        )}
+          )}
+        </View>
       </View>
 
       {/* NEGOTIATION OVERLAY PANEL */}
@@ -506,20 +509,13 @@ export const QuotationScreen: React.FC<QuotationScreenProps> = ({
           </View>
         </View>
       )}
-    </View>
+        </motion.div>
+      </div>
+    </AnimatePresence>
   );
 };
 
 const styles = StyleSheet.create({
-  modalFullContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#FAF7F2',
-    zIndex: 100,
-  },
   modalHeaderNav: {
     height: 56,
     flexDirection: 'row',
@@ -529,6 +525,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8E2D9',
     backgroundColor: '#FAF7F2',
+    flexShrink: 0,
+  },
+  scrollContentContainer: {
+    padding: 16,
+    paddingBottom: 20,
+    width: '100%',
   },
   modalCloseBtn: {
     width: 36,
@@ -651,8 +653,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E8E2D9',
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  bottomBarInnerContainer: {
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
   },
   confirmQuoteBtn: {

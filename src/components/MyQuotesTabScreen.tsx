@@ -183,14 +183,16 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.pageHeader}>
-          <TouchableOpacity onPress={() => { setScreen('list'); setActiveQuote(null); }} style={styles.backBtn}>
-            <ChevronLeft size={20} color="#2A2425" />
-          </TouchableOpacity>
-          <Text style={styles.pageHeaderTitle}>Invoice</Text>
-          <View style={{ width: 36 }} />
+          <View style={styles.headerInnerRow}>
+            <TouchableOpacity onPress={() => { setScreen('list'); setActiveQuote(null); }} style={styles.backBtn}>
+              <ChevronLeft size={20} color="#2A2425" />
+            </TouchableOpacity>
+            <Text style={styles.pageHeaderTitle}>Invoice</Text>
+            <View style={{ width: 36 }} />
+          </View>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.invoiceScrollContent} showsVerticalScrollIndicator={false}>
           {getPaidVendorForCategory(activeQuote.category, activeQuote.id) && (
             <View style={styles.alternativePaidWarning}>
               <AlertTriangle size={16} color="#9A3412" style={{ marginTop: 2 }} />
@@ -355,35 +357,37 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
 
         {/* Sticky Bottom Bar */}
         <View style={styles.invoiceBottomBar}>
-          <TouchableOpacity
-            style={styles.invoiceCancelBtn}
-            onPress={() => setShowCancelDialog(true)}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.invoiceCancelBtnText}>Cancel</Text>
-          </TouchableOpacity>
-
-          {activeQuote.paymentStatus !== 'fully_paid' ? (
+          <View style={styles.bottomBarInnerContainer}>
             <TouchableOpacity
-              style={[
-                styles.invoicePaymentBtn,
-                getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { backgroundColor: '#E5E7EB', opacity: 0.6 }
-              ]}
-              onPress={handleGoToPayment}
-              disabled={Boolean(getPaidVendorForCategory(activeQuote.category, activeQuote.id))}
-              activeOpacity={getPaidVendorForCategory(activeQuote.category, activeQuote.id) ? 1 : 0.85}
-            >
-              <Text style={[styles.invoicePaymentBtnText, getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { color: '#9CA3AF' }]}>Payment</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={[styles.invoicePaymentBtn, { backgroundColor: '#15803D' }]}
-              onPress={() => { setScreen('list'); setActiveQuote(null); }}
+              style={styles.invoiceCancelBtn}
+              onPress={() => setShowCancelDialog(true)}
               activeOpacity={0.85}
             >
-              <Text style={styles.invoicePaymentBtnText}>Done</Text>
+              <Text style={styles.invoiceCancelBtnText}>Cancel</Text>
             </TouchableOpacity>
-          )}
+
+            {activeQuote.paymentStatus !== 'fully_paid' ? (
+              <TouchableOpacity
+                style={[
+                  styles.invoicePaymentBtn,
+                  getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { backgroundColor: '#E5E7EB', opacity: 0.6 }
+                ]}
+                onPress={handleGoToPayment}
+                disabled={Boolean(getPaidVendorForCategory(activeQuote.category, activeQuote.id))}
+                activeOpacity={getPaidVendorForCategory(activeQuote.category, activeQuote.id) ? 1 : 0.85}
+              >
+                <Text style={[styles.invoicePaymentBtnText, getPaidVendorForCategory(activeQuote.category, activeQuote.id) && { color: '#9CA3AF' }]}>Payment</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[styles.invoicePaymentBtn, { backgroundColor: '#15803D' }]}
+                onPress={() => { setScreen('list'); setActiveQuote(null); }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.invoicePaymentBtnText}>Done</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {/* Cancel Confirmation Dialog */}
@@ -441,14 +445,16 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
     return (
       <View style={styles.container}>
         <View style={styles.pageHeader}>
-          <TouchableOpacity onPress={() => setScreen('invoice')} style={styles.backBtn}>
-            <ChevronLeft size={20} color="#2A2425" />
-          </TouchableOpacity>
-          <Text style={styles.pageHeaderTitle}>Payment</Text>
-          <View style={{ width: 36 }} />
+          <View style={styles.headerInnerRow}>
+            <TouchableOpacity onPress={() => setScreen('invoice')} style={styles.backBtn}>
+              <ChevronLeft size={20} color="#2A2425" />
+            </TouchableOpacity>
+            <Text style={styles.pageHeaderTitle}>Payment</Text>
+            <View style={{ width: 36 }} />
+          </View>
         </View>
 
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.paymentScrollContent} showsVerticalScrollIndicator={false}>
 
           {/* Vendor Info */}
           <View style={styles.payVendorCard}>
@@ -551,21 +557,23 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
 
         {/* Pay Button */}
         <View style={styles.payBottomBar}>
-          <TouchableOpacity
-            style={[styles.payBtn, isProcessing && { opacity: 0.7 }]}
-            onPress={handlePay}
-            disabled={isProcessing}
-            activeOpacity={0.85}
-          >
-            {isProcessing ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <ActivityIndicator size="small" color="#FFFFFF" />
-                <Text style={styles.payBtnText}>Processing Payment...</Text>
-              </View>
-            ) : (
-              <Text style={styles.payBtnText}>Pay ₹{amountToPay.toLocaleString('en-IN')}</Text>
-            )}
-          </TouchableOpacity>
+          <View style={styles.bottomBarInnerContainer}>
+            <TouchableOpacity
+              style={[styles.payBtn, { width: '100%' }, isProcessing && { opacity: 0.7 }]}
+              onPress={handlePay}
+              disabled={isProcessing}
+              activeOpacity={0.85}
+            >
+              {isProcessing ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <Text style={styles.payBtnText}>Processing Payment...</Text>
+                </View>
+              ) : (
+                <Text style={styles.payBtnText}>Pay ₹{amountToPay.toLocaleString('en-IN')}</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -626,34 +634,40 @@ export const MyQuotesTabScreen: React.FC<MyQuotesTabScreenProps> = ({
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.topHeader}>
-        <Text style={styles.headerTitle}>My Quotes</Text>
-        <Text style={styles.headerSubtitle}>Vendor quote requests & advance payment tracking</Text>
+        <View style={styles.headerInnerRow}>
+          <View>
+            <Text style={styles.headerTitle}>My Quotes</Text>
+            <Text style={styles.headerSubtitle}>Vendor quote requests & advance payment tracking</Text>
+          </View>
+        </View>
       </View>
 
       {/* FILTER TABS */}
       <View style={styles.filterTabsScrollWrapper}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterTabsContainer}
-        >
-          {(['All', 'Requested', 'Advance Paid', 'Fully Paid'] as const).map((tab) => {
-            const isActive = activeFilterTab === tab;
-            return (
-              <React.Fragment key={tab}>
-                <TouchableOpacity
-                  style={[styles.filterTabPill, isActive && styles.filterTabPillActive]}
-                  onPress={() => setActiveFilterTab(tab)}
-                  activeOpacity={0.8}
-                >
-                  <Text style={[styles.filterTabText, isActive && styles.filterTabTextActive]}>
-                    {tab}
-                  </Text>
-                </TouchableOpacity>
-              </React.Fragment>
-            );
-          })}
-        </ScrollView>
+        <View style={styles.headerInnerRow}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterTabsContainer}
+          >
+            {(['All', 'Requested', 'Advance Paid', 'Fully Paid'] as const).map((tab) => {
+              const isActive = activeFilterTab === tab;
+              return (
+                <React.Fragment key={tab}>
+                  <TouchableOpacity
+                    style={[styles.filterTabPill, isActive && styles.filterTabPillActive]}
+                    onPress={() => setActiveFilterTab(tab)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.filterTabText, isActive && styles.filterTabTextActive]}>
+                      {tab}
+                    </Text>
+                  </TouchableOpacity>
+                </React.Fragment>
+              );
+            })}
+          </ScrollView>
+        </View>
       </View>
 
       {/* QUOTES LIST */}
@@ -882,13 +896,19 @@ const styles = StyleSheet.create({
   // ── PAGE HEADER (Invoice / Payment pages) ──
   pageHeader: {
     height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E8E2D9',
+  },
+  headerInnerRow: {
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   backBtn: {
     width: 36,
@@ -942,6 +962,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 40,
     gap: 14,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  invoiceScrollContent: {
+    padding: 20,
+    paddingBottom: 120,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  paymentScrollContent: {
+    padding: 20,
+    paddingBottom: 120,
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
   },
   emptyStateContainer: {
     alignItems: 'center',
@@ -1279,12 +1316,21 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    gap: 12,
     padding: 16,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E8E2D9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  bottomBarInnerContainer: {
+    maxWidth: 800,
+    width: '100%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
   },
   invoiceCancelBtn: {
     flex: 1,
@@ -1547,6 +1593,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E8E2D9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
   },
   payBtn: {
     height: 50,

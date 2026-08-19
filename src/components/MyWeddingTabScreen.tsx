@@ -479,7 +479,20 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   onHideTabBar,
   onOpenQuotesTab,
 }) => {
-  const [activeSegment, setActiveSegment] = useState<'overview' | 'payment'>('overview');
+  const [activeSegment, setActiveSegmentState] = useState<'overview' | 'payment'>(() => {
+    try {
+      const saved = localStorage.getItem('tot_my_wedding_segment');
+      if (saved === 'overview' || saved === 'payment') return saved;
+    } catch (e) {}
+    return 'overview';
+  });
+
+  const setActiveSegment = (seg: 'overview' | 'payment') => {
+    setActiveSegmentState(seg);
+    try {
+      localStorage.setItem('tot_my_wedding_segment', seg);
+    } catch (e) {}
+  };
   const [weddingBookings, setWeddingBookings] = useState<WeddingVendorBooking[]>(() => {
     return getEntireWeddingBookings();
   });
@@ -652,17 +665,31 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
   const [newServiceInput, setNewServiceInput] = useState('');
   const [showAddInput, setShowAddInput] = useState(false);
   const [showServicesModal, setShowServicesModal] = useState(false);
-  const [showServicesView, setShowServicesView] = useState(false);
-  const [showPhotographyListing, setShowPhotographyListing] = useState(false);
-  const [showMehendiListing, setShowMehendiListing] = useState(false);
-  const [showCateringListing, setShowCateringListing] = useState(false);
-  const [showCarsListing, setShowCarsListing] = useState(false);
-  const [showMakeupListing, setShowMakeupListing] = useState(false);
-  const [showDecorListing, setShowDecorListing] = useState(false);
-  const [showVenueListing, setShowVenueListing] = useState(false);
-  const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
-  const [showInvitationListing, setShowInvitationListing] = useState(false);
-  const [showRitualsListing, setShowRitualsListing] = useState(false);
+
+  // Persist and restore current UI view so a page refresh returns the user to the same screen
+  const UI_STATE_KEY = 'tot_my_wedding_ui_state';
+
+  const getSavedUIState = () => {
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(UI_STATE_KEY) : null;
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  };
+
+  const initialUIState = getSavedUIState();
+
+  const [showServicesView, setShowServicesView] = useState<boolean>(Boolean(initialUIState?.showServicesView));
+  const [showPhotographyListing, setShowPhotographyListing] = useState<boolean>(Boolean(initialUIState?.showPhotographyListing));
+  const [showMehendiListing, setShowMehendiListing] = useState<boolean>(Boolean(initialUIState?.showMehendiListing));
+  const [showCateringListing, setShowCateringListing] = useState<boolean>(Boolean(initialUIState?.showCateringListing));
+  const [showCarsListing, setShowCarsListing] = useState<boolean>(Boolean(initialUIState?.showCarsListing));
+  const [showMakeupListing, setShowMakeupListing] = useState<boolean>(Boolean(initialUIState?.showMakeupListing));
+  const [showDecorListing, setShowDecorListing] = useState<boolean>(Boolean(initialUIState?.showDecorListing));
+  const [showVenueListing, setShowVenueListing] = useState<boolean>(Boolean(initialUIState?.showVenueListing));
+  const [showEntertainmentListing, setShowEntertainmentListing] = useState<boolean>(Boolean(initialUIState?.showEntertainmentListing));
+  const [showInvitationListing, setShowInvitationListing] = useState<boolean>(Boolean(initialUIState?.showInvitationListing));
+  const [showRitualsListing, setShowRitualsListing] = useState<boolean>(Boolean(initialUIState?.showRitualsListing));
   const [addedToast, setAddedToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -673,6 +700,44 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
       return () => clearTimeout(timer);
     }
   }, [addedToast]);
+
+  // Persist UI state whenever the key view-related states change
+  useEffect(() => {
+    try {
+      const toSave = {
+        activeSegment,
+        showServicesView,
+        showPhotographyListing,
+        showMehendiListing,
+        showCateringListing,
+        showCarsListing,
+        showMakeupListing,
+        showDecorListing,
+        showVenueListing,
+        showEntertainmentListing,
+        showInvitationListing,
+        showRitualsListing,
+        selectedInvoiceVendor,
+      };
+      localStorage.setItem(UI_STATE_KEY, JSON.stringify(toSave));
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [
+    activeSegment,
+    showServicesView,
+    showPhotographyListing,
+    showMehendiListing,
+    showCateringListing,
+    showCarsListing,
+    showMakeupListing,
+    showDecorListing,
+    showVenueListing,
+    showEntertainmentListing,
+    showInvitationListing,
+    showRitualsListing,
+    selectedInvoiceVendor,
+  ]);
 
   const isAnyListingOpen = Boolean(
     showServicesView ||
@@ -918,7 +983,7 @@ export const MyWeddingTabScreen: React.FC<MyWeddingTabScreenProps> = ({
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}
+                } as any}
               >
                 <Text style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 12.5, color: '#FFFFFF', fontWeight: '600' }}>
                   ✓ {addedToast}

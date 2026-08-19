@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { StudioDetailPage } from './StudioDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { VendorCompareModal } from './VendorCompareModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -45,6 +50,7 @@ export interface PhotographyStudio {
   rating: number;
   reviewsCount: number;
   location: string;
+  city?: string;
   category: string;
   startingPrice: string;
   priceValue: number;
@@ -55,6 +61,10 @@ export interface PhotographyStudio {
   experience?: string;
   portfolio?: string[];
   phone?: string;
+  deliveryTime?: string;
+  teamSize?: string;
+  equipment?: string;
+  [key: string]: any;
 }
 
 const TAMIL_NADU_DISTRICTS = [
@@ -115,6 +125,7 @@ export const STUDIOS_DATA: PhotographyStudio[] = [
     reviewsCount: 312,
     startingPrice: '₹1,50,000 onwards',
     priceValue: 150000,
+    tier: 'Signature',
     deliveryTime: '3-4 Weeks',
     image: '/src/assets/images/hindu_couple_arch_1786467605789.jpg',
     description: 'Award-winning team specializing in candid moments and cinematic wedding films.',
@@ -678,10 +689,42 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
   const [selectedBudget, setSelectedBudget] = useState('All');
   const [selectedRating, setSelectedRating] = useState('All');
   const [selectedTier, setSelectedTier] = useState('All');
-
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedStudio, setSelectedStudio] = useState<PhotographyStudio | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedStudio, setSelectedStudio] = useState<PhotographyStudio | null>(() => {
+    if (initialRoute.subpage === 'photography' && initialRoute.detailId) {
+      return STUDIOS_DATA.find((s) => s.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openStudioDetail = (studio: PhotographyStudio) => {
+    setSelectedStudio(studio);
+    setAppRoute({ screen: 'dashboard', subpage: 'photography', detailId: studio.id });
+  };
+
+  const closeStudioDetail = () => {
+    setSelectedStudio(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'photography', detailId: null });
+  };
+
+  // Sync hash changes for photography detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'photography') {
+        if (route.detailId) {
+          const match = STUDIOS_DATA.find((s) => s.id === route.detailId);
+          if (match) setSelectedStudio(match);
+        } else {
+          setSelectedStudio(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
   
   // Send Quote Modal State
   const [quoteStudio, setQuoteStudio] = useState<PhotographyStudio | null>(null);
@@ -789,18 +832,18 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
     return (
       <StudioDetailPage
         studio={selectedStudio}
-        onBack={() => setSelectedStudio(null)}
+        onBack={closeStudioDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedStudio.id])}
         onToggleBookmark={toggleBookmark}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedStudio.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -961,7 +1004,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full mb-3.5 cursor-pointer"
-                onClick={() => setSelectedStudio(studio)}
+                onClick={() => openStudioDetail(studio)}
               >
                 <View style={styles.studioCard}>
                   {/* Left Photo */}
@@ -1033,7 +1076,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
                       <Text style={styles.priceText}>{studio.startingPrice}</Text>
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedStudio(studio)}
+                        onPress={() => openStudioDetail(studio)}
                         activeOpacity={0.8}
                       >
                         <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -1298,7 +1341,7 @@ export const PhotographyListingPage: React.FC<PhotographyListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = STUDIOS_DATA.find((s) => s.id === v.id);
-          if (match) setSelectedStudio(match);
+          if (match) openStudioDetail(match);
         }}
       />
     </View>

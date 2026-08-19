@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { MakeupDetailPage } from './MakeupDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { VendorCompareModal } from './VendorCompareModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -46,6 +51,7 @@ export interface MakeupStudio {
   rating: number;
   reviewsCount: number;
   location: string;
+  city?: string;
   category: string;
   startingPrice: string;
   priceValue: number;
@@ -57,6 +63,10 @@ export interface MakeupStudio {
   portfolio?: string[];
   phone?: string;
   brandsUsed?: string[];
+  brands?: string[];
+  services?: string[];
+  studioLocation?: string;
+  [key: string]: any;
 }
 
 const TAMIL_NADU_DISTRICTS = [
@@ -115,6 +125,7 @@ export const MAKEUP_STUDIOS_DATA: MakeupStudio[] = [
     reviewsCount: 198,
     startingPrice: '₹30,000 onwards',
     priceValue: 30000,
+    tier: 'Signature',
     services: ['Airbrush Makeup', 'HD Makeup', 'Hairstyling', 'Draping'],
     brands: ['MAC', 'Huda Beauty', 'Bobbi Brown', 'Charlotte Tilbury'],
     image: '/src/assets/images/pastel_reception_stage.jpg',
@@ -550,7 +561,41 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'specialization' | null>(null);
 
   // Selected Studio for Detail Screen or Quote Modal
-  const [selectedStudio, setSelectedStudio] = useState<MakeupStudio | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedStudio, setSelectedStudio] = useState<MakeupStudio | null>(() => {
+    if (initialRoute.subpage === 'makeup' && initialRoute.detailId) {
+      return MAKEUP_STUDIOS_DATA.find((m) => m.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openStudioDetail = (studio: MakeupStudio) => {
+    setSelectedStudio(studio);
+    setAppRoute({ screen: 'dashboard', subpage: 'makeup', detailId: studio.id });
+  };
+
+  const closeStudioDetail = () => {
+    setSelectedStudio(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'makeup', detailId: null });
+  };
+
+  // Sync hash changes for makeup detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'makeup') {
+        if (route.detailId) {
+          const match = MAKEUP_STUDIOS_DATA.find((m) => m.id === route.detailId);
+          if (match) setSelectedStudio(match);
+        } else {
+          setSelectedStudio(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   const [quoteStudio, setQuoteStudio] = useState<MakeupStudio | null>(null);
 
   // Local saved bookmarks fallback
@@ -637,19 +682,19 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
     return (
       <MakeupDetailPage
         studio={selectedStudio}
-        onBack={() => setSelectedStudio(null)}
+        onBack={closeStudioDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedStudio.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedStudio.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -783,7 +828,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 80, opacity: 0, scale: 0.96 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              style={styles.modalSheet}
+              style={styles.modalSheet as any}
               className="cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
@@ -1041,11 +1086,11 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
                 key={studio.id}
                 style={styles.cardContainer}
                 activeOpacity={0.9}
-                onPress={() => setSelectedStudio(studio)}
+                onPress={() => openStudioDetail(studio)}
               >
                 {/* IMAGE CONTAINER */}
                 <View style={styles.cardImgWrapper}>
-                  <Image source={{ uri: studio.image }} style={styles.cardImg} />
+                  <Image source={{ uri: studio.image }} style={styles.cardImg as any} />
                   
                   {/* TIER BADGE */}
                   <View style={styles.cardTierBadge}>
@@ -1091,7 +1136,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
 
                     <TouchableOpacity
                       style={styles.cardViewBtn}
-                      onPress={() => setSelectedStudio(studio)}
+                      onPress={() => openStudioDetail(studio)}
                       activeOpacity={0.85}
                     >
                       <Text style={styles.cardViewBtnText}>View Details</Text>
@@ -1158,7 +1203,7 @@ export const MakeupListingPage: React.FC<MakeupListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = MAKEUP_STUDIOS_DATA.find((m) => m.id === v.id);
-          if (match) setSelectedStudio(match);
+          if (match) openStudioDetail(match);
         }}
       />
     </View>
@@ -1248,7 +1293,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 12,
     color: '#2A2425',
-    outlineStyle: 'none',
+    outlineStyle: 'none' as any,
   },
   filterBarContainer: {
     flexDirection: 'row',

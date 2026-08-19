@@ -29,7 +29,7 @@ export const VerifyOtpPage: React.FC<VerifyOtpPageProps> = ({
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const [verifiedSuccess, setVerifiedSuccess] = useState<boolean>(false);
 
-  const inputRefs = useRef<(TextInput | null)[]>([]);
+  const inputRefs = useRef<any[]>([]);
 
   // Countdown timer for Resend OTP
   useEffect(() => {

@@ -260,6 +260,8 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
     : PHOTOGRAPHY_BUDGET_RANGES;
 
   const [weddingDate, setWeddingDate] = useState('');
+  const [weddingDateRaw, setWeddingDateRaw] = useState('');
+  const dateInputRef = React.useRef<HTMLInputElement>(null);
   const [weddingLocation, setWeddingLocation] = useState(finalLocation);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [selectedEvents, setSelectedEvents] = useState<string[]>([]);
@@ -270,6 +272,47 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
 
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    setWeddingDateRaw(raw);
+    if (!raw) {
+      setWeddingDate('');
+      return;
+    }
+    try {
+      const [year, month, day] = raw.split('-');
+      const dateObj = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
+      const formatted = dateObj.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
+      setWeddingDate(formatted);
+      setValidationError(null);
+    } catch (err) {
+      setWeddingDate(raw);
+      setValidationError(null);
+    }
+  };
+
+  const triggerDatePicker = () => {
+    try {
+      if (dateInputRef.current) {
+        if (typeof (dateInputRef.current as any).showPicker === 'function') {
+          (dateInputRef.current as any).showPicker();
+        } else {
+          dateInputRef.current.focus();
+          dateInputRef.current.click();
+        }
+      }
+    } catch (e) {
+      try {
+        dateInputRef.current?.focus();
+        dateInputRef.current?.click();
+      } catch (err) {}
+    }
+  };
 
   useEffect(() => {
     if (visible) {
@@ -497,6 +540,14 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       <Palette className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : isMakeup ? (
                       <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isMehendi ? (
+                      <Sparkles className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isCatering ? (
+                      <Utensils className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isCars ? (
+                      <Car className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
+                    ) : isEntertainment ? (
+                      <Music className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     ) : (
                       <Camera className="w-6 h-6 text-[#581420] mr-2 flex-shrink-0" />
                     )}
@@ -535,7 +586,7 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       : isMakeup
                       ? 'bridal makeup'
                       : isMehendi
-                      ? 'mehendi'
+                      ? 'bridal mehendi'
                       : isCatering
                       ? 'catering'
                       : 'photography'}{' '}
@@ -645,19 +696,42 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                       <Text style={styles.fieldLabel}>
                         Event Date <Text style={styles.asterisk}>*</Text>
                       </Text>
-                      <View style={styles.inputBox}>
-                        <TextInput
-                          style={styles.textInputFlex}
-                          value={weddingDate}
-                          onChangeText={(val) => {
-                            setWeddingDate(val);
-                            setValidationError(null);
+                      <div
+                        onClick={triggerDatePicker}
+                        onPointerDown={triggerDatePicker}
+                        className="relative flex items-center justify-between w-full h-[40px] px-3 bg-white border border-[#E8DFD5] rounded-xl cursor-pointer hover:border-[#581420] transition-colors"
+                      >
+                        <span
+                          className={`text-[13px] font-medium select-none ${
+                            weddingDate ? 'text-[#2A2425] font-semibold' : 'text-[#9CA3AF]'
+                          }`}
+                        >
+                          {weddingDate || 'Select event date'}
+                        </span>
+                        <Calendar className="w-4 h-4 text-[#581420] pointer-events-none flex-shrink-0" />
+                        <input
+                          ref={dateInputRef}
+                          type="date"
+                          min={new Date().toISOString().split('T')[0]}
+                          value={weddingDateRaw}
+                          onChange={handleDateChange}
+                          onClick={(e) => {
+                            try {
+                              if (typeof (e.currentTarget as any).showPicker === 'function') {
+                                (e.currentTarget as any).showPicker();
+                              }
+                            } catch (err) {}
                           }}
-                          placeholder="e.g. 24 Oct 2026"
-                          placeholderTextColor="#9CA3AF"
+                          onFocus={(e) => {
+                            try {
+                              if (typeof (e.currentTarget as any).showPicker === 'function') {
+                                (e.currentTarget as any).showPicker();
+                              }
+                            } catch (err) {}
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-20"
                         />
-                        <Calendar className="w-4 h-4 text-[#581420] ml-1" />
-                      </View>
+                      </div>
                     </View>
 
                     <View style={[styles.fieldGroup, { flex: 1, marginLeft: 6 }]}>
@@ -689,9 +763,13 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                           ? 'Special Theme Ideas / Stage Dimensions & Venue Notes (Optional)'
                           : isMakeup
                             ? 'Special Instructions / Skin & Saree Details (Optional)'
-                            : isCars
-                              ? 'Special Requests / Rental Details (Optional)'
-                              : 'Special Instructions / Venue Notes (Optional)'}
+                            : isMehendi
+                              ? 'Special Requests / Henna Style Details (Optional)'
+                              : isCatering
+                                ? 'Special Catering / Menu Preferences (Optional)'
+                                : isCars
+                                  ? 'Special Requests / Rental Details (Optional)'
+                                  : 'Special Instructions / Venue Notes (Optional)'}
                     </Text>
                     <View style={styles.textAreaBox}>
                       <TextInput
@@ -705,9 +783,13 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                               ? 'e.g. Traditional jasmine mandap + fairy light canopy for reception'
                               : isMakeup
                                 ? 'e.g. Need 9-yard saree draping, airbrush makeup for bride + 2 family members'
-                                : isCars
-                                  ? 'e.g. Need a vintage car for 3 hours, and 2 vans for 12 hours.'
-                                  : 'e.g. Need 2 photographers for Muhurtham, outdoor pre-wedding in Ooty'
+                                : isMehendi
+                                  ? 'e.g. Need portrait figures of bride and groom on hands, floral motifs on feet'
+                                  : isCatering
+                                    ? 'e.g. Banana leaf lunch for 500 guests + evening live dosa and chaat counter'
+                                    : isCars
+                                      ? 'e.g. Need a vintage car for 3 hours, and 2 vans for 12 hours.'
+                                      : 'e.g. Need 2 photographers for Muhurtham, outdoor pre-wedding in Ooty'
                         }
                         placeholderTextColor="#9CA3AF"
                         multiline
@@ -770,15 +852,23 @@ export const RequestQuoteModal: React.FC<RequestQuoteModalProps> = ({
                     activeOpacity={0.85}
                   >
                     <Text style={styles.submitBtnText}>
-                      {isCars
+                      {isVenue
+                        ? 'Send Venue Booking Request'
+                        : isInvitations
+                        ? 'Send Invitation Quote Request'
+                        : isCars
                         ? 'Send Car Quote Request'
                         : isEntertainment
-                          ? 'Send Entertainment Quote Request'
-                          : isDecor
-                            ? 'Send Decor Quote Request'
-                            : isMakeup
-                              ? 'Send Makeup Quote Request'
-                              : 'Send Photography Quote Request'}
+                        ? 'Send Entertainment Quote Request'
+                        : isDecor
+                        ? 'Send Decor Quote Request'
+                        : isMakeup
+                        ? 'Send Makeup Quote Request'
+                        : isMehendi
+                        ? 'Send Mehendi Quote Request'
+                        : isCatering
+                        ? 'Send Catering Quote Request'
+                        : 'Send Photography Quote Request'}
                     </Text>
                   </TouchableOpacity>
                 </View>

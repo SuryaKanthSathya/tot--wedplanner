@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CatererDetailPage } from './CatererDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { VendorCompareModal } from './VendorCompareModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -109,19 +114,16 @@ export const CATERING_DATA: CateringVendor[] = [
     id: 'pkg_catering_1',
     name: 'Flavors Catering',
     category: 'Premium Multi-Cuisine Catering',
-    city: 'All Cities',
-    location: 'Destination Weddings',
+    location: 'Chennai',
     rating: 4.8,
     reviewsCount: 420,
-    startingPrice: '₹800 per plate',
-    priceValue: 800,
-    cuisineSpecialty: 'South Indian & Multi-Cuisine',
-    image: '/src/assets/images/white_banquet_illustration_1786471427275.jpg',
-    description: 'A curated multi-cuisine feast prepared by top chefs.',
-    experience: '15+ Years',
-    capacity: '100-2000 Guests',
-    foodTypes: 'Pure Veg & Non-Veg',
-    services: ['Live Counters', 'Dessert Bars', 'Waitstaff', 'Crockery'],
+    startingPrice: '₹1,20,000 onwards',
+    priceValue: 120000,
+    tier: 'Signature',
+    image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=1200&q=85',
+    description: 'A curated multi-cuisine feast prepared by top master chefs for unforgettable weddings.',
+    experience: '15+ Years Experience',
+    phone: '+91 91501 97966'
   },
   {
     id: 'caterer-1',
@@ -452,7 +454,40 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
 
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedCaterer, setSelectedCaterer] = useState<CateringVendor | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedCaterer, setSelectedCaterer] = useState<CateringVendor | null>(() => {
+    if (initialRoute.subpage === 'catering' && initialRoute.detailId) {
+      return CATERING_DATA.find((c) => c.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openCatererDetail = (caterer: CateringVendor) => {
+    setSelectedCaterer(caterer);
+    setAppRoute({ screen: 'dashboard', subpage: 'catering', detailId: caterer.id });
+  };
+
+  const closeCatererDetail = () => {
+    setSelectedCaterer(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'catering', detailId: null });
+  };
+
+  // Sync hash changes for catering detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'catering') {
+        if (route.detailId) {
+          const match = CATERING_DATA.find((c) => c.id === route.detailId);
+          if (match) setSelectedCaterer(match);
+        } else {
+          setSelectedCaterer(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
   
   // Send Quote Modal State
   const [quoteCaterer, setQuoteCaterer] = useState<CateringVendor | null>(null);
@@ -560,19 +595,19 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
     return (
       <CatererDetailPage
         caterer={selectedCaterer}
-        onBack={() => setSelectedCaterer(null)}
+        onBack={closeCatererDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedCaterer.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedCaterer(null);
+          closeCatererDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedCaterer.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedCaterer(null);
+          closeCatererDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -733,7 +768,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full mb-3.5 cursor-pointer"
-                onClick={() => setSelectedCaterer(caterer)}
+                onClick={() => openCatererDetail(caterer)}
               >
                 <View style={styles.catererCard}>
                   {/* Left Photo */}
@@ -805,7 +840,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
                       <Text style={styles.priceText}>{caterer.startingPrice}</Text>
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedCaterer(caterer)}
+                        onPress={() => openCatererDetail(caterer)}
                         activeOpacity={0.8}
                       >
                         <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -1070,7 +1105,7 @@ export const CateringListingPage: React.FC<CateringListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = CATERING_DATA.find((item) => item.id === v.id);
-          if (match) setSelectedCaterer(match);
+          if (match) openCatererDetail(match);
         }}
       />
     </View>

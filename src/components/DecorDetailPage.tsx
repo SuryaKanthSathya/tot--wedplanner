@@ -2,42 +2,56 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
+  Image,
   TouchableOpacity,
   ScrollView,
-  Image,
+  StyleSheet,
   Modal,
+  TextInput,
   Linking,
 } from 'react-native';
-import { motion, AnimatePresence } from 'motion/react';
-import { QuotationScreen } from './QuotationScreen';
-import { RequestQuoteModal } from './RequestQuoteModal';
-import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
-import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   ChevronLeft,
+  Heart,
   Share2,
-  Bookmark,
   Star,
   MapPin,
-  CheckCircle2,
-  Phone,
-  MessageCircle,
-  Award,
-  Sparkles,
   Calendar,
-  Check,
-  X,
-  Eye,
+  Users,
+  Camera,
+  CheckCircle2,
+  Award,
   ShieldCheck,
-  Building,
-  Flower2,
-  Palette,
-  Image as ImageIcon,
   Instagram,
+  Trophy,
+  Phone,
   Send,
+  MessageCircle,
+  X,
+  Check,
+  Building2,
+  Video,
+  Eye,
+  Clock,
+  Sparkles,
+  ChevronDown,
+  User,
+  FileText,
+  Palette,
+  Flower2,
+  Bookmark,
+  LayoutGrid,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { RequestQuoteModal } from './RequestQuoteModal';
+import { QuotationScreen } from './QuotationScreen';
+import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
+import { LuxuryToast } from './LuxuryToast';
+import {
+  getWeddingBookingByVendorId,
+  saveOrUpdateWeddingBooking,
+} from '../utils/weddingPaymentsManager';
 
 export interface DecorStudio {
   id: string;
@@ -45,6 +59,7 @@ export interface DecorStudio {
   rating: number;
   reviewsCount: number;
   location: string;
+  city?: string;
   category: string;
   startingPrice: string;
   priceValue: number;
@@ -57,14 +72,19 @@ export interface DecorStudio {
   phone?: string;
   themesProvided?: string[];
   instagram?: string;
+  coreSpecialty?: string;
+  teamSize?: string;
+  designProcess?: string;
+  services?: string[];
+  [key: string]: any;
 }
 
 interface DecorDetailPageProps {
   onNavigateToQuotesTab?: () => void;
   studio: DecorStudio;
   onBack: () => void;
-  isBookmarked?: boolean;
-  onToggleBookmark?: (id: string) => void;
+  isBookmarked: boolean;
+  onToggleBookmark: (id: string) => void;
   bookingSource?: 'entire_wedding' | 'individual';
   onNavigateToMyWeddingPayments?: () => void;
   onNavigateToProfileMyBookings?: () => void;
@@ -74,17 +94,19 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
   onNavigateToQuotesTab,
   studio,
   onBack,
-  isBookmarked = false,
+  isBookmarked,
   onToggleBookmark,
   bookingSource = 'entire_wedding',
   onNavigateToMyWeddingPayments,
   onNavigateToProfileMyBookings,
 }) => {
-  const [activeTab, setActiveTab] = useState<'about' | 'gallery' | 'packages' | 'reviews'>('about');
+  const [activeMediaTab, setActiveMediaTab] = useState<'photos' | 'packages' | 'reviews'>('photos');
+  const [isReadMore, setIsReadMore] = useState(false);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
-  const [showQuoteModal, setShowQuoteModal] = useState<boolean>(false);
-  const [showInvoiceModal, setShowInvoiceModal] = useState<boolean>(false);
+  const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [quoteSuccess, setQuoteSuccess] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -150,10 +172,10 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
     updateQuoteStatus('requested');
     setToastMessage('Quote Request Sent! Vendor reviewing...');
 
-    // Simulate response after 2.5s
+    // Simulate vendor response ready after 2.5s
     setTimeout(() => {
       updateQuoteStatus('response_ready');
-      setToastMessage('Vendor Quotation Received! Click "View Quote"');
+      setToastMessage('Quotation Received! Click "View Quote"');
       setTimeout(() => setToastMessage(null), 5000);
     }, 2500);
   };
@@ -168,43 +190,20 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 2800);
+    }, 3000);
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: studio.name,
-        text: `Check out ${studio.name} for wedding decor on Tale of Two!`,
-        url: window.location.href,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard?.writeText(window.location.href);
-      showToast('Link copied to clipboard!');
+  // Helper to get studio initials for logo
+  const getInitials = (name: string) => {
+    const words = (name || '').replace(/decor|wedding|designs|events/gi, '').trim().split(' ');
+    if (words.length >= 2 && words[0] && words[1]) {
+      return (words[0][0] + words[1][0]).toUpperCase();
     }
-  };
-
-  const handleCall = () => {
-    const phoneNumber = studio.phone || '+919150197966';
-    window.open(`tel:${phoneNumber}`, '_self');
-  };
-
-  const handleWhatsApp = () => {
-    const phoneNumber = studio.phone ? studio.phone.replace(/[^0-9]/g, '') : '919150197966';
-    const text = encodeURIComponent(
-      `Hi ${studio.name}, I found your wedding decor profile on Tale of Two app. I would like to check availability and package details!`
-    );
-    window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
-  };
-
-  const handleInstagram = () => {
-    const handle = studio.instagram || '@_ranjith_r.r_';
-    const username = handle.replace('@', '');
-    window.open(`https://instagram.com/${username}`, '_blank');
+    return (name || 'DEC').slice(0, 3).toUpperCase();
   };
 
   // Curated 24 high-res luxury wedding decor and floral stage photos
-  const galleryImages = [
+  const photoGallery = [
     studio.image,
     'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
@@ -231,327 +230,450 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
     'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
   ];
 
+  const handleShare = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Decor link copied to clipboard!');
+    } else {
+      showToast('Sharing decor details...');
+    }
+  };
+
+  const handleWhatsApp = () => {
+    const msg = encodeURIComponent(
+      `Hi ${studio.name}, I found your wedding decor studio on Tale of Two. I would like to inquire about wedding stage & mandap decoration packages in ${studio.location}.`
+    );
+    const phone = studio.phone ? studio.phone.replace(/[^0-9]/g, '') : '919150197966';
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  };
+
+  const handleCall = () => {
+    const phone = studio.phone || '+919150197966';
+    window.open(`tel:${phone}`, '_self');
+  };
+
+  const handleInstagram = () => {
+    const handle = studio.instagram || '@_ranjith_r.r_';
+    const username = handle.replace('@', '');
+    window.open(`https://instagram.com/${username}`, '_blank');
+  };
+
+  const packagesList = [
+    {
+      title: 'Grand Mandap & Stage Floral Decor',
+      price: studio.startingPrice || '₹1,50,000 onwards',
+      popular: true,
+      features: [
+        'Royal Floral Mandap with Jasmine & Rose Garland Strands',
+        'Custom 3D Stage Backdrop with Warm Ambient Mood Lighting',
+        'Carpeted Aisle with Brass Urli & Floral Pillar Accents',
+        'Bride & Groom Royal Seating Sofa / Chairs Setup',
+        'Full Pre-event 3D Concept Blueprint Consultation',
+      ],
+    },
+    {
+      title: 'Royal Reception & Grand Entrance Canopy',
+      price: '₹2,50,000 onwards',
+      popular: false,
+      features: [
+        'Crystal Chandelier & Heavy Truss Light Rigging',
+        'Grand Floral Entrance Arch Tunnel with Photobooth Backdrop',
+        'VIP Family Table Centerpieces & Satin Linen Draping',
+        'Cold Pyro Sparks & Heavy Fog Entry Effects',
+        'Dedicated On-site Decor Maintenance Team during event',
+      ],
+    },
+    {
+      title: 'Haldi, Mehendi & Sangeet Yellow Decor',
+      price: '₹95,000 onwards',
+      popular: false,
+      features: [
+        'Vibrant Yellow & Orange Marigold Curtain Draping',
+        'Traditional Floral Swing (Jhula) Photo Area',
+        'Brass Urlis with Floating Lotus Flowers & Candles',
+        'Comfortable Colorful Floor Cushion Seating Setup',
+      ],
+    },
+  ];
+
   return (
     <View style={styles.container}>
-      {/* TOAST MESSAGE */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-medium shadow-xl flex items-center gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4 text-[#C5A880]" />
-            <span>{toastMessage}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* TOP FIXED NAV BAR */}
-      <View style={styles.topNav}>
-        <TouchableOpacity style={styles.navIconBtn} onPress={onBack} activeOpacity={0.8}>
-          <ChevronLeft className="w-5 h-5 text-[#2A2425]" />
-        </TouchableOpacity>
-
-        <View style={styles.topNavRight}>
-          <TouchableOpacity style={styles.navIconBtn} onPress={handleShare} activeOpacity={0.8}>
-            <Share2 className="w-4 h-4 text-[#2A2425]" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.navIconBtn, isBookmarked && styles.navIconBtnActive]}
-            onPress={() => {
-              if (onToggleBookmark) onToggleBookmark(studio.id);
-              showToast(isBookmarked ? 'Removed from Saved Items' : 'Saved to your Wedding Planner!');
-            }}
-            activeOpacity={0.8}
-          >
-            <Bookmark
-              className={`w-4 h-4 ${isBookmarked ? 'text-[#581420] fill-[#581420]' : 'text-[#2A2425]'}`}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* Toast Notification */}
+      <LuxuryToast message={toastMessage} />
 
       <ScrollView
-        style={{ flex: 1 }}
+        style={{ flex: 1, overflowY: 'auto' } as any}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 90 }}
       >
-        {/* HERO IMAGE CONTAINER */}
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: studio.image }} style={styles.heroImage} resizeMode="cover" />
-          <View style={styles.heroOverlay} />
+        {/* HERO SECTION WITH LUXURY 5-PHOTO MOSAIC (DESKTOP) & MOBILE COVER */}
+        <div className="relative w-full bg-[#FAF7F2] border-b border-[#E8DEC2]/40">
+          {/* Top Overlaid Action Bar - Pinned to screen top-left & top-right */}
+          <div className="absolute top-4 left-4 right-4 z-50 flex items-center justify-between pointer-events-auto">
+            <TouchableOpacity style={styles.overlayCircleBtnDark} onPress={onBack} activeOpacity={0.8}>
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </TouchableOpacity>
 
-          {/* TIER BADGE */}
-          <View style={styles.tierBadgeContainer}>
-            <Award className="w-3.5 h-3.5 text-[#581420] mr-1" />
-            <Text style={styles.tierBadgeText}>{studio.tier} Decorator</Text>
-          </View>
+            <View style={styles.topOverlayRightGroup}>
+              <TouchableOpacity
+                style={styles.overlayCircleBtnLight}
+                onPress={() => onToggleBookmark(studio.id)}
+                activeOpacity={0.8}
+              >
+                <Heart
+                  className={`w-5 h-5 ${
+                    isBookmarked ? 'text-[#8B1E2F] fill-[#8B1E2F]' : 'text-[#2A2425]'
+                  }`}
+                />
+              </TouchableOpacity>
 
-          {/* RATING & LOCATION OVERLAY */}
-          <View style={styles.heroInfoOverlay}>
-            <View style={styles.ratingBadge}>
-              <Star className="w-3.5 h-3.5 text-white fill-white mr-1" />
-              <Text style={styles.ratingText}>{studio.rating}</Text>
+              <TouchableOpacity style={styles.overlayCircleBtnLight} onPress={handleShare} activeOpacity={0.8}>
+                <Share2 className="w-5 h-5 text-[#2A2425]" />
+              </TouchableOpacity>
             </View>
-            <Text style={styles.reviewsText}>({studio.reviewsCount} verified reviews)</Text>
-            <Text style={styles.dotSeparator}>•</Text>
-            <MapPin className="w-3.5 h-3.5 text-white mr-0.5" />
-            <Text style={styles.locationText}>{studio.location}</Text>
+          </div>
+
+          {/* DESKTOP 5-PHOTO LUXURY MOSAIC GRID */}
+          <div className="hidden md:block w-full max-w-6xl mx-auto pt-16 pb-4 px-4 sm:px-6">
+            <div className="grid grid-cols-4 grid-rows-2 gap-2.5 h-[420px] lg:h-[480px] rounded-2xl overflow-hidden shadow-sm relative">
+              {/* Main Featured Large Photo (Left 50%) */}
+              <div
+                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(0);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[0]}
+                  alt={studio.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 2 (Top Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[1] || photoGallery[0]}
+                  alt={`${studio.name} 2`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 3 (Top Right preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(2);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[2] || photoGallery[0]}
+                  alt={`${studio.name} 3`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 4 (Bottom Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(3);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[3] || photoGallery[0]}
+                  alt={`${studio.name} 4`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 5 (Bottom Right preview with "View All" Button) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(4);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={photoGallery[4] || photoGallery[0]}
+                  alt={`${studio.name} 5`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+
+                {/* Floating "Show all photos" Pill Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryInitialIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                  className="absolute bottom-3 right-3 z-10 bg-white/90 hover:bg-white text-[#2A2425] text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all border border-stone-200"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-[#581420]" />
+                  <span>Show all {photoGallery.length} photos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE HERO VIEW (< md screens) */}
+          <div className="block md:hidden relative w-full overflow-hidden flex flex-col items-center justify-center pt-14 pb-2 px-3">
+            <div
+              className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm cursor-pointer"
+              onClick={() => {
+                setGalleryInitialIndex(0);
+                setIsGalleryOpen(true);
+              }}
+            >
+              <img
+                src={studio.image}
+                alt={studio.name}
+                className="w-full h-full object-cover"
+              />
+              <button className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <Camera className="w-3 h-3 text-white" />
+                <span>1 / {photoGallery.length}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* OVERLAPPING MAIN STUDIO INFO CARD */}
+        <View style={styles.mainContentCard}>
+          {/* Logo Badge + Header Row */}
+          <View style={styles.studioHeaderRow}>
+            <View style={styles.logoBox}>
+              <Flower2 className="w-6 h-6 text-[#E5A93C] mb-0.5" />
+              <Text style={styles.logoInitials}>{getInitials(studio.name)}</Text>
+            </View>
+
+            <View style={styles.headerInfoCol}>
+              <Text style={styles.studioTitle}>{studio.name}</Text>
+
+              {/* TOT CERTIFIED Gold Tag */}
+              <View style={styles.certifiedBadge}>
+                <ShieldCheck className="w-3.5 h-3.5 text-[#B45309] mr-1" />
+                <Text style={styles.certifiedBadgeText}>TOT CERTIFIED</Text>
+              </View>
+
+              <Text style={styles.subtitleText}>
+                {studio.category} • <Text style={styles.tierHighlight}>{studio.tier || 'Signature'}</Text> • {studio.location}
+              </Text>
+
+              {/* Rating Row */}
+              <View style={styles.ratingRow}>
+                <Star className="w-4 h-4 text-[#E5A93C] fill-[#E5A93C] mr-1" />
+                <Text style={styles.ratingBold}>{studio.rating}</Text>
+                <Text style={styles.reviewsCountText}> ({studio.reviewsCount} Reviews)</Text>
+              </View>
+            </View>
           </View>
-        </View>
 
-        {/* TITLE & CATEGORY */}
-        <View style={styles.headerSection}>
-          <Text style={styles.studioName}>{studio.name}</Text>
-          <Text style={styles.categorySubText}>{studio.category}</Text>
-        </View>
+          {/* 4 KEY METRICS STATS BAR */}
+          <View style={styles.metricsBar}>
+            <View style={styles.metricItem}>
+              <Calendar className="w-4 h-4 text-[#8B1E2F] mb-1" />
+              <Text style={styles.metricVal}>{studio.experience || '10+ Years'}</Text>
+              <Text style={styles.metricLbl}>Exp.</Text>
+            </View>
+            <View style={styles.metricDivider} />
 
-        {/* QUICK INFO CARDS ROW — NON-OVERLAPPING PERFECT ALIGNMENT */}
-        <View style={styles.quickInfoRow}>
-          <View style={[styles.quickInfoCard, { flex: 1 }]}>
-            <Text style={styles.quickInfoLabel}>Starting Price</Text>
-            <Text style={styles.quickInfoValue}>{studio.startingPrice}</Text>
+            <View style={styles.metricItem}>
+              <Users className="w-4 h-4 text-[#8B1E2F] mb-1" />
+              <Text style={styles.metricVal}>250+</Text>
+              <Text style={styles.metricLbl}>Decor Events</Text>
+            </View>
+            <View style={styles.metricDivider} />
+
+            <View style={styles.metricItem}>
+              <Palette className="w-4 h-4 text-[#8B1E2F] mb-1" />
+              <Text style={styles.metricVal}>15+ Themes</Text>
+              <Text style={styles.metricLbl}>Styles</Text>
+            </View>
+            <View style={styles.metricDivider} />
+
+            <View style={styles.metricItem}>
+              <Star className="w-4 h-4 text-[#8B1E2F] mb-1" />
+              <Text style={styles.metricVal}>{studio.rating}</Text>
+              <Text style={styles.metricLbl}>Rating</Text>
+            </View>
           </View>
 
-          <View style={styles.quickInfoDivider} />
-
-          <View style={[styles.quickInfoCard, { flex: 1.3 }]}>
-            <Text style={styles.quickInfoLabel}>Specialization</Text>
-            <Text style={styles.quickInfoValueSpecial} numberOfLines={2}>
-              {studio.category}
-            </Text>
-          </View>
-
-          <View style={styles.quickInfoDivider} />
-
-          <View style={[styles.quickInfoCard, { flex: 1 }]}>
-            <Text style={styles.quickInfoLabel}>Experience</Text>
-            <Text style={styles.quickInfoValue}>{studio.experience || '10+ Years'}</Text>
-          </View>
-        </View>
-
-        {/* HIGHLIGHT BADGES */}
-        <View style={styles.highlightsContainer}>
-          <View style={styles.highlightPill}>
-            <ShieldCheck className="w-3.5 h-3.5 text-[#15803D] mr-1.5" />
-            <Text style={styles.highlightPillText}>Verified Decor Partner</Text>
-          </View>
-          <View style={styles.highlightPill}>
-            <Palette className="w-3.5 h-3.5 text-[#581420] mr-1.5" />
-            <Text style={styles.highlightPillText}>Fresh Flowers & Custom Lighting</Text>
-          </View>
-        </View>
-
-        {/* TAB NAVIGATION */}
-        <View style={styles.tabBar}>
-          {(['about', 'gallery', 'packages', 'reviews'] as const).map((tab) => (
+          {/* TAB BAR NAVIGATION */}
+          <View style={styles.tabBar}>
             <TouchableOpacity
-              key={tab}
-              style={[styles.tabItem, activeTab === tab && styles.tabItemActive]}
-              onPress={() => setActiveTab(tab)}
+              style={[styles.tabItem, activeMediaTab === 'photos' && styles.tabItemActive]}
+              onPress={() => setActiveMediaTab('photos')}
               activeOpacity={0.8}
             >
-              <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                {tab === 'about'
-                  ? 'About'
-                  : tab === 'gallery'
-                  ? 'Work Gallery'
-                  : tab === 'packages'
-                  ? 'Packages'
-                  : 'Reviews'}
+              <Text style={[styles.tabText, activeMediaTab === 'photos' && styles.tabTextActive]}>
+                Photos ({photoGallery.length})
               </Text>
             </TouchableOpacity>
-          ))}
-        </View>
 
-        {/* TAB CONTENT */}
-        <View style={styles.tabContentContainer}>
-          {activeTab === 'about' && (
-            <View style={styles.sectionBody}>
-              <Text style={styles.sectionHeading}>About {studio.name}</Text>
-              <Text style={styles.bodyParagraph}>
-                {studio.description ||
-                  `${studio.name} is one of Tamil Nadu's premiere wedding decor design houses, specialising in grand Mandap setups, lavish stage backdrops, fairy-light canopies, and bespoke Haldi & Mehendi themes. From royal traditional floral styling to minimalist modern aesthetics, we transform venues into magical celebrations.`}
+            <TouchableOpacity
+              style={[styles.tabItem, activeMediaTab === 'packages' && styles.tabItemActive]}
+              onPress={() => setActiveMediaTab('packages')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.tabText, activeMediaTab === 'packages' && styles.tabTextActive]}>
+                Packages ({packagesList.length})
               </Text>
+            </TouchableOpacity>
 
-              {/* SPECIALTIES */}
-              <Text style={styles.subHeading}>Key Specialties & Themes</Text>
-              <View style={styles.specialtiesGrid}>
-                {(
-                  studio.themesProvided || [
-                    'Traditional South Indian Jasmine Mandap',
-                    'Royal Pastel Floral Stage Decor',
-                    'Crystal Chandelier & Truss Lighting',
-                    'Haldi & Mehendi Yellow Setup',
-                    'Fairy-Light Outdoor Canopy',
-                    'Destination Beachside Stage',
-                  ]
-                ).map((theme, idx) => (
-                  <View key={idx} style={styles.specialtyItem}>
-                    <CheckCircle2 className="w-4 h-4 text-[#581420] mr-2 flex-shrink-0" />
-                    <Text style={styles.specialtyText}>{theme}</Text>
-                  </View>
-                ))}
-              </View>
+            <TouchableOpacity
+              style={[styles.tabItem, activeMediaTab === 'reviews' && styles.tabItemActive]}
+              onPress={() => setActiveMediaTab('reviews')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.tabText, activeMediaTab === 'reviews' && styles.tabTextActive]}>
+                Reviews ({studio.reviewsCount})
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-              {/* SERVICES OFFERED */}
-              <Text style={styles.subHeading}>Services Included</Text>
-              <View style={styles.servicesContainer}>
-                {[
-                  'Custom 3D Stage Design & Blueprint',
-                  'Fresh Flower Sourcing & Floral Sculptures',
-                  'LED Screen Setup & Ambient Lighting',
-                  'Drapes, Carpets & Aisle Styling',
-                  'Brass Urli & Marigold Floral Accents',
-                  'Table Centerpieces & Dining Decor',
-                ].map((s, idx) => (
-                  <View key={idx} style={styles.serviceChip}>
-                    <Palette className="w-3.5 h-3.5 text-[#C5A880] mr-1.5" />
-                    <Text style={styles.serviceChipText}>{s}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
-
-          {activeTab === 'gallery' && (
-            <View style={styles.sectionBody}>
-              <View style={styles.galleryHeader}>
-                <Text style={styles.sectionHeading}>Work Portfolio</Text>
-                <Text style={styles.gallerySubText}>{galleryImages.length} HD Decor Photos</Text>
-              </View>
-
-              <View style={styles.galleryGrid}>
-                {galleryImages.slice(0, 12).map((imgUrl, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.galleryImageWrapper}
-                    activeOpacity={0.85}
-                    onPress={() => {
-                      setGalleryInitialIndex(index);
+          {/* TAB CONTENT: PHOTOS */}
+          {activeMediaTab === 'photos' && (
+            <View style={styles.galleryGridContainer}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 w-full">
+                {photoGallery.map((imgUrl, idx) => (
+                  <motion.div
+                    key={idx}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="relative aspect-square rounded-xl overflow-hidden bg-stone-100 cursor-pointer shadow-sm group"
+                    onClick={() => {
+                      setGalleryInitialIndex(idx);
                       setIsGalleryOpen(true);
                     }}
                   >
-                    <Image source={{ uri: imgUrl }} style={styles.galleryImage} resizeMode="cover" />
-                    <View style={styles.galleryOverlayHover}>
-                      <Eye className="w-5 h-5 text-white" />
-                    </View>
-                  </TouchableOpacity>
+                    <img
+                      src={imgUrl}
+                      alt={`${studio.name} Decor ${idx + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-white drop-shadow-md" />
+                    </div>
+                  </motion.div>
                 ))}
-              </View>
+              </div>
             </View>
           )}
 
-          {activeTab === 'packages' && (
-            <View style={styles.sectionBody}>
-              <Text style={styles.sectionHeading}>Decor Packages & Estimates</Text>
-              <Text style={styles.bodyParagraph}>
-                Custom decor packages crafted according to venue dimensions, floral preference, and lighting scale.
-              </Text>
-
-              {/* PACKAGE 1 */}
-              <View style={styles.packageCard}>
-                <View style={styles.packageHeaderRow}>
-                  <View>
-                    <Text style={styles.packageTitle}>Stage & Mandap Decor</Text>
-                    <Text style={styles.packageSubTitle}>Complete Wedding Mandap + Backdrop</Text>
-                  </View>
-                  <Text style={styles.packagePrice}>{studio.startingPrice}</Text>
-                </View>
-                <View style={styles.packageDivider} />
-                <View style={styles.packageFeaturesList}>
-                  <Text style={styles.featureItem}>• Royal Floral Mandap with Jasmine/Rose Strands</Text>
-                  <Text style={styles.featureItem}>• Stage Backdrop with Warm Ambient Lighting</Text>
-                  <Text style={styles.featureItem}>• Carpeted Aisle with Floral Pillar Accents</Text>
-                  <Text style={styles.featureItem}>• Bride & Groom Royal Chairs / Sofa Setup</Text>
-                </View>
-              </View>
-
-              {/* PACKAGE 2 */}
-              <View style={styles.packageCard}>
-                <View style={styles.packageHeaderRow}>
-                  <View>
-                    <Text style={styles.packageTitle}>Royal Reception & Canopy</Text>
-                    <Text style={styles.packageSubTitle}>Chandelier Stage + Entrance Canopy</Text>
-                  </View>
-                  <Text style={styles.packagePrice}>₹2,50,000 onwards</Text>
-                </View>
-                <View style={styles.packageDivider} />
-                <View style={styles.packageFeaturesList}>
-                  <Text style={styles.featureItem}>• Crystal Chandelier & Truss Lighting</Text>
-                  <Text style={styles.featureItem}>• Grand Floral Entrance Tunnel & Photobooth</Text>
-                  <Text style={styles.featureItem}>• VIP Table Centerpieces & Linen Drapes</Text>
-                  <Text style={styles.featureItem}>• Cold Pyro & Fog Smoke Effects for Entry</Text>
-                </View>
-              </View>
-
-              {/* PACKAGE 3 */}
-              <View style={styles.packageCard}>
-                <View style={styles.packageHeaderRow}>
-                  <View>
-                    <Text style={styles.packageTitle}>Haldi & Mehendi Yellow Setup</Text>
-                    <Text style={styles.packageSubTitle}>Vibrant Marigold & Brass Decor</Text>
-                  </View>
-                  <Text style={styles.packagePrice}>₹95,000 onwards</Text>
-                </View>
-                <View style={styles.packageDivider} />
-                <View style={styles.packageFeaturesList}>
-                  <Text style={styles.featureItem}>• Marigold Floral Curtain & Yellow Drapes</Text>
-                  <Text style={styles.featureItem}>• Brass Urli Floater Basin with Flowers</Text>
-                  <Text style={styles.featureItem}>• Colorful Cushion Seating & Jhula (Swing) Decor</Text>
-                </View>
-              </View>
-            </View>
-          )}
-
-          {activeTab === 'reviews' && (
-            <View style={styles.sectionBody}>
-              <View style={styles.reviewsSummaryCard}>
-                <Text style={styles.reviewsBigScore}>{studio.rating}</Text>
-                <View style={styles.starsRow}>
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-4 h-4 text-[#D97706] fill-[#D97706] mr-0.5" />
-                  ))}
-                </View>
-                <Text style={styles.reviewsCountText}>Based on {studio.reviewsCount} verified reviews</Text>
-              </View>
-
-              <Text style={styles.subHeading}>Recent Client Reviews</Text>
-              {[
-                {
-                  name: 'Kavitha & Arjun',
-                  date: '3 weeks ago',
-                  review:
-                    'The mandap decor was absolutely breathtaking! The fresh jasmine pillars and warm chandelier lighting created a magical ambience that all our guests praised.',
-                },
-                {
-                  name: 'Praveen R.',
-                  date: '1 month ago',
-                  review:
-                    'Extremely professional team! They executed the exact 3D design we approved for our Chennai reception. The entrance tunnel and photobooth were huge hits.',
-                },
-              ].map((rev, idx) => (
-                <View key={idx} style={styles.reviewCard}>
-                  <View style={styles.reviewHeader}>
-                    <Text style={styles.reviewerName}>{rev.name}</Text>
-                    <Text style={styles.reviewDate}>{rev.date}</Text>
-                  </View>
-                  <View style={styles.starsRow}>
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className="w-3.5 h-3.5 text-[#D97706] fill-[#D97706] mr-0.5" />
+          {/* TAB CONTENT: PACKAGES */}
+          {activeMediaTab === 'packages' && (
+            <View style={styles.packagesContainer}>
+              {packagesList.map((pkg, idx) => (
+                <View key={idx} style={[styles.packageCard, pkg.popular && styles.packageCardPopular]}>
+                  {pkg.popular && (
+                    <View style={styles.popularBadge}>
+                      <Sparkles className="w-3 h-3 text-white mr-1" />
+                      <Text style={styles.popularBadgeText}>MOST POPULAR</Text>
+                    </View>
+                  )}
+                  <Text style={styles.pkgTitle}>{pkg.title}</Text>
+                  <Text style={styles.pkgPrice}>{pkg.price}</Text>
+                  <View style={styles.featuresList}>
+                    {pkg.features.map((feat, fIdx) => (
+                      <View key={fIdx} style={styles.featureRow}>
+                        <Check className="w-4 h-4 text-[#15803D] mr-2 flex-shrink-0" />
+                        <Text style={styles.featureText}>{feat}</Text>
+                      </View>
                     ))}
                   </View>
-                  <Text style={styles.reviewBody}>{rev.review}</Text>
                 </View>
               ))}
             </View>
           )}
+
+          {/* TAB CONTENT: REVIEWS */}
+          {activeMediaTab === 'reviews' && (
+            <View style={styles.reviewsContainer}>
+              <View style={styles.ratingOverviewBox}>
+                <Text style={styles.ratingBigScore}>{studio.rating}</Text>
+                <View style={styles.starsRow}>
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-[#E5A93C] fill-[#E5A93C] mr-0.5" />
+                  ))}
+                </View>
+                <Text style={styles.totalReviewsLabel}>Based on {studio.reviewsCount} verified reviews</Text>
+              </View>
+
+              {[
+                {
+                  name: 'Kavitha & Arjun',
+                  date: '15 Jan 2026',
+                  rating: 5,
+                  comment: 'The mandap decor was absolutely breathtaking! The fresh jasmine pillars and warm chandelier lighting created a magical ambience that all our guests praised.',
+                },
+                {
+                  name: 'Praveen & Divya',
+                  date: '28 Dec 2025',
+                  rating: 5,
+                  comment: 'Extremely professional team! They executed the exact 3D design we approved for our Chennai reception. The entrance tunnel and photobooth were huge hits.',
+                },
+              ].map((rev, idx) => (
+                <View key={idx} style={styles.reviewItemCard}>
+                  <View style={styles.reviewHeaderRow}>
+                    <Text style={styles.reviewerName}>{rev.name}</Text>
+                    <Text style={styles.reviewDate}>{rev.date}</Text>
+                  </View>
+                  <View style={styles.starsRow}>
+                    {[...Array(rev.rating)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 text-[#E5A93C] fill-[#E5A93C] mr-0.5" />
+                    ))}
+                  </View>
+                  <Text style={styles.reviewComment}>{rev.comment}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* ABOUT STUDIO DESCRIPTION */}
+          <View style={styles.aboutSection}>
+            <Text style={styles.aboutHeading}>About {studio.name}</Text>
+            <Text style={styles.aboutText}>
+              {isReadMore
+                ? studio.description ||
+                  `${studio.name} is one of Tamil Nadu's premiere wedding decor design houses, specialising in grand Mandap setups, lavish stage backdrops, fairy-light canopies, and bespoke Haldi & Mehendi themes. From royal traditional floral styling to minimalist modern aesthetics, we transform venues into magical celebrations.`
+                : (studio.description ||
+                    `${studio.name} is one of Tamil Nadu's premiere wedding decor design houses, specialising in grand Mandap setups, lavish stage backdrops, fairy-light canopies, and bespoke Haldi & Mehendi themes.`).slice(0, 160) + '...'}
+            </Text>
+            <TouchableOpacity onPress={() => setIsReadMore(!isReadMore)} activeOpacity={0.7}>
+              <Text style={styles.readMoreBtnText}>{isReadMore ? 'Read Less' : 'Read More'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
 
-      {/* BOTTOM FIXED ACTION BAR */}
+      {/* FIXED BOTTOM ACTION BAR */}
       <View style={styles.bottomBar}>
         <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-3 px-3 sm:px-6">
           <View style={styles.bottomPriceCol}>
@@ -640,7 +762,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
       <DraggablePhotoGalleryModal
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
-        photos={galleryImages}
+        photos={photoGallery}
         initialIndex={galleryInitialIndex}
         title={studio.name}
         category="Wedding Decor"
@@ -658,6 +780,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
         onQuoteSent={handleQuoteRequestSent}
       />
 
+      {/* QUOTATION MODAL */}
       <QuotationScreen
         visible={showQuotationScreen}
         onClose={() => setShowQuotationScreen(false)}
@@ -669,7 +792,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
         vendorLocation={studio.location}
         startingPrice={studio.startingPrice}
         category="Decor"
-        packageName="Exquisite Mandap & Entrance Stage Decor"
+        packageName="Theme Wedding Mandap & Grand Stage Decor"
         includedServices={[
           'Grand Mandap Stage Floral Backdrop',
           'Bespoke Wooden Mandap Structure Setup',
@@ -682,7 +805,7 @@ export const DecorDetailPage: React.FC<DecorDetailPageProps> = ({
           setShowInvoiceModal(true);
         }}
         onBack={onBack}
-        onShowToast={handleShowToast}
+        onShowToast={(msg) => setToastMessage(msg)}
       />
 
       {/* INVOICE & MILESTONES PAYMENT MODAL */}
@@ -731,393 +854,286 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     display: 'flex' as any,
     flexDirection: 'column',
-    position: 'relative',
   },
-  topNav: {
+  toastContainer: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 56,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    top: 20,
+    left: 20,
+    right: 20,
+    zIndex: 9999,
+    backgroundColor: '#2A2425',
+    paddingVertical: 10,
     paddingHorizontal: 16,
-    zIndex: 30,
-    backgroundColor: 'rgba(250, 247, 242, 0.85)',
+    borderRadius: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
   },
-  navIconBtn: {
+  toastText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  overlayCircleBtnDark: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     justifyContent: 'center',
-    borderColor: '#E8DFD5',
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 3,
-  },
-  navIconBtnActive: {
-    borderColor: '#581420',
-    backgroundColor: '#FDF8F5',
-  },
-  topNavRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  scrollContent: {
-    paddingTop: 56,
-    paddingBottom: 90,
-  },
-  heroContainer: {
-    position: 'relative',
-    height: 250,
-    width: '100%',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroOverlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0,0,0,0.42)',
-  },
-  tierBadgeContainer: {
-    position: 'absolute',
-    top: 12,
-    left: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  tierBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#581420',
-  },
-  heroInfoOverlay: {
-    position: 'absolute',
-    bottom: 12,
-    left: 16,
-    right: 16,
-    flexDirection: 'row',
     alignItems: 'center',
   },
-  ratingBadge: {
+  topOverlayRightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#581420',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginRight: 6,
-  },
-  ratingText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 12,
-  },
-  reviewsText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  dotSeparator: {
-    color: '#FFFFFF',
-    marginHorizontal: 6,
-    fontSize: 12,
-  },
-  locationText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  headerSection: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  studioName: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#2A2425',
-    marginBottom: 4,
-  },
-  categorySubText: {
-    fontSize: 13,
-    color: '#7D6E70',
-    fontWeight: '600',
-  },
-
-  /* QUICK INFO ROW — PERFECT NON-OVERLAPPING STYLING */
-  quickInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
-    marginTop: 12,
-    borderRadius: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderColor: '#E8DFD5',
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 4,
-    zIndex: 10,
-  },
-  quickInfoCard: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 2,
-  },
-  quickInfoLabel: {
-    fontSize: 9.5,
-    color: '#8C7A7C',
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    minHeight: 14,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-  quickInfoValue: {
-    fontSize: 12.5,
-    fontWeight: '800',
-    color: '#2A2425',
-    textAlign: 'center',
-    lineHeight: 16,
-  },
-  quickInfoValueSpecial: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: '#2A2425',
-    textAlign: 'center',
-    lineHeight: 15,
-  },
-  quickInfoDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: '#E8DFD5',
-    alignSelf: 'center',
-    marginHorizontal: 2,
-  },
-
-  highlightsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginHorizontal: 16,
-    marginTop: 14,
-  },
-  highlightPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  highlightPillText: {
-    fontSize: 11,
-    color: '#2A2425',
-    fontWeight: '600',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8DFD5',
-    marginHorizontal: 16,
-    marginTop: 20,
-  },
-  tabItem: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  tabItemActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#581420',
-  },
-  tabText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#7D6E70',
-  },
-  tabTextActive: {
-    color: '#581420',
-    fontWeight: '800',
-  },
-  tabContentContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  sectionBody: {
-    gap: 16,
-  },
-  sectionHeading: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#2A2425',
-  },
-  bodyParagraph: {
-    fontSize: 13,
-    color: '#4A3E3F',
-    lineHeight: 20,
-  },
-  subHeading: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#2A2425',
-    marginTop: 8,
-  },
-  specialtiesGrid: {
     gap: 10,
   },
-  specialtyItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  specialtyText: {
-    fontSize: 13,
-    color: '#2A2425',
-    fontWeight: '600',
-  },
-  servicesContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  serviceChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  serviceChipText: {
-    fontSize: 12,
-    color: '#2A2425',
-    fontWeight: '600',
-  },
-  galleryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  gallerySubText: {
-    fontSize: 12,
-    color: '#7D6E70',
-    fontWeight: '600',
-  },
-  galleryGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  galleryImageWrapper: {
-    width: '48%',
-    height: 140,
-    borderRadius: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  galleryImage: {
-    width: '100%',
-    height: '100%',
-  },
-  galleryOverlayHover: {
-    position: 'absolute',
-    inset: 0,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    alignItems: 'center',
+  overlayCircleBtnLight: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  packageCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
+  mainContentCard: {
+    marginTop: 0,
+    backgroundColor: '#FAF7F2',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
-  packageHeaderRow: {
+  studioHeaderRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginBottom: 16,
   },
-  packageTitle: {
-    fontSize: 14,
+  logoBox: {
+    width: 68,
+    height: 68,
+    borderRadius: 14,
+    backgroundColor: '#581420',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+    borderWidth: 1.5,
+    borderColor: '#E5A93C',
+  },
+  logoInitials: {
+    color: '#FDE68A',
+    fontSize: 12,
     fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  headerInfoCol: {
+    flex: 1,
+  },
+  studioTitle: {
+    fontFamily: 'Playfair Display, Georgia, serif',
+    fontSize: 19,
+    fontWeight: '700',
     color: '#2A2425',
+    marginBottom: 4,
   },
-  packageSubTitle: {
-    fontSize: 11,
-    color: '#7D6E70',
-    marginTop: 2,
+  certifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 6,
   },
-  packagePrice: {
-    fontSize: 13,
+  certifiedBadgeText: {
+    color: '#B45309',
+    fontSize: 10,
     fontWeight: '800',
+    letterSpacing: 0.3,
+  },
+  subtitleText: {
+    fontSize: 12,
+    color: '#6B5A5C',
+    marginBottom: 4,
+  },
+  tierHighlight: {
+    fontWeight: '700',
     color: '#581420',
   },
-  packageDivider: {
-    height: 1,
-    backgroundColor: '#F3ECE4',
-    marginVertical: 10,
-  },
-  packageFeaturesList: {
-    gap: 4,
-  },
-  featureItem: {
-    fontSize: 12,
-    color: '#4A3E3F',
-  },
-  reviewsSummaryCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8DFD5',
-  },
-  reviewsBigScore: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: '#2A2425',
-  },
-  starsRow: {
+  ratingRow: {
     flexDirection: 'row',
-    marginVertical: 4,
+    alignItems: 'center',
+  },
+  ratingBold: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#2A2425',
   },
   reviewsCountText: {
     fontSize: 12,
-    color: '#7D6E70',
-    fontWeight: '500',
+    color: '#8C7A7C',
   },
-  reviewCard: {
+  metricsBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#E8DFD5',
-    gap: 4,
+    borderColor: '#F0E8D8',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
   },
-  reviewHeader: {
+  metricItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  metricVal: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#2A2425',
+  },
+  metricLbl: {
+    fontSize: 10,
+    color: '#8C7A7C',
+    marginTop: 2,
+  },
+  metricDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: '#F0E8D8',
+  },
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#F0EAE1',
+    borderRadius: 12,
+    padding: 3,
+    marginBottom: 16,
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 9,
+  },
+  tabItemActive: {
+    backgroundColor: '#581420',
+  },
+  tabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6B5A5C',
+  },
+  tabTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+  },
+  galleryGridContainer: {
+    marginBottom: 24,
+  },
+  packagesContainer: {
+    gap: 12,
+    marginBottom: 24,
+  },
+  packageCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F0E8D8',
+    position: 'relative',
+  },
+  packageCardPopular: {
+    borderColor: '#581420',
+    borderWidth: 1.5,
+  },
+  popularBadge: {
+    position: 'absolute',
+    top: -10,
+    right: 14,
+    backgroundColor: '#581420',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  popularBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  pkgTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#2A2425',
+    marginBottom: 4,
+  },
+  pkgPrice: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#581420',
+    marginBottom: 12,
+  },
+  featuresList: {
+    gap: 6,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  featureText: {
+    fontSize: 12,
+    color: '#4A3E3F',
+    flex: 1,
+  },
+  reviewsContainer: {
+    gap: 12,
+    marginBottom: 24,
+  },
+  ratingOverviewBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F0E8D8',
+    marginBottom: 8,
+  },
+  ratingBigScore: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#2A2425',
+  },
+  totalReviewsLabel: {
+    fontSize: 11,
+    color: '#8C7A7C',
+    marginTop: 4,
+  },
+  reviewItemCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: '#F0E8D8',
+  },
+  reviewHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginBottom: 4,
   },
   reviewerName: {
     fontSize: 13,
@@ -1126,106 +1142,120 @@ const styles = StyleSheet.create({
   },
   reviewDate: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: '#8C7A7C',
   },
-  reviewBody: {
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  reviewComment: {
     fontSize: 12,
     color: '#4A3E3F',
     lineHeight: 18,
   },
-
-  /* BOTTOM FIXED BAR */
+  aboutSection: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#F0E8D8',
+    marginBottom: 24,
+  },
+  aboutHeading: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#2A2425',
+    marginBottom: 8,
+  },
+  aboutText: {
+    fontSize: 12,
+    color: '#6B5A5C',
+    lineHeight: 19,
+    marginBottom: 6,
+  },
+  readMoreBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#581420',
+  },
   bottomBar: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
+    height: 70,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderTopWidth: 1,
     borderTopColor: '#E8DFD5',
-    paddingVertical: 10,
-    zIndex: 40,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 50,
   },
   bottomPriceCol: {
-    flexDirection: 'column',
-    flexShrink: 1,
-    marginRight: 4,
+    justifyContent: 'center',
   },
   bottomPriceLabel: {
-    fontSize: 9.5,
-    color: '#7D6E70',
-    fontWeight: '600',
+    fontSize: 10,
+    color: '#8C7A7C',
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   bottomPriceValue: {
-    fontSize: 13,
+    fontSize: 16,
     fontWeight: '800',
     color: '#581420',
   },
   bottomActionsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    flexShrink: 0,
+    gap: 8,
   },
   circleCallBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3ECE4',
-    alignItems: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F5EFE6',
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E8DEC2',
   },
   circleWhatsAppBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#DCFCE7',
-    alignItems: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#E8F5E9',
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#C8E6C9',
   },
   circleInstagramBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#FCE7F3',
-    alignItems: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FCE4EC',
     justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F8BBD0',
   },
   primaryQuoteBtn: {
-    backgroundColor: '#581420',
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 18,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#581420',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#581420',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   primaryQuoteBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 12,
-  },
-  modalBg: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  modalCloseBtn: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 10,
-    padding: 8,
-  },
-  fullModalImage: {
-    width: '90%',
-    height: '80%',
+    fontWeight: '700',
   },
 });
-
-

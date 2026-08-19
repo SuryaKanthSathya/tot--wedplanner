@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -67,6 +67,13 @@ export const NotificationsModal: React.FC<NotificationsModalProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'invoice' | 'message' | 'quote'>('all');
   const [selectedNotification, setSelectedNotification] = useState<AppNotification | null>(null);
+
+  // Automatically mark all notifications as read once the user opens/views the modal
+  useEffect(() => {
+    if (visible) {
+      markAllNotificationsAsRead();
+    }
+  }, [visible]);
 
   if (!visible) return null;
 

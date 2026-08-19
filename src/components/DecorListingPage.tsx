@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,11 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { DecorDetailPage, DecorStudio } from './DecorDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -90,6 +95,7 @@ export const DECOR_STUDIOS_DATA: DecorStudio[] = [
     reviewsCount: 245,
     startingPrice: '₹2,00,000 onwards',
     priceValue: 200000,
+    tier: 'Signature',
     coreSpecialty: 'Floral & Mandap Decor',
     image: '/src/assets/images/royal_mandap_decor.jpg',
     description: 'Bespoke floral arrangements and thematic styling for your big day.',
@@ -582,7 +588,42 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
-  const [selectedStudio, setSelectedStudio] = useState<DecorStudio | null>(null);
+  
+  const initialRoute = getInitialRoute();
+  const [selectedStudio, setSelectedStudio] = useState<DecorStudio | null>(() => {
+    if (initialRoute.subpage === 'decor' && initialRoute.detailId) {
+      return DECOR_STUDIOS_DATA.find((s) => s.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openStudioDetail = (studio: DecorStudio) => {
+    setSelectedStudio(studio);
+    setAppRoute({ screen: 'dashboard', subpage: 'decor', detailId: studio.id });
+  };
+
+  const closeStudioDetail = () => {
+    setSelectedStudio(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'decor', detailId: null });
+  };
+
+  // Sync hash changes for decor detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'decor') {
+        if (route.detailId) {
+          const match = DECOR_STUDIOS_DATA.find((s) => s.id === route.detailId);
+          if (match) setSelectedStudio(match);
+        } else {
+          setSelectedStudio(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   const savedDecorsList = DECOR_STUDIOS_DATA.filter((d) => Boolean(savedDecorIds[d.id]));
   const [showCompareModal, setShowCompareModal] = useState<boolean>(false);
 
@@ -646,19 +687,19 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
     return (
       <DecorDetailPage
         studio={selectedStudio}
-        onBack={() => setSelectedStudio(null)}
+        onBack={closeStudioDetail}
         isBookmarked={Boolean(savedDecorIds[selectedStudio.id])}
         onToggleBookmark={handleToggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedStudio.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedStudio(null);
+          closeStudioDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -982,12 +1023,9 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
                 whileHover={{ y: -3 }}
                 transition={{ duration: 0.2 }}
                 className="w-full cursor-pointer mb-4"
+                onClick={() => openStudioDetail(studio)}
               >
-                <TouchableOpacity
-                  style={styles.card}
-                  activeOpacity={0.92}
-                  onPress={() => setSelectedStudio(studio)}
-                >
+                <View style={styles.card}>
                   {/* CARD COVER IMAGE */}
                   <View style={styles.cardImageContainer}>
                     <Image source={{ uri: studio.image }} style={styles.cardImage} resizeMode="cover" />
@@ -1003,7 +1041,9 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
                     <TouchableOpacity
                       style={styles.bookmarkBtn}
                       onPress={(e) => {
-                        e.stopPropagation();
+                        if (e && typeof (e as any).stopPropagation === 'function') {
+                          (e as any).stopPropagation();
+                        }
                         handleToggleBookmark(studio.id);
                       }}
                       activeOpacity={0.8}
@@ -1058,10 +1098,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
 
                       <TouchableOpacity
                         style={styles.quoteBtn}
-                        onPress={(e) => {
-                          e.stopPropagation();
-                          setSelectedStudio(studio);
-                        }}
+                        onPress={() => openStudioDetail(studio)}
                         activeOpacity={0.85}
                       >
                         <Eye className="w-3.5 h-3.5 text-[#581420] mr-1" />
@@ -1069,7 +1106,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
                       </TouchableOpacity>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
               </motion.div>
             );
           })}
@@ -1078,8 +1115,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
       </ScrollView>
 
       {/* FILTER MODAL */}
-      <Modal visible={showFilterModal}
-        vendorId={quoteStudio?.id} transparent animationType="slide">
+      <Modal visible={showFilterModal} transparent animationType="slide">
         <View style={styles.filterModalOverlay}>
           <View style={styles.filterModalContent}>
             <View style={styles.filterModalHeader}>
@@ -1250,7 +1286,7 @@ export const DecorListingPage: React.FC<DecorListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = DECOR_STUDIOS_DATA.find((item) => item.id === v.id);
-          if (match) setSelectedStudio(match);
+          if (match) openStudioDetail(match);
         }}
       />
     </View>

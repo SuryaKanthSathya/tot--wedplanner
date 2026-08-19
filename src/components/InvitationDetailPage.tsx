@@ -26,12 +26,16 @@ import {
   Clock,
   Printer,
   Send,
+  Eye,
+  Camera,
+  LayoutGrid,
 } from 'lucide-react';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { QuotationScreen } from './QuotationScreen';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
+import { LuxuryToast } from './LuxuryToast';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -171,32 +175,32 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
     setToastMessage('✓ Quote Confirmed! You can now View Invoice & Pay');
   };
 
-  // Curated 24 luxury invitation cards & stationary photos
+  // Curated 24 luxury invitation cards, suites & stationery photos (100% invitation content only)
   const portfolioImages = [
     invite.image,
     'https://images.unsplash.com/photo-1607344645866-009c320c5ab8?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=85',
     'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
-    'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1516962215378-7fa2e137ae93?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1531685250784-7569952593d2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1595053826286-2e59ef7905d4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1586075010620-2254924c7f07?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1586075010634-1b15df308732?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=85',
   ];
 
   const phoneNum = invite.phone || '+91 91501 97966';
@@ -238,19 +242,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
 
   return (
     <View style={styles.container}>
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2"
-          >
-            <Sparkles className="w-4 h-4 text-[#C28E38]" />
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LuxuryToast message={toastMessage} />
 
       {/* HEADER NAV BAR (transparent, overlapping hero) */}
       <View style={styles.navHeader}>
@@ -281,11 +273,137 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
       >
-        {/* HERO IMAGE */}
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: invite.image }} style={styles.heroImage} resizeMode="cover" />
-          <View style={styles.heroOverlay} />
-        </View>
+        {/* HERO SECTION WITH LUXURY 5-PHOTO MOSAIC (DESKTOP) & MOBILE COVER */}
+        <div className="relative w-full bg-[#FAF7F2] border-b border-[#E8DEC2]/40">
+          {/* DESKTOP 5-PHOTO LUXURY MOSAIC GRID */}
+          <div className="hidden md:block w-full max-w-6xl mx-auto pt-16 pb-4 px-4 sm:px-6">
+            <div className="grid grid-cols-4 grid-rows-2 gap-2.5 h-[420px] lg:h-[480px] rounded-2xl overflow-hidden shadow-sm relative">
+              {/* Main Featured Large Photo (Left 50%) */}
+              <div
+                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(0);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[0]}
+                  alt={invite.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 2 (Top Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[1] || portfolioImages[0]}
+                  alt={`${invite.name} 2`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 3 (Top Right preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(2);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[2] || portfolioImages[0]}
+                  alt={`${invite.name} 3`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 4 (Bottom Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(3);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[3] || portfolioImages[0]}
+                  alt={`${invite.name} 4`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 5 (Bottom Right preview with "View All" Button) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(4);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[4] || portfolioImages[0]}
+                  alt={`${invite.name} 5`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+
+                {/* Floating "Show all photos" Pill Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryInitialIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                  className="absolute bottom-3 right-3 z-10 bg-white/90 hover:bg-white text-[#2A2425] text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all border border-stone-200"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-[#581420]" />
+                  <span>Show all {portfolioImages.length} photos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE HERO VIEW (< md screens) */}
+          <div className="block md:hidden relative w-full overflow-hidden flex flex-col items-center justify-center pt-14 pb-2 px-3">
+            <div
+              className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm cursor-pointer"
+              onClick={() => {
+                setGalleryInitialIndex(0);
+                setIsGalleryOpen(true);
+              }}
+            >
+              <img
+                src={invite.image}
+                alt={invite.name}
+                className="w-full h-full object-cover"
+              />
+              <button className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <Camera className="w-3 h-3 text-white" />
+                <span>1 / {portfolioImages.length}</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* OVERLAPPING MAIN CARD */}
         <View style={styles.mainCard}>
@@ -679,7 +797,7 @@ export const InvitationDetailPage: React.FC<InvitationDetailPageProps> = ({
           setShowInvoiceModal(true);
         }}
         onBack={onBack}
-        onShowToast={handleShowToast}
+        onShowToast={(msg) => setToastMessage(msg)}
       />
 
       {/* INVOICE & MILESTONES PAYMENT MODAL */}
@@ -772,14 +890,14 @@ const styles = StyleSheet.create({
 
   /* MAIN OVERLAPPING CARD */
   mainCard: {
-    marginTop: 220,
+    marginTop: 0,
     backgroundColor: '#FAF7F2',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     width: '100%',
     maxWidth: 800,
     alignSelf: 'center',
-minHeight: 800,
+    minHeight: 800,
     paddingHorizontal: 16,
     paddingTop: 24,
     zIndex: 10,

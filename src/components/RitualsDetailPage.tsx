@@ -35,6 +35,8 @@ import { RitualsVendor, ReligionType } from './RitualsFlow';
 import { QuotationScreen } from './QuotationScreen';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
+import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
+import { LuxuryToast } from './LuxuryToast';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -103,7 +105,8 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
   onNavigateToProfileMyBookings,
   onNavigateToQuotesTab,
 }) => {
-  const [activePhotoModal, setActivePhotoModal] = useState<string | null>(null);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
   const [showQuotationScreen, setShowQuotationScreen] = useState(false);
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
@@ -188,11 +191,31 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
     }, 2500);
   };
 
-  const portfolioImages = vendor.portfolio && vendor.portfolio.length >= 4 ? vendor.portfolio.slice(0, 4) : [
+  const portfolioImages = [
     vendor.image,
-    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=600&q=80',
+    'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1609151162377-794fa68b02f1?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1546804784-896d0dca3805?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1509927083803-4bd519298ac4?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1587271407850-8d438ca9fdf2?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=85',
+    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
   ];
 
   const handleShare = () => {
@@ -222,19 +245,7 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
 
   return (
     <View style={styles.container}>
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 w-max max-w-[90%] text-center"
-          >
-            <Sparkles className="w-4 h-4 text-[#C28E38]" />
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LuxuryToast message={toastMessage} />
 
       <View style={styles.navHeader}>
         <TouchableOpacity style={styles.navBtn} onPress={onBack} activeOpacity={0.7}>
@@ -367,11 +378,14 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
             <View style={styles.section}>
               <Text style={styles.sectionLabel}>Ceremony Portfolio</Text>
               <View style={styles.portfolioGrid}>
-                {portfolioImages.map((img, idx) => (
+                {portfolioImages.slice(0, 12).map((img, idx) => (
                   <TouchableOpacity
                     key={idx}
                     style={styles.portfolioImgWrapper}
-                    onPress={() => setActivePhotoModal(img)}
+                    onPress={() => {
+                      setGalleryInitialIndex(idx);
+                      setIsGalleryOpen(true);
+                    }}
                     activeOpacity={0.85}
                   >
                     <img
@@ -398,7 +412,7 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <div className="w-full max-w-4xl mx-auto flex items-center gap-2">
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between gap-2.5 px-3 sm:px-6">
           <TouchableOpacity style={styles.btnWhatsApp} onPress={handleWhatsApp} activeOpacity={0.85}>
             <MessageCircle className="w-4 h-4 text-[#10B981] mr-1.5" />
             <Text style={styles.btnWhatsAppText}>WhatsApp</Text>
@@ -456,21 +470,23 @@ export const RitualsDetailPage: React.FC<RitualsDetailPageProps> = ({
         </div>
       </View>
 
-      {activePhotoModal && (
-        <Modal transparent animationType="fade" visible={Boolean(activePhotoModal)}>
-          <View style={styles.lightboxBackdrop}>
-            <TouchableOpacity style={styles.lightboxCloseBtn} onPress={() => setActivePhotoModal(null)}>
-              <X className="w-6 h-6 text-white" />
-            </TouchableOpacity>
-            <Image source={{ uri: activePhotoModal }} style={styles.lightboxImage} resizeMode="contain" />
-          </View>
-        </Modal>
-      )}
+      {/* DRAGGABLE PHOTO GALLERY MODAL */}
+      <DraggablePhotoGalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        photos={portfolioImages}
+        initialIndex={galleryInitialIndex}
+        title={vendor.name}
+        category={`${religion} Rituals`}
+      />
 
       <RequestQuoteModal
         visible={showQuoteModal}
+        vendorId={vendor.id}
         vendorName={vendor.name}
         vendorLocation={vendor.location}
+        startingPrice={vendor.startingPrice}
+        category="rituals"
         onQuoteSent={handleQuoteRequestSent}
         onClose={() => setShowQuoteModal(false)}
       />
@@ -617,7 +633,7 @@ const styles = StyleSheet.create({
   serviceItemText: { fontSize: 13, color: '#3D3234', fontWeight: '500', flex: 1, lineHeight: 18 },
   portfolioGrid: { flexDirection: 'row', flexWrap: 'wrap' as any, gap: 8, marginTop: 6 },
   portfolioImgWrapper: { width: '48%', height: 120, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F3ECE3' },
-  portfolioImg: { width: '100%', height: '100%', objectFit: 'cover' as any, objectPosition: 'center 20%' as any },
+  portfolioImg: { width: '100%', height: '100%', objectFit: 'cover' as any, objectPosition: 'center 20%' as any } as any,
   priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F5EEE6', padding: 14, borderRadius: 14, marginBottom: 14 },
   priceLabel: { fontSize: 13, color: '#2A2425', fontWeight: '700' },
   priceSub: { fontSize: 11, color: '#78696A', marginTop: 2 },

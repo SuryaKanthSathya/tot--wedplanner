@@ -23,7 +23,7 @@ export interface WeddingVendorBooking {
   totalAmount: number;
   paidAmount: number;
   remainingAmount: number;
-  status: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid';
+  status: 'initial' | 'requested' | 'response_ready' | 'confirmed' | 'partially_paid' | 'fully_paid' | 'rejected' | 'negotiating';
   invoiceNo: string;
   invoiceDate: string;
   milestones: WeddingMilestone[];

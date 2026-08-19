@@ -181,42 +181,56 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
     }
   };
 
+  if (!visible) return null;
+
   return (
-    <View style={styles.modalFullContainer}>
-      {/* HEADER */}
-      <View style={styles.modalHeaderNav}>
-        <TouchableOpacity
-          onPress={step === 'payment_method' ? () => setStep('invoice') : onClose}
-          style={styles.modalCloseBtn}
-          activeOpacity={0.7}
-        >
-          <ChevronLeft className="w-5 h-5 text-[#2A2425]" />
-        </TouchableOpacity>
-
-        <View style={{ alignItems: 'center', flex: 1, paddingHorizontal: 8 }}>
-          <Text style={styles.modalHeaderTitle}>
-            {step === 'invoice'
-              ? 'Invoice & Milestones'
-              : step === 'payment_method'
-              ? 'Choose Payment Method'
-              : 'Payment Successful'}
-          </Text>
-          <Text style={styles.modalHeaderSubtitle} numberOfLines={1}>
-            {booking.vendorName} • {booking.serviceType}
-          </Text>
-        </View>
-
-        <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn} activeOpacity={0.7}>
-          <X className="w-5 h-5 text-[#2A2425]" />
-        </TouchableOpacity>
-      </View>
-
-      {/* BODY */}
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={styles.modalScrollContent}
-        showsVerticalScrollIndicator={false}
+    <AnimatePresence>
+      <div
+        className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-xs p-3 sm:p-5"
+        onClick={onClose}
       >
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0, y: 15 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.95, opacity: 0, y: 15 }}
+          transition={{ type: 'spring', damping: 26, stiffness: 320 }}
+          className="w-full max-w-xl sm:max-w-2xl bg-[#FAF7F2] rounded-3xl border border-stone-200 shadow-2xl flex flex-col max-h-[92vh] overflow-hidden relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* HEADER */}
+          <View style={styles.modalHeaderNav}>
+            <TouchableOpacity
+              onPress={step === 'payment_method' ? () => setStep('invoice') : onClose}
+              style={styles.modalCloseBtn}
+              activeOpacity={0.7}
+            >
+              <ChevronLeft className="w-5 h-5 text-[#2A2425]" />
+            </TouchableOpacity>
+
+            <View style={{ alignItems: 'center', flex: 1, paddingHorizontal: 8 }}>
+              <Text style={styles.modalHeaderTitle}>
+                {step === 'invoice'
+                  ? 'Invoice & Milestones'
+                  : step === 'payment_method'
+                  ? 'Choose Payment Method'
+                  : 'Payment Successful'}
+              </Text>
+              <Text style={styles.modalHeaderSubtitle} numberOfLines={1}>
+                {booking.vendorName} • {booking.serviceType}
+              </Text>
+            </View>
+
+            <TouchableOpacity onPress={onClose} style={styles.modalCloseBtn} activeOpacity={0.7}>
+              <X className="w-5 h-5 text-[#2A2425]" />
+            </TouchableOpacity>
+          </View>
+
+          {/* BODY */}
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.modalScrollContent}
+            showsVerticalScrollIndicator={false}
+          >
             {/* ================= STEP 1: INVOICE & 3 MILESTONES ================= */}
             {step === 'invoice' && (
               <View style={{ gap: 14 }}>
@@ -560,7 +574,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
             )}
           </ScrollView>
 
-          {/* FIXED BOTTOM ACTION BAR */}
+          {/* BOTTOM ACTION BAR */}
           <View style={styles.fixedBottomBar}>
             {step === 'invoice' && (
               <View style={{ flexDirection: 'row', gap: 10, width: '100%' }}>
@@ -646,22 +660,13 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
               </View>
             )}
           </View>
-        </View>
-      );
-    };
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
 
   const styles = StyleSheet.create({
-    modalFullContainer: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: '#FAF7F2',
-      zIndex: 120,
-      display: 'flex',
-      flexDirection: 'column',
-    },
     modalHeaderNav: {
       height: 58,
       flexDirection: 'row',
@@ -671,6 +676,7 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
       borderBottomWidth: 1,
       borderBottomColor: '#E8E2D9',
       backgroundColor: '#FAF7F2',
+      flexShrink: 0,
     },
     modalCloseBtn: {
       width: 36,
@@ -694,21 +700,18 @@ export const WeddingInvoicePaymentModal: React.FC<WeddingInvoicePaymentModalProp
       textAlign: 'center',
     },
     fixedBottomBar: {
-      position: 'absolute',
-      bottom: 0,
-      left: 0,
-      right: 0,
       backgroundColor: '#FFFFFF',
       paddingHorizontal: 16,
       paddingVertical: 12,
       borderTopWidth: 1,
       borderTopColor: '#E8E2D9',
       boxShadow: '0 -4px 12px rgba(0,0,0,0.06)',
-      zIndex: 20,
+      flexShrink: 0,
     },
     modalScrollContent: {
       padding: 16,
-      paddingBottom: 110,
+      paddingBottom: 20,
+      width: '100%',
     },
   invoiceHeroCard: {
     backgroundColor: '#FFFFFF',

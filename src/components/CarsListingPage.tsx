@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { CarsDetailPage } from './CarsDetailPage';
 import { CarItem, CARS_DATA } from '../constants/CarsData';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -113,10 +118,42 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
   const [selectedBudget, setSelectedBudget] = useState('All');
   const [selectedRating, setSelectedRating] = useState('All');
   const [selectedTier, setSelectedTier] = useState('All');
-
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedCar, setSelectedCar] = useState<CarItem | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedCar, setSelectedCar] = useState<CarItem | null>(() => {
+    if (initialRoute.subpage === 'cars' && initialRoute.detailId) {
+      return CARS_DATA.find((c) => c.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openCarDetail = (car: CarItem) => {
+    setSelectedCar(car);
+    setAppRoute({ screen: 'dashboard', subpage: 'cars', detailId: car.id });
+  };
+
+  const closeCarDetail = () => {
+    setSelectedCar(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'cars', detailId: null });
+  };
+
+  // Sync hash changes for car detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'cars') {
+        if (route.detailId) {
+          const match = CARS_DATA.find((c) => c.id === route.detailId);
+          if (match) setSelectedCar(match);
+        } else {
+          setSelectedCar(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
   
   // Send Quote Modal State
   const [quoteCar, setQuoteCar] = useState<CarItem | null>(null);
@@ -224,19 +261,19 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
     return (
       <CarsDetailPage
         car={selectedCar}
-        onBack={() => setSelectedCar(null)}
+        onBack={closeCarDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedCar.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedCar(null);
+          closeCarDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedCar.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedCar(null);
+          closeCarDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -396,7 +433,8 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
                 key={car.id}
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full mb-3.5"
+                className="w-full mb-3.5 cursor-pointer"
+                onClick={() => openCarDetail(car)}
               >
                 <View style={styles.carCard}>
                   {/* Left Photo */}
@@ -468,7 +506,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
                       <Text style={styles.priceText}>{car.startingPrice}</Text>
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedCar(car)}
+                        onPress={() => openCarDetail(car)}
                         activeOpacity={0.8}
                       >
                         <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -734,7 +772,7 @@ export const CarsListingPage: React.FC<CarsListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = CARS_DATA.find((item) => item.id === v.id);
-          if (match) setSelectedCar(match);
+          if (match) openCarDetail(match);
         }}
       />
     </View>

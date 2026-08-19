@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, StyleSheet, Linking } from 'react-native-web';
 import { ArrowLeft, Share2, Bookmark, Star, Users, Building2, MessageCircle, Phone } from 'lucide-react';
 import { VenueDetailPage, VenueItem } from './VenueDetailPage';
+import { getInitialRoute, setAppRoute } from '../utils/routeManager';
 
 // --- DATA ---
 const COLLECTIONS_DATA = [
@@ -435,14 +436,83 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
           "/src/assets/images/modern_canopy_decor.jpg"
         ];
         newVenue.category = "4 Star & Above Resorts, Lawns";
-      } else if (title.includes('kerala')) {
-        newVenue.name = `Backwater Lake Resort ${index + 1}`;
-        newVenue.location = `Kumarakom, Kerala`;
-        newVenue.images = [
-          "/src/assets/images/beach_resort_decor.jpg",
-          "/src/assets/images/jasmine_ceiling_decor.jpg"
+      } else if (title.includes('island')) {
+        const islandVenues = [
+          {
+            name: "Havelock Coral Lagoon Resort & Spa",
+            location: "Havelock Island, Andamans",
+            images: [
+              "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "Private Island Resort, Beachfront Lawn",
+            priceText: "₹ 5,500",
+            capacity: "50 - 400 pax"
+          },
+          {
+            name: "Neil Island Turquoise Bay Retreat",
+            location: "Neil Island, Andamans",
+            images: [
+              "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "Oceanfront Island Villa & Private Beach",
+            priceText: "₹ 6,200",
+            capacity: "30 - 350 pax"
+          },
+          {
+            name: "Bangaram Coral Isle Luxury Sanctuary",
+            location: "Bangaram Island, Lakshadweep",
+            images: [
+              "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "Lagoon Overwater Deck, Coral Beach",
+            priceText: "₹ 7,500",
+            capacity: "40 - 250 pax"
+          },
+          {
+            name: "Agatti Island Luxury Palms Resort",
+            location: "Agatti Island, Lakshadweep",
+            images: [
+              "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "5 Star Island Resort, Sunset Pavilion",
+            priceText: "₹ 6,800",
+            capacity: "60 - 500 pax"
+          },
+          {
+            name: "Port Blair Palm Grove Ocean Estate",
+            location: "Port Blair Island, Andamans",
+            images: [
+              "https://images.unsplash.com/photo-1512100356356-de1b84283e18?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "Cliffside Oceanview Lawns, Heritage Banquet",
+            priceText: "₹ 4,800",
+            capacity: "100 - 800 pax"
+          },
+          {
+            name: "Kadmat Island White Sands Sanctuary",
+            location: "Kadmat Island, Lakshadweep",
+            images: [
+              "https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&w=800&q=80",
+              "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=800&q=80"
+            ],
+            category: "Exclusive Island Buyout, Sandbank Mandap",
+            priceText: "₹ 8,200",
+            capacity: "30 - 200 pax"
+          }
         ];
-        newVenue.category = "Backwater Resorts, Lawns";
+        const islandVenue = islandVenues[index % islandVenues.length];
+        newVenue.name = `${islandVenue.name} ${index >= islandVenues.length ? index + 1 : ''}`.trim();
+        newVenue.location = islandVenue.location;
+        newVenue.images = islandVenue.images;
+        newVenue.category = islandVenue.category;
+        newVenue.priceText = islandVenue.priceText;
+        newVenue.capacity = islandVenue.capacity;
+        newVenue.isPremium = true;
       } else if (title.includes('budget')) {
         newVenue.priceText = "₹ 800";
         newVenue.isPremium = false;
@@ -453,7 +523,23 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
   };
 
   const displayData = getDisplayData();
-  const [selectedVenue, setSelectedVenue] = useState<any | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedVenue, setSelectedVenue] = useState<any | null>(() => {
+    if (initialRoute.subpage === 'collection' && initialRoute.detailId) {
+      return displayData.find((v) => v.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const handleSelectVenue = (venue: any) => {
+    setSelectedVenue(venue);
+    setAppRoute({ screen: 'dashboard', subpage: 'collection', detailId: venue.id });
+  };
+
+  const handleCloseVenue = () => {
+    setSelectedVenue(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'collection', detailId: null });
+  };
 
   if (selectedVenue) {
     const mappedVenue: VenueItem = {
@@ -482,7 +568,7 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
       <View style={styles.container}>
         <VenueDetailPage
           venue={mappedVenue}
-          onBack={() => setSelectedVenue(null)}
+          onBack={handleCloseVenue}
           isBookmarked={savedVenues[selectedVenue.id] || false}
           onToggleBookmark={handleToggleSave}
           bookingSource="individual"
@@ -532,7 +618,7 @@ export const CollectionsPage = ({ onBack, collectionData }) => {
               venue={venue} 
               isSaved={savedVenues[venue.id]} 
               onToggleSave={handleToggleSave}
-              onPressCard={() => setSelectedVenue(venue)}
+              onPressCard={() => handleSelectVenue(venue)}
             />
           ))}
         </div>

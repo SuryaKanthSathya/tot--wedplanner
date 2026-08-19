@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArtistDetailPage } from './ArtistDetailPage';
 import { RequestQuoteModal } from './RequestQuoteModal';
 import { VendorCompareModal } from './VendorCompareModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -359,7 +364,40 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
 
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedArtist, setSelectedArtist] = useState<MehendiArtist | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedArtist, setSelectedArtist] = useState<MehendiArtist | null>(() => {
+    if (initialRoute.subpage === 'mehendi' && initialRoute.detailId) {
+      return MEHENDI_DATA.find((a) => a.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openArtistDetail = (artist: MehendiArtist) => {
+    setSelectedArtist(artist);
+    setAppRoute({ screen: 'dashboard', subpage: 'mehendi', detailId: artist.id });
+  };
+
+  const closeArtistDetail = () => {
+    setSelectedArtist(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'mehendi', detailId: null });
+  };
+
+  // Sync hash changes for mehendi detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'mehendi') {
+        if (route.detailId) {
+          const match = MEHENDI_DATA.find((a) => a.id === route.detailId);
+          if (match) setSelectedArtist(match);
+        } else {
+          setSelectedArtist(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
   
   // Send Quote Modal State
   const [quoteArtist, setQuoteArtist] = useState<MehendiArtist | null>(null);
@@ -468,19 +506,19 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
     return (
       <ArtistDetailPage
         artist={selectedArtist}
-        onBack={() => setSelectedArtist(null)}
+        onBack={closeArtistDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedArtist.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedArtist(null);
+          closeArtistDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedArtist.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedArtist(null);
+          closeArtistDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -641,7 +679,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full mb-3.5 cursor-pointer"
-                onClick={() => setSelectedArtist(artist)}
+                onClick={() => openArtistDetail(artist)}
               >
                 <View style={styles.artistCard}>
                   {/* Left Photo */}
@@ -713,7 +751,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
                       <Text style={styles.priceText}>{artist.startingPrice}</Text>
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedArtist(artist)}
+                        onPress={() => openArtistDetail(artist)}
                         activeOpacity={0.8}
                       >
                         <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -978,7 +1016,7 @@ export const MehendiListingPage: React.FC<MehendiListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = MEHENDI_DATA.find((a) => a.id === v.id);
-          if (match) setSelectedArtist(match);
+          if (match) openArtistDetail(match);
         }}
       />
     </View>

@@ -29,6 +29,9 @@ import {
   Globe,
   Clock,
   Send,
+  Eye,
+  Camera,
+  LayoutGrid,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MakeupStudio } from './MakeupListingPage';
@@ -36,6 +39,7 @@ import { RequestQuoteModal } from './RequestQuoteModal';
 import { QuotationScreen } from './QuotationScreen';
 import { WeddingInvoicePaymentModal } from './WeddingInvoicePaymentModal';
 import { DraggablePhotoGalleryModal } from './DraggablePhotoGalleryModal';
+import { LuxuryToast } from './LuxuryToast';
 import { saveOrUpdateQuote } from '../utils/quotesManager';
 import {
   getWeddingBookingByVendorId,
@@ -343,19 +347,7 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
 
   return (
     <View style={styles.container}>
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#2A2425] text-white px-4 py-2.5 rounded-full text-xs font-semibold shadow-xl flex items-center gap-2 w-max max-w-[90%] text-center"
-          >
-            <Sparkles className="w-4 h-4 text-[#C28E38]" />
-            {toastMessage}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <LuxuryToast message={toastMessage} />
 
       {/* HEADER NAV BAR (Transparent overlapping top) */}
       <View style={styles.navHeader}>
@@ -378,11 +370,137 @@ export const MakeupDetailPage: React.FC<MakeupDetailPageProps> = ({
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
-        {/* HERO IMAGE */}
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: studio.image }} style={styles.heroImage} />
-          <View style={styles.heroOverlay} />
-        </View>
+        {/* HERO SECTION WITH LUXURY 5-PHOTO MOSAIC (DESKTOP) & MOBILE COVER */}
+        <div className="relative w-full bg-[#FAF7F2] border-b border-[#E8DEC2]/40">
+          {/* DESKTOP 5-PHOTO LUXURY MOSAIC GRID */}
+          <div className="hidden md:block w-full max-w-6xl mx-auto pt-16 pb-4 px-4 sm:px-6">
+            <div className="grid grid-cols-4 grid-rows-2 gap-2.5 h-[420px] lg:h-[480px] rounded-2xl overflow-hidden shadow-sm relative">
+              {/* Main Featured Large Photo (Left 50%) */}
+              <div
+                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(0);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[0]}
+                  alt={studio.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 2 (Top Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(1);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[1] || portfolioImages[0]}
+                  alt={`${studio.name} 2`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 3 (Top Right preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(2);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[2] || portfolioImages[0]}
+                  alt={`${studio.name} 3`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 4 (Bottom Left preview) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(3);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[3] || portfolioImages[0]}
+                  alt={`${studio.name} 4`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-7 h-7 text-white drop-shadow-lg" />
+                </div>
+              </div>
+
+              {/* Photo 5 (Bottom Right preview with "View All" Button) */}
+              <div
+                className="col-span-1 row-span-1 relative overflow-hidden cursor-pointer group bg-stone-100"
+                onClick={() => {
+                  setGalleryInitialIndex(4);
+                  setIsGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={portfolioImages[4] || portfolioImages[0]}
+                  alt={`${studio.name} 5`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Eye className="w-6 h-6 text-white drop-shadow-lg" />
+                </div>
+
+                {/* Floating "Show all photos" Pill Button */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setGalleryInitialIndex(0);
+                    setIsGalleryOpen(true);
+                  }}
+                  className="absolute bottom-3 right-3 z-10 bg-white/90 hover:bg-white text-[#2A2425] text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5 transition-all border border-stone-200"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5 text-[#581420]" />
+                  <span>Show all {portfolioImages.length} photos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE HERO VIEW (< md screens) */}
+          <div className="block md:hidden relative w-full overflow-hidden flex flex-col items-center justify-center pt-14 pb-2 px-3">
+            <div
+              className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm cursor-pointer"
+              onClick={() => {
+                setGalleryInitialIndex(0);
+                setIsGalleryOpen(true);
+              }}
+            >
+              <img
+                src={studio.image}
+                alt={studio.name}
+                className="w-full h-full object-cover"
+              />
+              <button className="absolute bottom-3 right-3 bg-black/60 text-white text-[11px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <Camera className="w-3 h-3 text-white" />
+                <span>1 / {portfolioImages.length}</span>
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* OVERLAPPING MAIN CARD */}
         <View style={styles.mainCard}>
@@ -763,14 +881,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.2)',
   },
   mainCard: {
-    marginTop: 220,
+    marginTop: 0,
     backgroundColor: '#FAF7F2',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     width: '100%',
     maxWidth: 800,
     alignSelf: 'center',
-minHeight: 800,
+    minHeight: 800,
     paddingHorizontal: 16,
     paddingTop: 24,
     zIndex: 10,

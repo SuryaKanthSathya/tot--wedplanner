@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,11 @@ import {
   StyleSheet,
   TextInput,
 } from 'react-native-web';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ArrowLeft,
   Star,
@@ -2901,7 +2906,42 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
   const [selectedTier, setSelectedTier] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All Types');
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | 'type' | null>(null);
-  const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(null);
+  
+  const initialRoute = getInitialRoute();
+  const [selectedVenue, setSelectedVenue] = useState<VenueItem | null>(() => {
+    if (initialRoute.subpage === 'venues' && initialRoute.detailId) {
+      return VENUES_DATA.find((v) => v.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openVenueDetail = (venue: VenueItem) => {
+    setSelectedVenue(venue);
+    setAppRoute({ screen: 'dashboard', subpage: 'venues', detailId: venue.id });
+  };
+
+  const closeVenueDetail = () => {
+    setSelectedVenue(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'venues', detailId: null });
+  };
+
+  // Sync hash changes for venue detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'venues') {
+        if (route.detailId) {
+          const match = VENUES_DATA.find((v) => v.id === route.detailId);
+          if (match) setSelectedVenue(match);
+        } else {
+          setSelectedVenue(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [visibleCount, setVisibleCount] = useState<number>(16);
   const [showCompareModal, setShowCompareModal] = useState(false);
@@ -2960,19 +3000,19 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
     return (
       <VenueDetailPage
         venue={selectedVenue}
-        onBack={() => setSelectedVenue(null)}
+        onBack={closeVenueDetail}
         isBookmarked={Boolean(savedVenueIds[selectedVenue.id])}
         onToggleBookmark={onToggleSavedVenue}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedVenue(null);
+          closeVenueDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedVenue.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedVenue(null);
+          closeVenueDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -3106,7 +3146,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
                 key={venue.id}
                 venue={venue}
                 isSaved={isSaved}
-                onSelectVenue={setSelectedVenue}
+                onSelectVenue={openVenueDetail}
                 onToggleSavedVenue={onToggleSavedVenue}
               />
             );
@@ -3361,7 +3401,7 @@ export const VenueListingPage: React.FC<VenueListingPageProps> = ({
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = VENUES_DATA.find((item) => item.id === v.id);
-          if (match) setSelectedVenue(match);
+          if (match) openVenueDetail(match);
         }}
       />
     </View>

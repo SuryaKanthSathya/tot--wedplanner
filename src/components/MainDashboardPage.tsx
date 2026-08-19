@@ -20,6 +20,11 @@ import {
   getNotifications,
 } from '../utils/notificationsManager';
 import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
+import {
   View,
   Text,
   TouchableOpacity,
@@ -127,12 +132,22 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     weddingProfile && (weddingProfile.brideName || weddingProfile.marriageType)
   );
 
-  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'quotes' | 'profile'>(
-    initialTab === 'my-wedding' && !isPlannerCreated ? 'home' : initialTab
-  );
+  const initialRoute = getInitialRoute();
+  const [activeTab, setActiveTab] = useState<'home' | 'my-wedding' | 'quotes' | 'profile'>(() => {
+    if (initialRoute.tab) {
+      return initialRoute.tab;
+    }
+    return initialTab;
+  });
   const [hideTabBar, setHideTabBar] = useState<boolean>(false);
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
-  const [profileActiveTab, setProfileActiveTab] = useState<'profile' | 'mybooking'>('profile');
+  const [profileActiveTab, setProfileActiveTab] = useState<'profile' | 'mybooking'>(() => {
+    try {
+      const saved = localStorage.getItem('tot_profile_active_tab');
+      if (saved === 'mybooking' || saved === 'profile') return saved;
+    } catch (e) {}
+    return 'profile';
+  });
   const [profileSelectedBookingVendor, setProfileSelectedBookingVendor] = useState<{
     vendorId: string;
     vendorName: string;
@@ -147,23 +162,84 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
     return getAllWeddingBookings();
   });
   const [showExploreModal, setShowExploreModal] = useState<boolean>(false);
-  const [showPhotographyListing, setShowPhotographyListing] = useState<boolean>(false);
-  const [showMakeupListing, setShowMakeupListing] = useState<boolean>(false);
-  const [showDecorListing, setShowDecorListing] = useState<boolean>(false);
-  const [showVenueListing, setShowVenueListing] = useState<boolean>(false);
-  const [selectedCollection, setSelectedCollection] = useState<{ title: string; description: string; image: string; } | undefined>(undefined);
-  const [showEntertainmentListing, setShowEntertainmentListing] = useState(false);
-  const [showCarsListing, setShowCarsListing] = useState(false);
-  const [showInvitationListing, setShowInvitationListing] = useState<boolean>(false);
-  const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(false);
-  const [showCateringListing, setShowCateringListing] = useState<boolean>(false);
-  const [showMehendiListing, setShowMehendiListing] = useState<boolean>(false);
-  const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(false);
-  const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(false);
+  const [showPhotographyListing, setShowPhotographyListing] = useState<boolean>(initialRoute.subpage === 'photography');
+  const [showMakeupListing, setShowMakeupListing] = useState<boolean>(initialRoute.subpage === 'makeup');
+  const [showDecorListing, setShowDecorListing] = useState<boolean>(initialRoute.subpage === 'decor');
+  const [selectedCollection, setSelectedCollection] = useState<{ title: string; description: string; image: string; } | undefined>(() => {
+    if (initialRoute.subpage === 'collection' || initialRoute.subpage === 'venues') {
+      try {
+        const saved = localStorage.getItem('tot_active_collection');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return undefined;
+  });
+  const [showVenueListing, setShowVenueListing] = useState<boolean>(
+    initialRoute.subpage === 'venues' || initialRoute.subpage === 'collection'
+  );
+  const [showEntertainmentListing, setShowEntertainmentListing] = useState<boolean>(initialRoute.subpage === 'entertainment');
+  const [showCarsListing, setShowCarsListing] = useState<boolean>(initialRoute.subpage === 'cars');
+  const [showInvitationListing, setShowInvitationListing] = useState<boolean>(initialRoute.subpage === 'invitation');
+  const [showDestinationWeddingFlow, setShowDestinationWeddingFlow] = useState<boolean>(initialRoute.subpage === 'destinations');
+  const [showCateringListing, setShowCateringListing] = useState<boolean>(initialRoute.subpage === 'catering');
+  const [showMehendiListing, setShowMehendiListing] = useState<boolean>(initialRoute.subpage === 'mehendi');
+  const [showRitualsFlow, setShowRitualsFlow] = useState<boolean>(initialRoute.subpage === 'rituals');
+  const [showFindVendorsPage, setShowFindVendorsPage] = useState<boolean>(initialRoute.subpage === 'find-vendors');
   const [openedFromFindVendors, setOpenedFromFindVendors] = useState<boolean>(false);
   const [selectedFeatureName, setSelectedFeatureName] = useState<string>('');
   const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
   const [notifications, setNotifications] = useState<AppNotification[]>(() => getNotifications());
+
+  const handleTabChange = (tab: 'home' | 'my-wedding' | 'quotes' | 'profile') => {
+    setActiveTab(tab);
+    setAppRoute({ screen: 'dashboard', tab, subpage: null, detailId: null });
+  };
+
+  const handleProfileTabChange = (tab: 'profile' | 'mybooking') => {
+    setProfileActiveTab(tab);
+    try {
+      localStorage.setItem('tot_profile_active_tab', tab);
+    } catch (e) {}
+  };
+
+  // Listen for browser Back/Forward or direct URL hash updates
+  useEffect(() => {
+    const handleHashSync = () => {
+      const route = parseHashRoute();
+      if (!route) return;
+
+      if (route.tab && route.tab !== activeTab) {
+        setActiveTab(route.tab);
+      }
+
+      setShowPhotographyListing(route.subpage === 'photography');
+      setShowMakeupListing(route.subpage === 'makeup');
+      setShowDecorListing(route.subpage === 'decor');
+      if (route.subpage === 'collection') {
+        try {
+          const saved = localStorage.getItem('tot_active_collection');
+          if (saved) setSelectedCollection(JSON.parse(saved));
+        } catch (e) {}
+        setShowVenueListing(true);
+      } else {
+        setShowVenueListing(route.subpage === 'venues');
+        if (route.subpage !== 'venues') {
+          setSelectedCollection(undefined);
+        }
+      }
+      setShowEntertainmentListing(route.subpage === 'entertainment');
+      setShowCarsListing(route.subpage === 'cars');
+      setShowInvitationListing(route.subpage === 'invitation');
+      setShowCateringListing(route.subpage === 'catering');
+      setShowMehendiListing(route.subpage === 'mehendi');
+      setShowRitualsFlow(route.subpage === 'rituals');
+      setShowDestinationWeddingFlow(route.subpage === 'destinations');
+      setShowFindVendorsPage(route.subpage === 'find-vendors');
+    };
+
+    window.addEventListener('hashchange', handleHashSync);
+    return () => window.removeEventListener('hashchange', handleHashSync);
+  }, [activeTab]);
 
   useEffect(() => {
     const handleNotifUpdate = () => {
@@ -403,12 +479,10 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   };
 
   useEffect(() => {
-    if (initialTab === 'my-wedding' && !isPlannerCreated) {
-      setActiveTab('home');
-    } else if (initialTab) {
+    if (initialTab) {
       setActiveTab(initialTab);
     }
-  }, [initialTab, isPlannerCreated]);
+  }, [initialTab]);
 
   useEffect(() => {
     const handleSwitchTab = (e: Event) => {
@@ -477,8 +551,8 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       setShowCateringListing(false);
       setShowRitualsFlow(false);
       setShowDestinationWeddingFlow(false);
-      setActiveTab('profile');
-      setProfileActiveTab('mybooking');
+      handleTabChange('profile');
+      handleProfileTabChange('mybooking');
       const ind = getIndividualBookings();
       setProfileBookings(ind.length > 0 ? ind : getAllWeddingBookings());
     };
@@ -499,39 +573,48 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   }, []);
 
   const handleOptionPress = (featureName: string) => {
-    if (featureName === 'Photography') {
+    const fn = (featureName || '').trim().toLowerCase();
+    if (fn.includes('photo')) {
       setShowPhotographyListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'photography' });
       return;
     }
-    if (featureName === 'Makeup' || featureName === 'Bridal & Groom Makeup') {
+    if (fn.includes('makeup')) {
       setShowMakeupListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'makeup' });
       return;
     }
-    if (featureName === 'Decor' || featureName === 'Stage & Mandap Decor') {
+    if (fn.includes('decor')) {
       setShowDecorListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'decor' });
       return;
     }
-    if (featureName === 'Venue' || featureName === 'Mandapams & Venues') {
+    if (fn.includes('venue') || fn.includes('mandapam')) {
       setShowVenueListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'venues' });
       return;
     }
-    if (featureName === 'Entertainment' || featureName === 'DJs & Music') {
+    if (fn.includes('entertainment') || fn.includes('dj') || fn.includes('music')) {
       setShowEntertainmentListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'entertainment' });
       return;
     }
-    if (featureName === 'Invitations' || featureName === 'Wedding Cards & Invites') {
+    if (fn.includes('invitation') || fn.includes('invite') || fn.includes('card')) {
       setShowInvitationListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'invitation' });
       return;
     }
-    if (featureName === 'Cars') {
+    if (fn.includes('car')) {
       setShowCarsListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'cars' });
       return;
     }
-    if (featureName === 'Destination Wedding') {
+    if (fn.includes('destination')) {
       setShowDestinationWeddingFlow(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'destinations' });
       return;
     }
-    if (featureName === 'Plan My Entire Wedding') {
+    if (fn.includes('entire wedding')) {
       if (onNavigateToCoupleOnboarding) {
         onNavigateToCoupleOnboarding();
       } else {
@@ -540,21 +623,25 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
       }
       return;
     }
-    if (featureName === 'Mehendi') {
+    if (fn.includes('mehendi') || fn.includes('mehandi') || fn.includes('henna')) {
       setShowMehendiListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'mehendi' });
       return;
     }
-    if (featureName === 'Catering') {
+    if (fn.includes('catering') || fn.includes('food')) {
       setShowCateringListing(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'catering' });
       return;
     }
-    if (featureName === 'Rituals') {
+    if (fn.includes('ritual') || fn.includes('priest')) {
       setShowRitualsFlow(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'rituals' });
       return;
     }
-    if (featureName === 'Find Individual Vendors') {
+    if (fn.includes('find individual') || fn.includes('find vendor')) {
       setShowFindVendorsPage(true);
       setOpenedFromFindVendors(true);
+      setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
       return;
     }
 
@@ -581,6 +668,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowPhotographyListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedStudioIds={savedStudioIds}
@@ -590,6 +680,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -603,6 +694,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowMakeupListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedMakeupIds={savedMakeupIds}
@@ -612,6 +706,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -625,6 +720,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowDecorListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedDecorIds={savedDecorIds}
@@ -634,6 +732,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -643,10 +742,19 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
   if (showVenueListing) {
     if (selectedCollection) {
       // If a collection is selected, render the specific Collections Page layout
-      return <CollectionsPage collectionData={selectedCollection} onBack={() => {
-        setShowVenueListing(false);
-        setSelectedCollection(undefined);
-      }} />;
+      return (
+        <CollectionsPage
+          collectionData={selectedCollection}
+          onBack={() => {
+            setShowVenueListing(false);
+            setSelectedCollection(undefined);
+            try {
+              localStorage.removeItem('tot_active_collection');
+            } catch (e) {}
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
+          }}
+        />
+      );
     }
 
     // Otherwise render standard Venue Listing Page
@@ -656,6 +764,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowVenueListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedVenueIds={savedVenueIds}
@@ -665,6 +776,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -678,6 +790,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowEntertainmentListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedEntIds={savedEntIds}
@@ -687,6 +802,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -700,6 +816,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowCarsListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedCarIds={savedCarIds}
@@ -709,6 +828,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -722,6 +842,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowInvitationListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedInviteIds={savedInviteIds}
@@ -731,6 +854,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -744,15 +868,20 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowDestinationWeddingFlow(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         onExploreVenues={() => {
           setShowDestinationWeddingFlow(false);
           setShowVenueListing(true);
+          setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'venues' });
         }}
         onComplete={() => {
           setShowDestinationWeddingFlow(false);
           setActiveTab('home');
+          setAppRoute({ screen: 'dashboard', tab: 'home', subpage: null });
         }}
       />
     );
@@ -765,6 +894,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowMehendiListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedMehendiIds={savedMehendiIds}
@@ -774,6 +906,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -787,6 +920,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowCateringListing(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         savedCateringIds={savedCateringIds}
@@ -796,6 +932,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         bookingSource="individual"
       />
@@ -809,6 +946,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowRitualsFlow(false);
           if (openedFromFindVendors) {
             setShowFindVendorsPage(true);
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'find-vendors' });
+          } else {
+            setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
           }
         }}
         onNavigateToQuotesTab={() => {
@@ -816,6 +956,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
           setActiveTab('quotes');
+          setAppRoute({ screen: 'dashboard', tab: 'quotes', subpage: null });
         }}
         savedRitualsIds={savedRitualsIds}
         onToggleSavedRitual={toggleSavedRitual}
@@ -829,6 +970,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         onBack={() => {
           setShowFindVendorsPage(false);
           setOpenedFromFindVendors(false);
+          setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: null });
         }}
         onSelectCategory={(category) => {
           setOpenedFromFindVendors(true);
@@ -843,24 +985,27 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
         <View style={styles.desktopSidebar}>
           <Text style={styles.sidebarLogoText}>Tale of Two</Text>
 
-          <TouchableOpacity style={styles.sidebarItem} onPress={() => setActiveTab('home')}>
+          <TouchableOpacity style={styles.sidebarItem} onPress={() => handleTabChange('home')}>
             <Home className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-500'}`} />
             <Text style={[styles.sidebarItemText, activeTab === 'home' && styles.sidebarItemTextActive]}>Home</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.sidebarItem} onPress={() => {
-            if (!isPlannerCreated) {
-              setSelectedFeatureName('My Wedding');
-              setShowExploreModal(true);
-            } else {
-              setActiveTab('my-wedding');
-            }
-          }}>
+          <TouchableOpacity
+            style={styles.sidebarItem}
+            onPress={() => {
+              if (!isPlannerCreated) {
+                setSelectedFeatureName('My Wedding');
+                setShowExploreModal(true);
+              } else {
+                handleTabChange('my-wedding');
+              }
+            }}
+          >
             <Sparkles className={`w-5 h-5 ${activeTab === 'my-wedding' ? 'text-[#581420]' : 'text-stone-500'}`} />
             <Text style={[styles.sidebarItemText, activeTab === 'my-wedding' && styles.sidebarItemTextActive]}>My Wedding</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.sidebarItem} onPress={() => setActiveTab('profile')}>
+          <TouchableOpacity style={styles.sidebarItem} onPress={() => handleTabChange('profile')}>
             <User className={`w-5 h-5 ${activeTab === 'profile' ? 'text-[#581420]' : 'text-stone-500'}`} />
             <Text style={[styles.sidebarItemText, activeTab === 'profile' && styles.sidebarItemTextActive]}>Profile</Text>
           </TouchableOpacity>
@@ -898,51 +1043,80 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             {/* Full Page Header */}
             <View
               style={{
-                paddingTop: 48,
+                paddingTop: isDesktop ? 24 : 44,
                 paddingBottom: 16,
-                alignItems: 'center',
-                backgroundColor: '#F8F4EE',
+                backgroundColor: '#FAF6EE',
                 borderBottomWidth: 1,
                 borderBottomColor: '#EFE7DC',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                position: 'relative',
+                paddingHorizontal: 20,
               }}
             >
-              <TouchableOpacity
-                onPress={() => setActiveTab('home')}
+              <View
                 style={{
-                  position: 'absolute',
-                  left: 16,
-                  top: 48,
-                  padding: 4,
-                  zIndex: 10,
-                }}
-                activeOpacity={0.7}
-              >
-                <ChevronLeft size={28} color="#581420" />
-              </TouchableOpacity>
-              <Text
-                style={{
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontSize: 20,
-                  fontWeight: '700',
-                  color: '#581420',
+                  maxWidth: 720,
+                  width: '100%',
+                  alignSelf: 'center',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: isDesktop ? 'flex-start' : 'space-between',
                 }}
               >
-                {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
-              </Text>
+                {!isDesktop && (
+                  <TouchableOpacity
+                    onPress={() => setActiveTab('home')}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 18,
+                      backgroundColor: '#EAE4DC',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginRight: 12,
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <ChevronLeft size={22} color="#581420" />
+                  </TouchableOpacity>
+                )}
+
+                <View style={{ flex: 1, alignItems: isDesktop ? 'flex-start' : 'center' }}>
+                  <Text
+                    style={{
+                      fontFamily: "'Cormorant Garamond', Georgia, serif",
+                      fontSize: isDesktop ? 26 : 20,
+                      fontWeight: '700',
+                      color: '#2A2425',
+                    }}
+                  >
+                    {profileActiveTab === 'profile' ? 'User Profile' : 'My Bookings'}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                      fontSize: 12,
+                      color: '#7D7571',
+                      marginTop: 2,
+                    }}
+                  >
+                    {profileActiveTab === 'profile'
+                      ? 'Manage your account information and preferences'
+                      : 'Track confirmed vendor bookings, milestones & payments'}
+                  </Text>
+                </View>
+
+                {!isDesktop && <View style={{ width: 36 }} />}
+              </View>
             </View>
 
             {/* Profile Segment Tab Bar */}
-            <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 6, width: '100%', maxWidth: 640, alignSelf: 'center' }}>
+            <View style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8, width: '100%', maxWidth: 720, alignSelf: 'center' }}>
               <View style={styles.profileTabBar}>
                 <TouchableOpacity
                   style={[
                     styles.profileTabItem,
                     profileActiveTab === 'profile' && styles.profileTabItemActive,
                   ]}
-                  onPress={() => setProfileActiveTab('profile')}
+                  onPress={() => handleProfileTabChange('profile')}
                   activeOpacity={0.8}
                 >
                   <User color={profileActiveTab === 'profile' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
@@ -954,7 +1128,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                     styles.profileTabItem,
                     profileActiveTab === 'mybooking' && styles.profileTabItemActive,
                   ]}
-                  onPress={() => setProfileActiveTab('mybooking')}
+                  onPress={() => handleProfileTabChange('mybooking')}
                   activeOpacity={0.8}
                 >
                   <Briefcase color={profileActiveTab === 'mybooking' ? '#FFFFFF' : '#7D6E70'} className="w-4 h-4 mr-1.5 flex-shrink-0" />
@@ -971,7 +1145,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             {/* Scrollable Content */}
             <ScrollView
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 14, paddingTop: 8, width: '100%', maxWidth: 640, alignSelf: 'center' }}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 14, paddingTop: 8, width: '100%', maxWidth: 720, alignSelf: 'center' }}
             >
               {profileActiveTab === 'profile' && (
                 <>
@@ -1089,20 +1263,22 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
 
                         {/* Amount & Status Summary */}
                         <View style={styles.profileBookingFinanceRow}>
-                          <View>
+                          <View style={styles.profileFinanceCol}>
                             <Text style={styles.profileFinanceLabel}>Total Amount</Text>
                             <Text style={styles.profileFinanceVal}>₹{b.totalAmount.toLocaleString('en-IN')}</Text>
                           </View>
-                          <View>
+                          <View style={{ width: 1, backgroundColor: '#EFE7DC', height: '100%' }} />
+                          <View style={styles.profileFinanceCol}>
                             <Text style={styles.profileFinanceLabel}>Paid Amount</Text>
                             <Text style={[styles.profileFinanceVal, { color: '#15803D' }]}>
                               ₹{b.paidAmount.toLocaleString('en-IN')}
                             </Text>
                           </View>
-                          <View>
+                          <View style={{ width: 1, backgroundColor: '#EFE7DC', height: '100%' }} />
+                          <View style={styles.profileFinanceCol}>
                             <Text style={styles.profileFinanceLabel}>Remaining</Text>
-                            <Text style={[styles.profileFinanceVal, { color: '#581420' }]}>
-                              ₹{b.remainingAmount.toLocaleString('en-IN')}
+                            <Text style={[styles.profileFinanceVal, { color: b.remainingAmount === 0 ? '#15803D' : '#581420' }]}>
+                              {b.remainingAmount === 0 ? '✓ Paid' : `₹${b.remainingAmount.toLocaleString('en-IN')}`}
                             </Text>
                           </View>
                         </View>
@@ -1263,9 +1439,9 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=300&q=80', // Resort
                 },
                 {
-                  title: 'Kerala Wedding\nDestinations',
-                  vendors: '15 Vendors',
-                  image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=300&q=80', // Kerala Backwaters
+                  title: 'Island Wedding\nDestinations',
+                  vendors: '18 Vendors',
+                  image: 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?auto=format&fit=crop&w=300&q=80', // Tropical Island / Coral lagoon
                 }
               ];
 
@@ -1277,12 +1453,20 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                       <button
                         key={index}
                         onClick={() => {
-                          setSelectedCollection({
-                            title: item.title.replace('\n', ' ') + ' / Banquet Halls in Chennai',
-                            description: "If you're looking for luxury venues in Chennai, then here are some of the most opulent wedding venues in Chennai that are a part of our Luxury Collection.",
+                          const isIsland = item.title.toLowerCase().includes('island');
+                          const col = {
+                            title: item.title.replace('\n', ' '),
+                            description: isIsland
+                              ? "Experience pure tropical romance with breathtaking private island resorts, lagoon pavilions, and ocean-facing wedding venues across the Andaman & Lakshadweep Islands."
+                              : "If you're looking for luxury venues in Chennai, then here are some of the most opulent wedding venues in Chennai that are a part of our Luxury Collection.",
                             image: item.image,
-                          });
+                          };
+                          setSelectedCollection(col);
+                          try {
+                            localStorage.setItem('tot_active_collection', JSON.stringify(col));
+                          } catch (e) {}
                           setShowVenueListing(true);
+                          setAppRoute({ screen: 'dashboard', tab: activeTab, subpage: 'collection' });
                         }}
                         style={{
                           background: 'none',
@@ -1486,7 +1670,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
           <View style={styles.bottomTabBar}>
             <TouchableOpacity
               style={styles.tabItem}
-              onPress={() => setActiveTab('home')}
+              onPress={() => handleTabChange('home')}
             >
               <Home
                 className={`w-5 h-5 ${activeTab === 'home' ? 'text-[#581420]' : 'text-stone-400'}`}
@@ -1508,7 +1692,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
                   setSelectedFeatureName('My Wedding');
                   setShowExploreModal(true);
                 } else {
-                  setActiveTab('my-wedding');
+                  handleTabChange('my-wedding');
                 }
               }}
             >
@@ -1528,7 +1712,7 @@ export const MainDashboardPage: React.FC<MainDashboardPageProps> = ({
             <TouchableOpacity
               style={styles.tabItem}
               onPress={() => {
-                setActiveTab('profile');
+                handleTabChange('profile');
               }}
             >
               <User
@@ -2292,26 +2476,27 @@ const styles = StyleSheet.create({
   },
   profileBookingCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 12,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
     borderColor: '#EFE7DC',
-    gap: 10,
-    boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+    gap: 12,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
   },
   profileBookingTop: {
     flexDirection: 'row',
-    gap: 10,
+    alignItems: 'center',
+    gap: 12,
   },
   profileBookingThumb: {
-    width: 52,
-    height: 52,
-    borderRadius: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 12,
     backgroundColor: '#F3ECE4',
   },
   profileBookingVendorName: {
     fontFamily: "'Cormorant Garamond', Georgia, serif",
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
     color: '#2A2425',
   },
@@ -2319,47 +2504,53 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7EFF1',
     borderWidth: 1,
     borderColor: '#EBDCE0',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 2.5,
+    borderRadius: 6,
   },
   profileCategoryText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 9.5,
+    fontSize: 10,
     fontWeight: '700',
     color: '#581420',
   },
   profileBookingPkg: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: '#524345',
-    marginTop: 1,
+    marginTop: 2,
   },
   profileBookingDate: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 10,
+    fontSize: 11,
     color: '#8C8283',
-    marginTop: 1,
+    marginTop: 2,
   },
   profileBookingFinanceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#FAF7F2',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#EFE7DC',
   },
+  profileFinanceCol: {
+    alignItems: 'center',
+    gap: 2,
+    flex: 1,
+  },
   profileFinanceLabel: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 9.5,
+    fontSize: 10,
     color: '#7A7273',
   },
   profileFinanceVal: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 11.5,
+    fontSize: 12.5,
     fontWeight: '700',
     color: '#2A2425',
   },
@@ -2369,12 +2560,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     backgroundColor: '#581420',
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingVertical: 10,
+    borderRadius: 10,
   },
   profileInvoiceBtnText: {
     fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-    fontSize: 11.5,
+    fontSize: 12,
     fontWeight: '700',
     color: '#FFFFFF',
   },

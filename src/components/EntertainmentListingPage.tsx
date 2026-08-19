@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,11 @@ import { EntertainmentDetailPage } from './EntertainmentDetailPage';
 import { EntertainmentItem as EntertainmentArtist, ENTERTAINMENT_DATA } from '../constants/EntertainmentData';
 import { motion, AnimatePresence } from 'motion/react';
 import { RequestQuoteModal } from './RequestQuoteModal';
+import {
+  getInitialRoute,
+  setAppRoute,
+  parseHashRoute,
+} from '../utils/routeManager';
 import {
   ChevronLeft,
   Search,
@@ -116,7 +121,40 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
 
   const [activeFilterModal, setActiveFilterModal] = useState<'city' | 'budget' | 'rating' | 'tier' | null>(null);
 
-  const [selectedArtist, setSelectedArtist] = useState<EntertainmentArtist | null>(null);
+  const initialRoute = getInitialRoute();
+  const [selectedArtist, setSelectedArtist] = useState<EntertainmentArtist | null>(() => {
+    if (initialRoute.subpage === 'entertainment' && initialRoute.detailId) {
+      return ENTERTAINMENT_DATA.find((e) => e.id === initialRoute.detailId) || null;
+    }
+    return null;
+  });
+
+  const openArtistDetail = (artist: EntertainmentArtist) => {
+    setSelectedArtist(artist);
+    setAppRoute({ screen: 'dashboard', subpage: 'entertainment', detailId: artist.id });
+  };
+
+  const closeArtistDetail = () => {
+    setSelectedArtist(null);
+    setAppRoute({ screen: 'dashboard', subpage: 'entertainment', detailId: null });
+  };
+
+  // Sync hash changes for entertainment detail view
+  useEffect(() => {
+    const handleHash = () => {
+      const route = parseHashRoute();
+      if (route && route.subpage === 'entertainment') {
+        if (route.detailId) {
+          const match = ENTERTAINMENT_DATA.find((e) => e.id === route.detailId);
+          if (match) setSelectedArtist(match);
+        } else {
+          setSelectedArtist(null);
+        }
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   // Send Quote Modal State
   const [quoteArtist, setQuoteArtist] = useState<EntertainmentArtist | null>(null);
@@ -224,19 +262,19 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
     return (
       <EntertainmentDetailPage
         artist={selectedArtist}
-        onBack={() => setSelectedArtist(null)}
+        onBack={closeArtistDetail}
         isBookmarked={Boolean(bookmarkedIds[selectedArtist.id])}
         onToggleBookmark={toggleBookmark}
         onNavigateToQuotesTab={onNavigateToQuotesTab}
         bookingSource={bookingSource}
         onNavigateToMyWeddingPayments={() => {
-          setSelectedArtist(null);
+          closeArtistDetail();
           window.dispatchEvent(
             new CustomEvent('tot_switch_to_my_wedding_payments', { detail: { vendorId: selectedArtist.id } })
           );
         }}
         onNavigateToProfileMyBookings={() => {
-          setSelectedArtist(null);
+          closeArtistDetail();
           if (onNavigateToProfileMyBookings) {
             onNavigateToProfileMyBookings();
           } else {
@@ -396,7 +434,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 className="w-full mb-3.5 cursor-pointer"
-                onClick={() => setSelectedArtist(artist)}
+                onClick={() => openArtistDetail(artist)}
               >
                 <View style={styles.artistCard}>
                   {/* Left Photo */}
@@ -467,7 +505,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
                       <Text style={styles.priceText}>{artist.startingPrice}</Text>
                       <TouchableOpacity
                         style={styles.viewDetailsBtn}
-                        onPress={() => setSelectedArtist(artist)}
+                        onPress={() => openArtistDetail(artist)}
                         activeOpacity={0.8}
                       >
                         <Text style={styles.viewDetailsBtnText}>View Details</Text>
@@ -733,7 +771,7 @@ export const EntertainmentListingPage: React.FC<EntertainmentListingPageProps> =
         onClose={() => setShowCompareModal(false)}
         onSelectVendor={(v) => {
           const match = ENTERTAINMENT_DATA.find((item) => item.id === v.id);
-          if (match) setSelectedArtist(match);
+          if (match) openArtistDetail(match);
         }}
       />
     </View>

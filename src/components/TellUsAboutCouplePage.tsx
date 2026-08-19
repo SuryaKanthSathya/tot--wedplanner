@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import exactWeddingCoupleImg from '../assets/images/exact_wedding_couple_1786457746200.jpg';
 import christianCoupleImg from '../assets/images/christian_couple_arch_1786467622108.jpg';
 import muslimCoupleImg from '../assets/images/muslim_couple_arch_1786467635401.jpg';
@@ -299,24 +299,36 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
   onBack,
   onContinue,
 }) => {
-  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(1);
-  const [marriageType, setMarriageType] = useState<string>('');
-  const [brideName, setBrideName] = useState<string>('');
-  const [groomName, setGroomName] = useState<string>('');
-  const [weddingDate, setWeddingDate] = useState<string>('');
-  const [weddingDateRaw, setWeddingDateRaw] = useState<string>('');
+  const getDraft = () => {
+    try {
+      const saved = localStorage.getItem('tot_couple_onboarding_draft');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  };
 
-  // Location Step States (initially unselected as requested)
-  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const draft = getDraft();
+
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(
+    draft?.currentStep || 1
+  );
+  const [marriageType, setMarriageType] = useState<string>(draft?.marriageType || '');
+  const [brideName, setBrideName] = useState<string>(draft?.brideName || '');
+  const [groomName, setGroomName] = useState<string>(draft?.groomName || '');
+  const [weddingDate, setWeddingDate] = useState<string>(draft?.weddingDate || '');
+  const [weddingDateRaw, setWeddingDateRaw] = useState<string>(draft?.weddingDateRaw || '');
+
+  // Location Step States
+  const [selectedLocation, setSelectedLocation] = useState<string>(draft?.selectedLocation || '');
   const [locationSearchQuery, setLocationSearchQuery] = useState<string>('');
   const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState<boolean>(false);
 
-  // Guests Step States (initially unselected as requested)
-  const [selectedGuestRange, setSelectedGuestRange] = useState<string>('');
-  const [customGuestCount, setCustomGuestCount] = useState<string>('1200');
+  // Guests Step States
+  const [selectedGuestRange, setSelectedGuestRange] = useState<string>(draft?.selectedGuestRange || '');
+  const [customGuestCount, setCustomGuestCount] = useState<string>(draft?.customGuestCount || '1200');
 
-  // Style Step State (initially unselected as requested)
-  const [selectedStyle, setSelectedStyle] = useState<string>('');
+  // Style Step State
+  const [selectedStyle, setSelectedStyle] = useState<string>(draft?.selectedStyle || '');
 
   // Budget Step States & Range Definitions
   const BUDGET_STEPS = [
@@ -337,9 +349,44 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
     { amount: 100000000, label: '10 Crores+' },
   ];
 
-  const [budgetIndex, setBudgetIndex] = useState<number>(2); // Default index 2 = 15 Lakhs
-  const [customBudgetAmount, setCustomBudgetAmount] = useState<string>('');
+  const [budgetIndex, setBudgetIndex] = useState<number>(draft?.budgetIndex ?? 2);
+  const [customBudgetAmount, setCustomBudgetAmount] = useState<string>(draft?.customBudgetAmount || '');
   const [isEditingCustomBudget, setIsEditingCustomBudget] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        'tot_couple_onboarding_draft',
+        JSON.stringify({
+          currentStep,
+          marriageType,
+          brideName,
+          groomName,
+          weddingDate,
+          weddingDateRaw,
+          selectedLocation,
+          selectedGuestRange,
+          customGuestCount,
+          selectedStyle,
+          budgetIndex,
+          customBudgetAmount,
+        })
+      );
+    } catch (e) {}
+  }, [
+    currentStep,
+    marriageType,
+    brideName,
+    groomName,
+    weddingDate,
+    weddingDateRaw,
+    selectedLocation,
+    selectedGuestRange,
+    customGuestCount,
+    selectedStyle,
+    budgetIndex,
+    customBudgetAmount,
+  ]);
 
   const currentBudgetNum = customBudgetAmount
     ? parseInt(customBudgetAmount) || 1500000
@@ -480,6 +527,9 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
           ? `${customGuestCount || '1000'} Guests`
           : selectedGuestRange;
       const finalBudgetStr = `${formatIndianCurrency(currentBudgetNum)} ${formatBudgetSubtitle(currentBudgetNum)}`;
+      try {
+        localStorage.removeItem('tot_couple_onboarding_draft');
+      } catch (e) {}
       onContinue({
         marriageType,
         brideName,
@@ -860,6 +910,20 @@ export const TellUsAboutCouplePage: React.FC<TellUsAboutCouplePageProps> = ({
                     type="date"
                     value={weddingDateRaw}
                     onChange={handleDateChange}
+                    onClick={(e) => {
+                      try {
+                        if (typeof (e.currentTarget as any).showPicker === 'function') {
+                          (e.currentTarget as any).showPicker();
+                        }
+                      } catch (err) {}
+                    }}
+                    onFocus={(e) => {
+                      try {
+                        if (typeof (e.currentTarget as any).showPicker === 'function') {
+                          (e.currentTarget as any).showPicker();
+                        }
+                      } catch (err) {}
+                    }}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
                   />
                 </div>
